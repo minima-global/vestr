@@ -1,0 +1,9 @@
+
+.App  {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.App > div {
+  min-width: 480px;
+}
