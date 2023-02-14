@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-import { Formik, useFormik } from "formik";
+import { useFormik } from "formik";
 import { Button, Stack, TextField } from "@mui/material";
 import { MinimaToken } from "../../@types";
 import MiSelect from "../MiCustom/MiSelect/MiSelect";
@@ -11,10 +11,23 @@ import * as RPC from "../../minima/libs/RPC";
 
 import { DateTimePicker } from "@mui/x-date-pickers";
 import Select from "../MiCustom/Select";
+import { events } from "../../minima/libs/events";
 
 const VestCreate = () => {
   // create wallet state
   const [wallet, setWallet] = useState<false | MinimaToken[]>(false);
+
+  events.onNewBalance(() => {
+    RPC.getMinimaBalance()
+      .then((balance) => {
+        setWallet(balance);
+      })
+      .catch((err) => {
+        const errorMessage = err && err.message ? err.message : err;
+        console.log(err);
+        formik.setStatus(errorMessage);
+      });
+  });
 
   useEffect(() => {
     // get balance and set state
