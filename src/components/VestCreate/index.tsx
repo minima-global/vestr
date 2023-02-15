@@ -4,18 +4,19 @@ import { useFormik } from "formik";
 import { Button, Stack, TextField } from "@mui/material";
 import { MinimaToken } from "../../@types";
 import MiSelect from "../MiCustom/MiSelect/MiSelect";
+import Select from "../MiCustom/Select";
+import { DateTimePicker } from "@mui/x-date-pickers";
 
+import format from "date-fns/format";
+import { events } from "../../minima/libs/events";
+import * as RPC from "../../minima/libs/RPC";
 import styles from "./VestCreate.module.css";
 
-import * as RPC from "../../minima/libs/RPC";
-
-import { DateTimePicker } from "@mui/x-date-pickers";
-import Select from "../MiCustom/Select";
-import { events } from "../../minima/libs/events";
+import { isDate } from "date-fns";
 
 const VestCreate = () => {
   // create wallet state
-  const [wallet, setWallet] = useState<false | MinimaToken[]>(false);
+  const [wallet, setWallet] = useState<MinimaToken[]>([]);
 
   events.onNewBalance(() => {
     RPC.getMinimaBalance()
@@ -46,22 +47,48 @@ const VestCreate = () => {
   const formik = useFormik({
     // create initial values of form
     initialValues: {
-      token: wallet ? wallet[0] : false,
+      token: wallet[0],
       address: "",
       amount: 0,
       endContract: undefined,
-      cliff: undefined,
+      cliff: 0,
       root: "",
     },
-    onSubmit: (data: any) => {
+    onSubmit: async (formInput) => {
       console.log("Creating vestr contract..");
+      try {
+        if (!isDate(formInput.endContract)) throw new Error("Not a date..");
+
+        if (
+          formInput &&
+          formInput.endContract &&
+          isDate(formInput.endContract)
+        ) {
+          console.log(
+            "endContract formatted",
+            format(formInput.endContract, "MM/dd/yyyy")
+          );
+          await RPC.createVestingContract(
+            formInput.amount,
+            formInput.cliff,
+            formInput.address,
+            formInput.token,
+            formInput.root,
+            formInput.endContract
+          );
+        }
+      } catch (error: any) {
+        const formError =
+          error && error.message ? error.message : "Invalid form inputs";
+        formik.setStatus(formError);
+      }
     },
     enableReinitialize: !!wallet,
   });
   return (
     <Stack textAlign="center">
       <h6 className={styles["form-header"]}>Lock Minima</h6>
-      <form>
+      <form onSubmit={formik.handleSubmit}>
         <Stack spacing={5}>
           <Stack spacing={1} alignItems="center">
             {formik.status ? <div>{formik.status}</div> : null}
@@ -141,6 +168,7 @@ const VestCreate = () => {
             />
           </Stack>
           <Button
+            type="submit"
             disableElevation
             fullWidth
             color="inherit"
