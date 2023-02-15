@@ -9,8 +9,8 @@ export const calculateBlockHeightFromDate = async (
     const now = new Date().getTime();
     const then = dateTimeChosenByUser.getTime();
     const currentBlockHeight = await getCurrentBlockHeight();
-    const duration = new Decimal(now).minus(new Decimal(then));
-
+    const duration = new Decimal(then).minus(new Decimal(now));
+    console.log("Duration calculated by minusing future from now", duration);
     if (duration.lessThanOrEqualTo(0)) {
       throw new Error(
         "You have to send cash to the future, not the present or the past."

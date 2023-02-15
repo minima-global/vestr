@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react";
 
 import { useFormik } from "formik";
-import { Button, Stack, TextField } from "@mui/material";
+import { Button, CircularProgress, Stack, TextField } from "@mui/material";
 import { MinimaToken } from "../../@types";
 import MiSelect from "../MiCustom/MiSelect/MiSelect";
 import Select from "../MiCustom/Select";
 import { DateTimePicker } from "@mui/x-date-pickers";
 
-import format from "date-fns/format";
 import { events } from "../../minima/libs/events";
 import * as RPC from "../../minima/libs/RPC";
 import styles from "./VestCreate.module.css";
@@ -55,7 +54,8 @@ const VestCreate = () => {
       root: "",
     },
     onSubmit: async (formInput) => {
-      console.log("Creating vestr contract..");
+      formik.setStatus(undefined);
+
       try {
         if (!isDate(formInput.endContract)) throw new Error("Not a date..");
 
@@ -64,10 +64,6 @@ const VestCreate = () => {
           formInput.endContract &&
           isDate(formInput.endContract)
         ) {
-          console.log(
-            "endContract formatted",
-            format(formInput.endContract, "MM/dd/yyyy")
-          );
           await RPC.createVestingContract(
             formInput.amount,
             formInput.cliff,
@@ -79,7 +75,11 @@ const VestCreate = () => {
         }
       } catch (error: any) {
         const formError =
-          error && error.message ? error.message : "Invalid form inputs";
+          error && error.message
+            ? error.message
+            : error
+            ? error
+            : "Invalid Form Inputs";
         formik.setStatus(formError);
       }
     },
@@ -91,7 +91,9 @@ const VestCreate = () => {
       <form onSubmit={formik.handleSubmit}>
         <Stack spacing={5}>
           <Stack spacing={1} alignItems="center">
-            {formik.status ? <div>{formik.status}</div> : null}
+            {formik.status ? (
+              <div className={styles["form-error"]}>{formik.status}</div>
+            ) : null}
             {formik.values.token ? (
               <MiSelect
                 id="token"
@@ -107,6 +109,7 @@ const VestCreate = () => {
                 tokens={wallet}
                 setFieldValue={formik.setFieldValue}
                 resetForm={formik.resetForm}
+                disabled={formik.isSubmitting}
               />
             ) : null}
             <TextField
@@ -117,6 +120,18 @@ const VestCreate = () => {
               value={formik.values.address}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
+              disabled={formik.isSubmitting}
+            />
+            <TextField
+              type="number"
+              fullWidth
+              id="amount"
+              name="amount"
+              placeholder="amount"
+              value={formik.values.amount}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              disabled={formik.isSubmitting}
             />
             <TextField
               fullWidth
@@ -126,6 +141,7 @@ const VestCreate = () => {
               value={formik.values.root}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
+              disabled={formik.isSubmitting}
             />
             <Select
               id="cliff"
@@ -133,6 +149,7 @@ const VestCreate = () => {
               value={formik.values.cliff}
               onBlur={formik.handleBlur}
               onChange={formik.handleChange}
+              disabled={formik.isSubmitting}
             >
               <option defaultValue={0} disabled value={0}>
                 Set a cliff period
@@ -152,6 +169,7 @@ const VestCreate = () => {
               renderInput={(params: any) => {
                 return (
                   <TextField
+                    disabled={formik.isSubmitting}
                     fullWidth
                     InputProps={{
                       readOnly: true,
@@ -173,8 +191,10 @@ const VestCreate = () => {
             fullWidth
             color="inherit"
             variant="contained"
+            disabled={formik.isSubmitting}
           >
-            Lock
+            {!formik.isSubmitting && "Lock"}
+            {formik.isSubmitting && <CircularProgress size={16} />}
           </Button>
         </Stack>
       </form>

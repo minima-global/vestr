@@ -12,3 +12,7 @@ form {
   border: 1px solid  #585f63;
   padding: 30px;
 }
+.form-error {
+  color: #fff;
+  text-align: left;
+}

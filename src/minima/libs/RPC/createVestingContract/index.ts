@@ -30,16 +30,17 @@ export const createVestingContract = async (
     const startingBlockHeight = await RPC.getCurrentBlockHeight();
     // calculate cliff height
     const estimateCliffPeriodBlocksPerMonth = new Decimal(cliff)
-      .times(50)
-      .times(60)
-      .times(24)
-      .times(30);
+      .times(50) // seconds per block
+      .times(60) // minutes per hour
+      .times(24) // hours per day
+      .times(30); // average days per month
     return new Promise((resolve, reject) => {
       MDS.cmd(
-        `send amount:${amount} address:${vestingContract.scriptaddress} tokenid:${token.tokenid} script:{"0":"${address}","1":"${amount}","3":"${startingBlockHeight}", "4":"${endContractBlockHeight}","5":"${estimateCliffPeriodBlocksPerMonth}","6":"${root}"}`,
+        `send amount:${amount} address:${vestingContract.scriptaddress} tokenid:${token.tokenid} state:{"0":"${address}","1":"${amount}","3":"${startingBlockHeight}", "4":"${endContractBlockHeight}","5":"${estimateCliffPeriodBlocksPerMonth}","6":"${root}"}`,
         (res) => {
-          if (!res.status) reject("RPC Failed");
+          if (!res.status) reject(res.error ? res.error : "RPC Failed");
 
+          console.log(res);
           resolve(res.response);
         }
       );
