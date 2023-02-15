@@ -36,7 +36,13 @@ export const createVestingContract = async (
       .times(30); // average days per month
     return new Promise((resolve, reject) => {
       MDS.cmd(
-        `send amount:${amount} address:${vestingContract.scriptaddress} tokenid:${token.tokenid} state:{"0":"${address}","1":"${amount}","3":"${startingBlockHeight}", "4":"${endContractBlockHeight}","5":"${estimateCliffPeriodBlocksPerMonth}","6":"${root}"}`,
+        `send amount:${amount} address:${
+          vestingContract.scriptaddress
+        } tokenid:${
+          token.tokenid
+        } state:{"0":"${address}","1":"${amount}","3":"${startingBlockHeight}", "4":"${endContractBlockHeight}","5":"${estimateCliffPeriodBlocksPerMonth}","6":"${
+          root.length === 0 ? "0x21" : root
+        }"}`,
         (res) => {
           if (!res.status) reject(res.error ? res.error : "RPC Failed");
 
