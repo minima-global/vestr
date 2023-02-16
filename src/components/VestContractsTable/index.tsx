@@ -39,10 +39,14 @@ export default function DataTable() {
   const [viewCoin, setView] = React.useState<false | string>(false);
   const [canCollect, setCanCollect] = React.useState<false | number>(false);
 
-  const collectCoin = async (coin: any, cancollect: any) => {
+  const collectCoin = async (
+    coin: any,
+    cancollect: any,
+    root: boolean = false
+  ) => {
     setError(false);
     try {
-      await RPC.withdrawVestingContract(coin, cancollect);
+      await RPC.withdrawVestingContract(coin, cancollect, root);
     } catch (err: any) {
       console.error(err);
       const errorMessage =
@@ -63,6 +67,8 @@ export default function DataTable() {
           parseInt(c.state[1].data),
           parseInt(c.amount)
         );
+
+        console.log("User can collect..", canCollect);
         setCanCollect(canCollect);
       });
   }, [viewCoin]);
@@ -185,16 +191,29 @@ export default function DataTable() {
                       </li>
                     </ul>
                   </Stack>
-                  <Button
-                    type="button"
-                    disableElevation
-                    fullWidth
-                    color="inherit"
-                    variant="contained"
-                    onClick={() => collectCoin(c, canCollect)}
-                  >
-                    Withdraw
-                  </Button>
+                  <Stack spacing={0.5}>
+                    <Button
+                      type="button"
+                      disableElevation
+                      fullWidth
+                      color="inherit"
+                      variant="contained"
+                      onClick={() => collectCoin(c, canCollect)}
+                    >
+                      Withdraw
+                    </Button>
+
+                    <Button
+                      type="button"
+                      disableElevation
+                      fullWidth
+                      color="inherit"
+                      variant="contained"
+                      onClick={() => collectCoin(c, canCollect, true)}
+                    >
+                      Root
+                    </Button>
+                  </Stack>
                 </Stack>
               </>
             );
@@ -211,26 +230,47 @@ const calculateBlockWithdrawalAmount = async (
 ) => {
   try {
     const currentBlockHeight = await getCurrentBlockHeight();
+    const dTotalAmountLocked = new Decimal(totalAmountLocked);
+    const totalduration = new Decimal(finalBlock).minus(
+      new Decimal(startBlock)
+    );
 
-    let totalduration = new Decimal(finalBlock).minus(new Decimal(startBlock));
+    const contractAlreadyFinished = new Decimal(currentBlockHeight).greaterThan(
+      new Decimal(finalBlock)
+    );
+    // you can collect all amount since you contract finished
+    if (contractAlreadyFinished) {
+      console.log(
+        "Contract already ended.. can collect all amount/rest of amount in full"
+      );
+      const howMuchHaveIAlreadyCollected = dTotalAmountLocked.minus(
+        new Decimal(currentCoinAmount)
+      );
+
+      return howMuchHaveIAlreadyCollected.equals(0)
+        ? dTotalAmountLocked.toNumber()
+        : dTotalAmountLocked.minus(new Decimal(currentCoinAmount)).toNumber();
+    }
+
     let blockamount = new Decimal(0);
-
     if (totalduration.lessThanOrEqualTo(0)) {
-      blockamount = new Decimal(totalAmountLocked);
+      blockamount = new Decimal(currentCoinAmount);
     }
 
     if (totalduration.greaterThan(0)) {
-      blockamount = new Decimal(totalAmountLocked).dividedBy(
-        new Decimal(totalduration)
-      );
+      blockamount = dTotalAmountLocked.dividedBy(totalduration);
     }
 
-    let totalAmountTime = currentBlockHeight - startBlock;
-    let totalOwedAmount = new Decimal(totalAmountTime).times(blockamount);
-    let alreadyCollected = totalAmountLocked - currentCoinAmount;
-    let canCollect = new Decimal(totalOwedAmount).minus(alreadyCollected);
+    let totalAmountTime = new Decimal(currentBlockHeight).minus(
+      new Decimal(startBlock)
+    );
 
-    console.log("Amount can collect", canCollect.toNumber());
+    let totalOwedAmount = totalAmountTime.times(blockamount);
+    let alreadyCollected = dTotalAmountLocked.minus(
+      new Decimal(currentCoinAmount)
+    );
+
+    let canCollect = totalOwedAmount.minus(alreadyCollected);
 
     return canCollect.toNumber();
   } catch (error) {
