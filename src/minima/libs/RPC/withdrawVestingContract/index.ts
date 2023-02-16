@@ -33,9 +33,24 @@ export const withdrawVestingContract = (
         `;
 
     MDS.cmd(command, (res) => {
-      if (!res.status) reject("RPC Failed");
       console.log(res);
-      resolve(res.response);
+      const multiResponse = res.length > 1;
+      if (!multiResponse && !res.status) reject("RPC Failed");
+      if (multiResponse) {
+        res.map((r: any) => {
+          // iterate through each response.. if you find an error, reject
+          if (!r.status) {
+            const error = r.error
+              ? r.error
+              : r.message
+              ? r.message
+              : `${r.command} failed`;
+            reject(error);
+          }
+        });
+      }
+
+      resolve(true);
     });
   });
 };
