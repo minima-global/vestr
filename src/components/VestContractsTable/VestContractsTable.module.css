@@ -1,0 +1,10 @@
+.table-wrapper {
+  height: 400px;
+  width: 100%;
+  background-color: #282b2e;
+  border: 1px solid  #585f63;
+  padding: 30px;
+}
+.table-wrapper * {
+  font-family: Manrope-regular;
+}

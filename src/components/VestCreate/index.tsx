@@ -15,6 +15,8 @@ import { isDate } from "date-fns";
 import { TabButton, Tabs } from "../MiCustom/MiTabs";
 import useTabs from "../../hooks/useTabs";
 
+import DataTable from "../VestContractsTable";
+
 const VestCreate = () => {
   // create wallet state
   const [wallet, setWallet] = useState<MinimaToken[]>([]);
@@ -219,7 +221,7 @@ const VestCreate = () => {
         </form>
       )}
 
-      {tabs === 1 && <div>Track your coins</div>}
+      {tabs === 1 && <DataTable />}
     </Stack>
   );
 };
