@@ -1,5 +1,5 @@
 .table-wrapper {
-  height: 400px;
+  min-height: 400px;
   width: 100%;
   background-color: #282b2e;
   border: 1px solid  #585f63;
@@ -7,4 +7,48 @@
 }
 .table-wrapper * {
   font-family: Manrope-regular;
+}
+.view div button {
+  background-color: inherit;
+  color: #fff;
+  border: 1px solid #585f63;
+  padding: 8px;
+}
+.view div h6 {
+  margin:0;
+  padding:0;
+  font-family: Manrope-semibold;
+  color: #fff;
+  font-size: 1.1rem;
+  max-width: 220px;
+  text-align: left;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+
+ul {
+  padding:0;
+  margin:0;
+  list-style: none;
+}
+
+ul li {
+  text-align:left;
+}
+
+ul * {
+  padding:0;
+  margin: 0;
+  color: #fff;
+}
+
+.view button {
+  border: none;
+  height: 48px;
+  font-family: Manrope-bold;
+  font-size: 1.1rem;
+}
+.view button:hover {
+  cursor:pointer;
 }

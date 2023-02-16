@@ -10,6 +10,8 @@ import { events } from "../../minima/libs/events";
 import { vestingContract } from "../../minima/libs/contracts";
 import * as RPC from "../../minima/libs/RPC";
 import styles from "./VestContractsTable.module.css";
+import { Box, Button, Stack } from "@mui/material";
+import { getCurrentBlockHeight } from "../../minima/libs/RPC";
 
 function createData(
   name: string,
@@ -31,12 +33,38 @@ const rows = [
 
 export default function DataTable() {
   const [relevantCoins, setRelevantCoins] = React.useState<any[]>([]);
+
   const [error, setError] = React.useState<false | string>(false);
   const [viewCoin, setView] = React.useState<false | string>(false);
+  const [canCollect, setCanCollect] = React.useState<false | number>(false);
+
+  const collectCoin = async (coin: any, cancollect: any) => {
+    try {
+      await RPC.withdrawVestingContract(coin, cancollect);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   events.onNewBlock(() => {});
 
   React.useEffect(() => {
+    relevantCoins
+      .filter((c) => c.coinid === viewCoin)
+      .map(async (c) => {
+        let canCollect = await calculateBlockWithdrawalAmount(
+          parseInt(c.state[3].data),
+          parseInt(c.state[2].data),
+          parseInt(c.state[1].data),
+          parseInt(c.amount)
+        );
+        setCanCollect(canCollect);
+      });
+  }, [viewCoin]);
+
+  React.useEffect(() => {
+    // setView(false);
+
     RPC.getCoinsByAddress(vestingContract.scriptaddress)
       .then((result: any) => {
         console.log(result);
@@ -95,9 +123,105 @@ export default function DataTable() {
       {viewCoin &&
         relevantCoins
           .filter((c) => c.coinid === viewCoin)
-          .map((c) => {
-            return <div>Viewing coin with coinid {c.coinid}</div>;
+          .map((c, i) => {
+            return (
+              <>
+                <Stack className={styles["view"]} spacing={4}>
+                  <Stack
+                    flexDirection="row"
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
+                    <h6>Contract {c.coinid}</h6>
+                    <button
+                      className={styles["back-btn"]}
+                      onClick={() => setView(false)}
+                    >
+                      Go back
+                    </button>
+                  </Stack>
+
+                  <Stack>
+                    <ul>
+                      <li>
+                        <h6>Total Amount Locked</h6>
+                        <p>{c.amount}</p>
+                      </li>
+                      <li>
+                        <h6>Contract Starts</h6>
+                        <p>{c.state[2].data}</p>
+                      </li>
+                      <li>
+                        <h6>Contract Ends</h6>
+                        <p>{c.state[3].data}</p>
+                      </li>
+                      <li>
+                        <h6>Cliff Period</h6>
+                        <p>{c.state[4].data}</p>
+                      </li>
+                      <li>
+                        <h6>Root Key</h6>
+                        <p>{c.state[5].data}</p>
+                      </li>
+                      <li>
+                        <h6>Withdrawal Address</h6>
+                        <p>{c.state[0].data}</p>
+                      </li>
+                      <li>
+                        <h6>Can Withdraw now</h6>
+                        <p>
+                          {canCollect ? canCollect + " / " + c.amount : "N/a"}
+                        </p>
+                      </li>
+                    </ul>
+                  </Stack>
+                  <Button
+                    type="button"
+                    disableElevation
+                    fullWidth
+                    color="inherit"
+                    variant="contained"
+                    onClick={() => collectCoin(c, canCollect)}
+                  >
+                    Withdraw
+                  </Button>
+                </Stack>
+              </>
+            );
           })}
     </div>
   );
 }
+
+const calculateBlockWithdrawalAmount = async (
+  finalBlock: number,
+  startBlock: number,
+  totalAmountLocked: number,
+  currentCoinAmount: number
+) => {
+  try {
+    const currentBlockHeight = await getCurrentBlockHeight();
+
+    let totalduration = finalBlock - startBlock;
+    let blockamount = 0;
+
+    if (totalduration <= 0) {
+      blockamount = totalAmountLocked;
+    }
+
+    if (totalduration > 0) {
+      blockamount = totalAmountLocked / totalduration;
+    }
+
+    let totalAmountTime = currentBlockHeight - startBlock;
+    let totalOwedAmount = totalAmountTime * blockamount;
+    let alreadyCollected = totalAmountLocked - currentCoinAmount;
+    let canCollect = totalOwedAmount - alreadyCollected;
+
+    console.log("Amount can collect", canCollect);
+
+    return canCollect;
+  } catch (error) {
+    throw error;
+  }
+};
