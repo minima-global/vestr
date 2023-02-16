@@ -10,8 +10,9 @@ import { events } from "../../minima/libs/events";
 import { vestingContract } from "../../minima/libs/contracts";
 import * as RPC from "../../minima/libs/RPC";
 import styles from "./VestContractsTable.module.css";
-import { Box, Button, Stack } from "@mui/material";
+import { Button, Stack } from "@mui/material";
 import { getCurrentBlockHeight } from "../../minima/libs/RPC";
+import Decimal from "decimal.js";
 
 function createData(
   name: string,
@@ -39,10 +40,14 @@ export default function DataTable() {
   const [canCollect, setCanCollect] = React.useState<false | number>(false);
 
   const collectCoin = async (coin: any, cancollect: any) => {
+    setError(false);
     try {
       await RPC.withdrawVestingContract(coin, cancollect);
-    } catch (error) {
-      console.error(error);
+    } catch (err: any) {
+      console.error(err);
+      const errorMessage =
+        err && err.message ? err.message : err ? err : "Failed to withdraw";
+      setError(errorMessage);
     }
   };
 
@@ -63,7 +68,7 @@ export default function DataTable() {
   }, [viewCoin]);
 
   React.useEffect(() => {
-    // setView(false);
+    setView(false);
 
     RPC.getCoinsByAddress(vestingContract.scriptaddress)
       .then((result: any) => {
@@ -80,44 +85,48 @@ export default function DataTable() {
   return (
     <div className={styles["table-wrapper"]}>
       {!viewCoin && (
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 650 }} aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Contract</TableCell>
-                <TableCell align="right">Amount</TableCell>
-                <TableCell align="right">Token ID</TableCell>
-                <TableCell align="right">Contract Start</TableCell>
-                <TableCell align="right">Contract Ends</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {relevantCoins.map((row, i) => (
-                <TableRow
-                  key={i}
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                >
-                  <TableCell component="th" scope="row">
-                    {i}
-                  </TableCell>
-                  <TableCell align="right">{row.amount}</TableCell>
-                  <TableCell align="right">{row.tokenid}</TableCell>
-                  <TableCell align="right">{row.state[2].data}</TableCell>
-                  <TableCell align="right">{row.state[3].data}</TableCell>
-                  <TableCell align="right">
-                    <button
-                      onClick={() => {
-                        setView(row.coinid);
-                      }}
-                    >
-                      View
-                    </button>
-                  </TableCell>
+        <>
+          {error && <div>{error}</div>}
+
+          <TableContainer component={Paper}>
+            <Table sx={{ minWidth: 650 }} aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Contract</TableCell>
+                  <TableCell align="right">Amount</TableCell>
+                  <TableCell align="right">Token ID</TableCell>
+                  <TableCell align="right">Contract Start</TableCell>
+                  <TableCell align="right">Contract Ends</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {relevantCoins.map((row, i) => (
+                  <TableRow
+                    key={i}
+                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  >
+                    <TableCell component="th" scope="row">
+                      {i}
+                    </TableCell>
+                    <TableCell align="right">{row.amount}</TableCell>
+                    <TableCell align="right">{row.tokenid}</TableCell>
+                    <TableCell align="right">{row.state[2].data}</TableCell>
+                    <TableCell align="right">{row.state[3].data}</TableCell>
+                    <TableCell align="right">
+                      <button
+                        onClick={() => {
+                          setView(row.coinid);
+                        }}
+                      >
+                        View
+                      </button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </>
       )}
 
       {viewCoin &&
@@ -127,6 +136,7 @@ export default function DataTable() {
             return (
               <>
                 <Stack className={styles["view"]} spacing={4}>
+                  {error && <div>{error}</div>}
                   <Stack
                     flexDirection="row"
                     justifyContent="space-between"
@@ -202,25 +212,27 @@ const calculateBlockWithdrawalAmount = async (
   try {
     const currentBlockHeight = await getCurrentBlockHeight();
 
-    let totalduration = finalBlock - startBlock;
-    let blockamount = 0;
+    let totalduration = new Decimal(finalBlock).minus(new Decimal(startBlock));
+    let blockamount = new Decimal(0);
 
-    if (totalduration <= 0) {
-      blockamount = totalAmountLocked;
+    if (totalduration.lessThanOrEqualTo(0)) {
+      blockamount = new Decimal(totalAmountLocked);
     }
 
-    if (totalduration > 0) {
-      blockamount = totalAmountLocked / totalduration;
+    if (totalduration.greaterThan(0)) {
+      blockamount = new Decimal(totalAmountLocked).dividedBy(
+        new Decimal(totalduration)
+      );
     }
 
     let totalAmountTime = currentBlockHeight - startBlock;
-    let totalOwedAmount = totalAmountTime * blockamount;
+    let totalOwedAmount = new Decimal(totalAmountTime).times(blockamount);
     let alreadyCollected = totalAmountLocked - currentCoinAmount;
-    let canCollect = totalOwedAmount - alreadyCollected;
+    let canCollect = new Decimal(totalOwedAmount).minus(alreadyCollected);
 
-    console.log("Amount can collect", canCollect);
+    console.log("Amount can collect", canCollect.toNumber());
 
-    return canCollect;
+    return canCollect.toNumber();
   } catch (error) {
     throw error;
   }
