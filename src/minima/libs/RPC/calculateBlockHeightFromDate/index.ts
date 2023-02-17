@@ -9,7 +9,7 @@ export const calculateBlockHeightFromDate = async (
     const now = new Decimal(new Date().getTime()).dividedBy(1000);
     console.log(`time now in seconds`, now.toNumber());
     const then = new Decimal(dateTimeChosenByUser.getTime()).dividedBy(1000);
-    console.log(`time then in seconds`, then);
+    console.log(`time then in seconds`, then.toNumber());
     const currentBlockHeight = await getCurrentBlockHeight();
     const duration = then.minus(now);
     console.log(

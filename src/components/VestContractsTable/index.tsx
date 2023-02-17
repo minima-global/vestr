@@ -6,13 +6,14 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import { events } from "../../minima/libs/events";
 import { vestingContract } from "../../minima/libs/contracts";
 import * as RPC from "../../minima/libs/RPC";
 import styles from "./VestContractsTable.module.css";
-import { Button, Stack } from "@mui/material";
-import { getCurrentBlockHeight } from "../../minima/libs/RPC";
+import { Button, Modal, Stack } from "@mui/material";
+
 import Decimal from "decimal.js";
+import MiRootModal from "../MiCustom/MiRootModal/MiRootModal";
+import { Coin } from "../../@types";
 
 function createData(
   name: string,
@@ -36,8 +37,10 @@ export default function DataTable() {
   const [relevantCoins, setRelevantCoins] = React.useState<any[]>([]);
 
   const [error, setError] = React.useState<false | string>(false);
-  const [viewCoin, setView] = React.useState<false | string>(false);
+  const [viewCoin, setView] = React.useState<false | Coin>(false);
   const [canCollect, setCanCollect] = React.useState<false | number>(false);
+  const [viewRootModal, setViewRootModal] = React.useState(false);
+  const closeRootModal = () => setViewRootModal(false);
 
   const collectCoin = async (
     coin: any,
@@ -55,22 +58,17 @@ export default function DataTable() {
     }
   };
 
-  events.onNewBlock(() => {});
-
   React.useEffect(() => {
-    relevantCoins
-      .filter((c) => c.coinid === viewCoin)
-      .map(async (c) => {
-        let canCollect = await calculateBlockWithdrawalAmount(
-          parseInt(c.state[3].data),
-          parseInt(c.state[2].data),
-          parseInt(c.state[1].data),
-          parseInt(c.amount)
-        );
-
-        console.log("User can collect..", canCollect);
-        setCanCollect(canCollect);
+    if (viewCoin) {
+      calculateBlockWithdrawalAmount(
+        parseInt(viewCoin.state[3].data),
+        parseInt(viewCoin.state[2].data),
+        parseInt(viewCoin.state[1].data),
+        parseInt(viewCoin.amount)
+      ).then((_canCollect) => {
+        setCanCollect(_canCollect);
       });
+    }
   }, [viewCoin]);
 
   React.useEffect(() => {
@@ -90,6 +88,14 @@ export default function DataTable() {
 
   return (
     <div className={styles["table-wrapper"]}>
+      <Modal open={viewRootModal}>
+        <MiRootModal
+          viewCoin={viewCoin}
+          closeModal={closeRootModal}
+          setError={setError}
+        />
+      </Modal>
+
       {!viewCoin && (
         <>
           {error && <div>{error}</div>}
@@ -121,7 +127,7 @@ export default function DataTable() {
                     <TableCell align="right">
                       <button
                         onClick={() => {
-                          setView(row.coinid);
+                          setView(row);
                         }}
                       >
                         View
@@ -135,89 +141,84 @@ export default function DataTable() {
         </>
       )}
 
-      {viewCoin &&
-        relevantCoins
-          .filter((c) => c.coinid === viewCoin)
-          .map((c, i) => {
-            return (
-              <>
-                <Stack className={styles["view"]} spacing={4}>
-                  {error && <div>{error}</div>}
-                  <Stack
-                    flexDirection="row"
-                    justifyContent="space-between"
-                    alignItems="center"
-                  >
-                    <h6>Contract {c.coinid}</h6>
-                    <button
-                      className={styles["back-btn"]}
-                      onClick={() => setView(false)}
-                    >
-                      Go back
-                    </button>
-                  </Stack>
+      {viewCoin && (
+        <>
+          <Stack className={styles["view"]} spacing={4}>
+            {error && <div>{error}</div>}
+            <Stack
+              flexDirection="row"
+              justifyContent="space-between"
+              alignItems="center"
+            >
+              <h6>Contract {viewCoin.coinid}</h6>
+              <button
+                className={styles["back-btn"]}
+                onClick={() => setView(false)}
+              >
+                Go back
+              </button>
+            </Stack>
 
-                  <Stack>
-                    <ul>
-                      <li>
-                        <h6>Total Amount Locked</h6>
-                        <p>{c.amount}</p>
-                      </li>
-                      <li>
-                        <h6>Contract Starts</h6>
-                        <p>{c.state[2].data}</p>
-                      </li>
-                      <li>
-                        <h6>Contract Ends</h6>
-                        <p>{c.state[3].data}</p>
-                      </li>
-                      <li>
-                        <h6>Cliff Period</h6>
-                        <p>{c.state[4].data}</p>
-                      </li>
-                      <li>
-                        <h6>Root Key</h6>
-                        <p>{c.state[5].data}</p>
-                      </li>
-                      <li>
-                        <h6>Withdrawal Address</h6>
-                        <p>{c.state[0].data}</p>
-                      </li>
-                      <li>
-                        <h6>Can Withdraw now</h6>
-                        <p>
-                          {canCollect ? canCollect + " / " + c.amount : "N/a"}
-                        </p>
-                      </li>
-                    </ul>
-                  </Stack>
-                  <Stack spacing={0.5}>
-                    <Button
-                      type="button"
-                      disableElevation
-                      fullWidth
-                      color="inherit"
-                      variant="contained"
-                      onClick={() => collectCoin(c, canCollect)}
-                    >
-                      Withdraw
-                    </Button>
+            <Stack>
+              <ul>
+                <li>
+                  <h6>Total Amount Locked</h6>
+                  <p>{viewCoin.amount}</p>
+                </li>
+                <li>
+                  <h6>Contract Starts</h6>
+                  <p>{viewCoin.state[2].data}</p>
+                </li>
+                <li>
+                  <h6>Contract Ends</h6>
+                  <p>{viewCoin.state[3].data}</p>
+                </li>
+                <li>
+                  <h6>Cliff Period</h6>
+                  <p>{viewCoin.state[4].data}</p>
+                </li>
+                <li>
+                  <h6>Root Key</h6>
+                  <p>{viewCoin.state[5].data}</p>
+                </li>
+                <li>
+                  <h6>Withdrawal Address</h6>
+                  <p>{viewCoin.state[0].data}</p>
+                </li>
+                <li>
+                  <h6>Can Withdraw now</h6>
+                  <p>
+                    {canCollect ? canCollect + " / " + viewCoin.amount : "N/a"}
+                  </p>
+                </li>
+              </ul>
+            </Stack>
+            <Stack spacing={0.5}>
+              <Button
+                type="button"
+                disableElevation
+                fullWidth
+                color="inherit"
+                variant="contained"
+                onClick={() => collectCoin(viewCoin, canCollect)}
+              >
+                Withdraw
+              </Button>
 
-                    <Button
-                      type="button"
-                      disableElevation
-                      fullWidth
-                      color="inherit"
-                      variant="contained"
-                      onClick={() => collectCoin(c, canCollect, true)}
-                    >
-                      Root
-                    </Button>
-                  </Stack>
-                </Stack>
-              </>
-            );
-          })}
+              <Button
+                type="button"
+                disableElevation
+                fullWidth
+                color="inherit"
+                variant="contained"
+                onClick={() => setViewRootModal(true)}
+              >
+                Root
+              </Button>
+            </Stack>
+          </Stack>
+        </>
+      )}
     </div>
   );
 }
@@ -229,7 +230,7 @@ const calculateBlockWithdrawalAmount = async (
   currentCoinAmount: number
 ) => {
   try {
-    const currentBlockHeight = await getCurrentBlockHeight();
+    const currentBlockHeight = await RPC.getCurrentBlockHeight();
     const dTotalAmountLocked = new Decimal(totalAmountLocked);
     const totalduration = new Decimal(finalBlock).minus(
       new Decimal(startBlock)

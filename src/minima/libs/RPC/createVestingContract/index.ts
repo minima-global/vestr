@@ -36,11 +36,6 @@ export const createVestingContract = async (
     const difference = new Decimal(then.getTime()).dividedBy(1000).minus(now);
     const estimateCliffPeriod = difference.dividedBy(50).round().toNumber();
 
-    // calculate cliff height
-    // const estimateCliffPeriodBlocksPerMonth = new Decimal(cliff) // how many months
-    //   .times(86400) // seconds a day
-    //   .times(30) // average days per month
-    //   .dividedBy(50); // seconds per block
     return new Promise((resolve, reject) => {
       MDS.cmd(
         `send amount:${amount} address:${

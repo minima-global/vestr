@@ -58,7 +58,7 @@ const VestCreate = () => {
     initialValues: {
       token: wallet[0],
       address: "",
-      amount: 0,
+      amount: "",
       endContract: undefined,
       cliff: 0,
       root: "",
@@ -75,7 +75,7 @@ const VestCreate = () => {
           isDate(formInput.endContract)
         ) {
           await RPC.createVestingContract(
-            formInput.amount,
+            Number(formInput.amount),
             formInput.cliff,
             formInput.address,
             formInput.token,
