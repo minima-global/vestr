@@ -1,3 +1,4 @@
+import { addMonths } from "date-fns";
 import { MinimaToken } from "../../../../@types";
 import { vestingContract } from "../../contracts";
 import Decimal from "decimal.js";
@@ -28,19 +29,25 @@ export const createVestingContract = async (
     );
     // get currentBlockHeight
     const startingBlockHeight = await RPC.getCurrentBlockHeight();
+
+    // calculate more accurately the cliff amount
+    const then = addMonths(new Date(), cliff);
+    const now = new Decimal(new Date().getTime()).dividedBy(1000); // time now in seconds
+    const difference = new Decimal(then.getTime()).dividedBy(1000).minus(now);
+    const estimateCliffPeriod = difference.dividedBy(50).round().toNumber();
+
     // calculate cliff height
-    const estimateCliffPeriodBlocksPerMonth = new Decimal(cliff)
-      .times(50) // seconds per block
-      .times(60) // minutes per hour
-      .times(24) // hours per day
-      .times(30); // average days per month
+    // const estimateCliffPeriodBlocksPerMonth = new Decimal(cliff) // how many months
+    //   .times(86400) // seconds a day
+    //   .times(30) // average days per month
+    //   .dividedBy(50); // seconds per block
     return new Promise((resolve, reject) => {
       MDS.cmd(
         `send amount:${amount} address:${
           vestingContract.scriptaddress
         } tokenid:${
           token.tokenid
-        } state:{"0":"${address}","1":"${amount}","3":"${startingBlockHeight}", "4":"${endContractBlockHeight}","5":"${estimateCliffPeriodBlocksPerMonth}","6":"${
+        } state:{"0":"${address}","1":"${amount}","3":"${startingBlockHeight}", "4":"${endContractBlockHeight}","5":"${estimateCliffPeriod}","6":"${
           root.length === 0 ? "0x21" : root
         }"}`,
         (res) => {

@@ -6,20 +6,28 @@ export const calculateBlockHeightFromDate = async (
 ): Promise<number> => {
   try {
     // get current time
-    const now = new Date().getTime();
-    const then = dateTimeChosenByUser.getTime();
+    const now = new Decimal(new Date().getTime()).dividedBy(1000);
+    console.log(`time now in seconds`, now.toNumber());
+    const then = new Decimal(dateTimeChosenByUser.getTime()).dividedBy(1000);
+    console.log(`time then in seconds`, then);
     const currentBlockHeight = await getCurrentBlockHeight();
-    const duration = new Decimal(then).minus(new Decimal(now));
-    console.log("Duration calculated by minusing future from now", duration);
+    const duration = then.minus(now);
+    console.log(
+      "Duration calculated by minusing future from now",
+      duration.toNumber()
+    );
     if (duration.lessThanOrEqualTo(0)) {
       throw new Error(
         "You have to send cash to the future, not the present or the past."
       );
     }
 
-    const calculatedBlocktime = new Decimal(duration).dividedBy(50 * 1000);
+    const calculatedBlockHeight = duration.dividedBy(50);
 
-    return calculatedBlocktime.add(currentBlockHeight).round().toNumber();
+    return new Decimal(currentBlockHeight)
+      .add(calculatedBlockHeight)
+      .round()
+      .toNumber();
   } catch (err: any) {
     const errorMessage = err && err.message ? err.message : err;
     throw new Error(errorMessage);
