@@ -14,6 +14,8 @@ import { Button, Modal, Stack } from "@mui/material";
 import Decimal from "decimal.js";
 import MiRootModal from "../MiCustom/MiRootModal/MiRootModal";
 import { Coin } from "../../@types";
+import MiSuccessModal from "../MiCustom/MiSuccessModal/MiSuccessModal";
+import MiError from "../MiCustom/MiError/MiError";
 
 function createData(
   name: string,
@@ -39,8 +41,10 @@ export default function DataTable() {
   const [error, setError] = React.useState<false | string>(false);
   const [viewCoin, setView] = React.useState<false | Coin>(false);
   const [canCollect, setCanCollect] = React.useState<false | number>(false);
+  const [showSuccessModal, setShowSuccessModal] = React.useState(false);
   const [viewRootModal, setViewRootModal] = React.useState(false);
   const closeRootModal = () => setViewRootModal(false);
+  const closeSuccessModal = () => setShowSuccessModal(false);
 
   const collectCoin = async (
     coin: any,
@@ -50,6 +54,8 @@ export default function DataTable() {
     setError(false);
     try {
       await RPC.withdrawVestingContract(coin, cancollect, root);
+
+      setShowSuccessModal(true);
     } catch (err: any) {
       console.error(err);
       const errorMessage =
@@ -88,6 +94,13 @@ export default function DataTable() {
 
   return (
     <div className={styles["table-wrapper"]}>
+      <Modal open={showSuccessModal}>
+        <MiSuccessModal
+          title="Withdrew Successfully"
+          subtitle="Check your Wallet Minidapp balance"
+          closeModal={closeSuccessModal}
+        />
+      </Modal>
       <Modal open={viewRootModal}>
         <MiRootModal
           viewCoin={viewCoin}
@@ -98,53 +111,64 @@ export default function DataTable() {
 
       {!viewCoin && (
         <>
-          {error && <div>{error}</div>}
+          {error && (
+            <MiError>
+              <label>{error}</label>
+            </MiError>
+          )}
+          {relevantCoins.length === 0 && <div>No contracts found</div>}
 
-          <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 650 }} aria-label="simple table">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Contract</TableCell>
-                  <TableCell align="right">Amount</TableCell>
-                  <TableCell align="right">Token ID</TableCell>
-                  <TableCell align="right">Contract Start</TableCell>
-                  <TableCell align="right">Contract Ends</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {relevantCoins.map((row, i) => (
-                  <TableRow
-                    key={i}
-                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                  >
-                    <TableCell component="th" scope="row">
-                      {i}
-                    </TableCell>
-                    <TableCell align="right">{row.amount}</TableCell>
-                    <TableCell align="right">{row.tokenid}</TableCell>
-                    <TableCell align="right">{row.state[2].data}</TableCell>
-                    <TableCell align="right">{row.state[3].data}</TableCell>
-                    <TableCell align="right">
-                      <button
-                        onClick={() => {
-                          setView(row);
-                        }}
-                      >
-                        View
-                      </button>
-                    </TableCell>
+          {relevantCoins.length > 0 && (
+            <TableContainer component={Paper}>
+              <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Contract</TableCell>
+                    <TableCell align="right">Amount</TableCell>
+                    <TableCell align="right">Token ID</TableCell>
+                    <TableCell align="right">Contract Start</TableCell>
+                    <TableCell align="right">Contract Ends</TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                </TableHead>
+                <TableBody>
+                  {relevantCoins.map((row, i) => (
+                    <TableRow
+                      key={i}
+                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                    >
+                      <TableCell component="th" scope="row">
+                        {i}
+                      </TableCell>
+                      <TableCell align="right">{row.amount}</TableCell>
+                      <TableCell align="right">{row.tokenid}</TableCell>
+                      <TableCell align="right">{row.state[2].data}</TableCell>
+                      <TableCell align="right">{row.state[3].data}</TableCell>
+                      <TableCell align="right">
+                        <button
+                          onClick={() => {
+                            setView(row);
+                          }}
+                        >
+                          View
+                        </button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
         </>
       )}
 
       {viewCoin && (
         <>
           <Stack className={styles["view"]} spacing={4}>
-            {error && <div>{error}</div>}
+            {error && (
+              <MiError>
+                <label>{error}</label>
+              </MiError>
+            )}
             <Stack
               flexDirection="row"
               justifyContent="space-between"

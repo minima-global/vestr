@@ -1,18 +1,22 @@
 import { useEffect, useState } from "react";
 
 import { Stack } from "@mui/system";
-import { Button, CircularProgress, TextField } from "@mui/material";
+import { Button, CircularProgress, Modal, TextField } from "@mui/material";
 import styles from "./MiModalLayout.module.css";
 import CloseIcon from "@mui/icons-material/Close";
 
 import * as RPC from "../../../minima/libs/RPC";
 
 import Decimal from "decimal.js";
+import MiSuccessModal from "../MiSuccessModal/MiSuccessModal";
 
 const MiRootModal = (props: any) => {
   const [maxAmount, setMaxAmount] = useState<number>(0);
   const [desiredAmount, setDesiredAmount] = useState(0);
   const { viewCoin, closeModal, setError } = props;
+
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const closeSuccessModal = () => setShowSuccessModal(false);
 
   const [loading, setLoading] = useState(false);
 
@@ -37,18 +41,31 @@ const MiRootModal = (props: any) => {
     setLoading(true);
     try {
       await RPC.withdrawVestingContract(viewCoin, desiredAmount, true);
+      closeModal();
+      setShowSuccessModal(true);
     } catch (error: any) {
+      console.error(error);
       const errorMessage =
-        error && error.message ? error.message : "Failed to withdraw";
+        error && error.message
+          ? error.message
+          : error && error.error
+          ? error.error
+          : "Failed to withdraw";
       setError(errorMessage);
     } finally {
-      closeModal();
       setLoading(false);
     }
   };
 
   return (
     <div className={styles["modal-wrapper"]}>
+      <Modal open={showSuccessModal}>
+        <MiSuccessModal
+          title="Root Withdrawal Successful"
+          subtitle="Check your Wallet Minidapp balance"
+          closeModal={closeSuccessModal}
+        />
+      </Modal>
       <Stack spacing={2}>
         <Stack alignItems="flex-end">
           <CloseIcon onClick={closeModal} />

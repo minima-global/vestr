@@ -1,6 +1,6 @@
 export const getCoinsByAddress = (address: string) => {
   return new Promise((resolve, reject) => {
-    MDS.cmd(`coins address:${address}`, (res) => {
+    MDS.cmd(`coins address:${address} relevant:true`, (res) => {
       if (!res.status) reject("RPC Failed");
 
       resolve({

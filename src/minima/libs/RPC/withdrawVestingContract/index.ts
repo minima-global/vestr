@@ -28,8 +28,7 @@ export const withdrawVestingContract = (
                 : ""
             }
             ${root ? `txnsign id:${id} publickey:${rootKey};` : ""}
-            txnpost id:${id};
-            txndelete id:${id}
+            txnpost id:${id}
         `;
 
     MDS.cmd(command, (res) => {
