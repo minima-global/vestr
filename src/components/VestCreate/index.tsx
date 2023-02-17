@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import { useFormik } from "formik";
 import { Button, CircularProgress, Stack, TextField } from "@mui/material";
@@ -16,10 +16,14 @@ import { TabButton, Tabs } from "../MiCustom/MiTabs";
 import useTabs from "../../hooks/useTabs";
 
 import DataTable from "../VestContractsTable";
+import { addMonths } from "date-fns";
 
 const VestCreate = () => {
   // create wallet state
   const [wallet, setWallet] = useState<MinimaToken[]>([]);
+  const [dynamicByCliff, setDynamicByCliff] = useState<undefined | Date>(
+    undefined
+  );
 
   const { tabs, setTabOpen, toggleTab, tabStyles } = useTabs();
 
@@ -169,7 +173,17 @@ const VestCreate = () => {
                 name="cliff"
                 value={formik.values.cliff}
                 onBlur={formik.handleBlur}
-                onChange={formik.handleChange}
+                onChange={(e) => {
+                  formik.handleChange(e);
+                  // according to the cliff period, we have to set the date-time
+                  // picker to comply with this rule..
+                  // so if they select 2 months, then they can only select an end contract
+                  // after that date..
+                  setDynamicByCliff(
+                    addMonths(new Date(), Number(e.target.value))
+                  );
+                  console.log(e.target.value);
+                }}
                 disabled={formik.isSubmitting}
               >
                 <option defaultValue={0} disabled value={0}>
@@ -182,6 +196,7 @@ const VestCreate = () => {
                 ))}
               </Select>
               <DateTimePicker
+                minDateTime={dynamicByCliff ? dynamicByCliff : undefined}
                 disablePast={true}
                 value={formik.values.endContract}
                 onChange={(value) => {
