@@ -4,7 +4,12 @@ import { useFormik } from "formik";
 import {
   Button,
   CircularProgress,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
   Modal,
+  Radio,
+  RadioGroup,
   Stack,
   TextField,
 } from "@mui/material";
@@ -37,6 +42,25 @@ const VestCreate = () => {
   const closeModal = () => setShowSuccessModal(false);
   const { tabs, toggleTab, tabStyles } = useTabs();
 
+  const handleAddressSelection = (e: any) => {
+    if (e.target.value === "other-address") {
+      return formik.setFieldValue("address", "");
+    }
+
+    RPC.getAddress().then((res: any) => {
+      formik.setFieldValue("address", res.address);
+    });
+  };
+  const handleKeySelection = (e: any) => {
+    if (e.target.value === "other-key") {
+      return formik.setFieldValue("root", "");
+    }
+
+    RPC.getAddress().then((res: any) => {
+      formik.setFieldValue("root", res.publickey);
+    });
+  };
+
   events.onNewBalance(() => {
     RPC.getMinimaBalance()
       .then((balance) => {
@@ -60,6 +84,11 @@ const VestCreate = () => {
         console.log(err);
         formik.setStatus(errorMessage);
       });
+
+    RPC.getAddress().then((res: any) => {
+      formik.setFieldValue("address", res.address);
+      formik.setFieldValue("root", res.publickey);
+    });
   }, []);
 
   // initialise formik to create form
@@ -159,6 +188,26 @@ const VestCreate = () => {
                     resetForm={formik.resetForm}
                   />
                 ) : null}
+                <FormControl className={styles["address-selection"]}>
+                  <FormLabel>Address</FormLabel>
+                  <RadioGroup
+                    onChange={handleAddressSelection}
+                    row
+                    defaultValue="my-address"
+                    name="radio-buttons-group"
+                  >
+                    <FormControlLabel
+                      value="my-address"
+                      control={<Radio />}
+                      label="My Address"
+                    />
+                    <FormControlLabel
+                      value="other-address"
+                      control={<Radio />}
+                      label="Other Address"
+                    />
+                  </RadioGroup>
+                </FormControl>
                 <TextField
                   fullWidth
                   id="address"
@@ -180,6 +229,26 @@ const VestCreate = () => {
                   onBlur={formik.handleBlur}
                   disabled={formik.isSubmitting}
                 />
+                <FormControl className={styles["address-selection"]}>
+                  <FormLabel>Select a root key</FormLabel>
+                  <RadioGroup
+                    onChange={handleKeySelection}
+                    row
+                    defaultValue="my-key"
+                    name="radio-buttons-group"
+                  >
+                    <FormControlLabel
+                      value="my-key"
+                      control={<Radio />}
+                      label="My Key"
+                    />
+                    <FormControlLabel
+                      value="other-key"
+                      control={<Radio />}
+                      label="Other Key"
+                    />
+                  </RadioGroup>
+                </FormControl>
                 <TextField
                   fullWidth
                   id="root"

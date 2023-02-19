@@ -16,3 +16,9 @@ form {
   color: #fff;
   text-align: left;
 }
+
+
+.address-selection label {
+  font-family: Manrope-semibold;
+  font-weight: 800;
+}
