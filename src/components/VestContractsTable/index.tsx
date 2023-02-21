@@ -17,10 +17,12 @@ import { Coin } from "../../@types";
 import MiSuccessModal from "../MiCustom/MiSuccessModal/MiSuccessModal";
 import MiError from "../MiCustom/MiError/MiError";
 import { events } from "../../minima/libs/events";
+import { MiTitle } from "../MiCustom/MiTitle/MiTitle";
 
 export default function DataTable() {
   const [relevantCoins, setRelevantCoins] = React.useState<any[]>([]);
 
+  const [currentBlockHeight, setCurrentBlockHeight] = React.useState(0);
   const [error, setError] = React.useState<false | string>(false);
   const [viewCoin, setView] = React.useState<false | Coin>(false);
   const [viewCoinScriptData, setViewCoinScriptData] = React.useState<
@@ -60,6 +62,10 @@ export default function DataTable() {
   };
 
   events.onNewBlock(() => {
+    RPC.getCurrentBlockHeight().then((h) => {
+      setCurrentBlockHeight(h);
+    });
+
     RPC.getCoinsByAddress(vestingContract.scriptaddress)
       .then((result: any) => {
         console.log(result);
@@ -113,6 +119,12 @@ export default function DataTable() {
       });
     }
   }, [viewCoin]);
+
+  React.useEffect(() => {
+    RPC.getCurrentBlockHeight().then((h) => {
+      setCurrentBlockHeight(h);
+    });
+  }, []);
 
   React.useEffect(() => {
     setView(false);
@@ -212,106 +224,127 @@ export default function DataTable() {
                 <label>{error}</label>
               </MiError>
             )}
-            <Stack
-              flexDirection="row"
-              justifyContent="space-between"
-              alignItems="center"
-            >
-              <h6>Contract {viewCoin.coinid}</h6>
-              <button
-                className={styles["back-btn"]}
-                onClick={() => {
-                  setView(false);
-                  setViewCoinScriptData(false);
-                }}
+            {viewCoinScriptData.cliffed === "TRUE" && (
+              <>
+                <MiTitle>
+                  <label>
+                    This contract has a cliffing period, can start withdrawing
+                    in
+                    {" " +
+                      new Decimal(viewCoin.state[3].data)
+                        .minus(currentBlockHeight)
+                        .toNumber()}{" "}
+                    blocks
+                  </label>
+                </MiTitle>
+              </>
+            )}
+            <>
+              <Stack
+                flexDirection="row"
+                justifyContent="space-between"
+                alignItems="center"
               >
-                Go back
-              </button>
-            </Stack>
+                <h6>Contract {viewCoin.coinid}</h6>
+                <button
+                  className={styles["back-btn"]}
+                  onClick={() => {
+                    setView(false);
+                    setViewCoinScriptData(false);
+                  }}
+                >
+                  Go back
+                </button>
+              </Stack>
 
-            <Stack>
-              <ul>
-                <li>
-                  <h6>Total Amount Locked</h6>
-                  <p>{viewCoin.amount}</p>
-                </li>
-                <li>
-                  <h6>Contract Starts</h6>
-                  <p>{viewCoin.state[2].data}</p>
-                </li>
-                <li>
-                  <h6>Contract Ends</h6>
-                  <p>{viewCoin.state[3].data}</p>
-                </li>
-                <li>
-                  <h6>Cliff Period</h6>
-                  <p>{viewCoin.state[3].data}</p>
-                </li>
-                <li>
-                  <h6>Root Key</h6>
-                  <p>{viewCoin.state[4].data}</p>
-                </li>
-                <li>
-                  <h6>Withdrawal Address</h6>
-                  <p>{viewCoin.state[0].data}</p>
-                </li>
-                <li>
-                  <h6>Can Withdraw Now</h6>
-                  <p>
-                    {viewCoinScriptData
-                      ? viewCoinScriptData.cancollect + " / " + viewCoin.amount
-                      : "N/a"}
-                  </p>
-                </li>
-                <li>
-                  <h6>Already Collected</h6>
-                  <p>
-                    {viewCoinScriptData
-                      ? viewCoinScriptData.alreadycollected
-                      : "N/a"}
-                  </p>
-                </li>
-                <li>
-                  <h6>Change</h6>
-                  <p>
-                    {viewCoinScriptData
-                      ? viewCoinScriptData.change + " / " + viewCoin.amount
-                      : "N/a"}
-                  </p>
-                </li>
-              </ul>
-            </Stack>
-            <Stack spacing={0.5}>
-              <Button
-                type="button"
-                disableElevation
-                fullWidth
-                color="inherit"
-                variant="contained"
-                onClick={() => {
-                  console.log(viewCoinScriptData.cancollect);
-                  console.log(viewCoinScriptData.change);
-                  collectCoin(
-                    viewCoin,
-                    viewCoinScriptData.cancollect,
-                    viewCoinScriptData.change
-                  );
-                }}
-              >
-                Withdraw
-              </Button>
+              <Stack>
+                <ul>
+                  <li>
+                    <h6>Total Amount Locked</h6>
+                    <p>{viewCoin.amount}</p>
+                  </li>
+                  <li>
+                    <h6>Contract Starts</h6>
+                    <p>{viewCoin.state[2].data}</p>
+                  </li>
+                  <li>
+                    <h6>Contract Ends</h6>
+                    <p>{viewCoin.state[3].data}</p>
+                  </li>
 
-              <Button
-                type="button"
-                disableElevation
-                fullWidth
-                color="inherit"
-                variant="contained"
-                onClick={() => setViewRootModal(true)}
-              >
-                Root
-              </Button>
-            </Stack>
+                  <li>
+                    <h6>Root Key</h6>
+                    <p>{viewCoin.state[4].data}</p>
+                  </li>
+                  <li>
+                    <h6>Withdrawal Address</h6>
+                    <p>{viewCoin.state[0].data}</p>
+                  </li>
+                  <li>
+                    <h6>Can Withdraw Now</h6>
+                    <p>
+                      {viewCoinScriptData &&
+                      viewCoinScriptData.cliffed !== "TRUE"
+                        ? viewCoinScriptData.cancollect +
+                          " / " +
+                          viewCoin.amount
+                        : "N/a"}
+                    </p>
+                  </li>
+                  <li>
+                    <h6>Already Collected</h6>
+                    <p>
+                      {viewCoinScriptData
+                        ? viewCoinScriptData.alreadycollected
+                        : "N/a"}
+                    </p>
+                  </li>
+                  <li>
+                    <h6>Change</h6>
+                    <p>
+                      {viewCoinScriptData &&
+                      viewCoinScriptData.cliffed !== "TRUE"
+                        ? viewCoinScriptData.change + " / " + viewCoin.amount
+                        : "N/a"}
+                    </p>
+                  </li>
+                </ul>
+              </Stack>
+
+              {viewCoinScriptData.cliffed !== "TRUE" && (
+                <Stack spacing={0.5}>
+                  <Button
+                    type="button"
+                    disableElevation
+                    fullWidth
+                    color="inherit"
+                    variant="contained"
+                    onClick={() => {
+                      console.log(viewCoinScriptData.cancollect);
+                      console.log(viewCoinScriptData.change);
+                      collectCoin(
+                        viewCoin,
+                        viewCoinScriptData.cancollect,
+                        viewCoinScriptData.change
+                      );
+                    }}
+                  >
+                    Withdraw
+                  </Button>
+
+                  <Button
+                    type="button"
+                    disableElevation
+                    fullWidth
+                    color="inherit"
+                    variant="contained"
+                    onClick={() => setViewRootModal(true)}
+                  >
+                    Root
+                  </Button>
+                </Stack>
+              )}
+            </>
           </Stack>
         </>
       )}
