@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 
 import { useFormik } from "formik";
 import {
@@ -30,6 +30,7 @@ import DataTable from "../VestContractsTable";
 import { addMonths } from "date-fns";
 import MiSuccessModal from "../MiCustom/MiSuccessModal/MiSuccessModal";
 import MiError from "../MiCustom/MiError/MiError";
+import { Box } from "@mui/system";
 
 const VestCreate = () => {
   // create wallet state
@@ -101,6 +102,7 @@ const VestCreate = () => {
       endContract: undefined,
       cliff: 0,
       root: "",
+      minBlockWait: 0,
     },
     onSubmit: async (formInput) => {
       formik.setStatus(undefined);
@@ -119,7 +121,8 @@ const VestCreate = () => {
             formInput.address,
             formInput.token,
             formInput.root,
-            formInput.endContract
+            formInput.endContract,
+            formInput.minBlockWait
           );
 
           setShowSuccessModal(true);
@@ -139,11 +142,13 @@ const VestCreate = () => {
   return (
     <>
       <Modal open={showSuccessModal}>
-        <MiSuccessModal
-          title="Contract Created!"
-          subtitle="Navigate to Track to find your pending contracts"
-          closeModal={closeModal}
-        />
+        <Box>
+          <MiSuccessModal
+            title="Contract Created!"
+            subtitle="Navigate to Track to find your pending contracts"
+            closeModal={closeModal}
+          />
+        </Box>
       </Modal>
       <Stack textAlign="center" spacing={1}>
         <h6 className={styles["form-header"]}>Lock up tokens</h6>
@@ -285,6 +290,29 @@ const VestCreate = () => {
                       {i} month
                     </option>
                   ))}
+                </Select>
+                <Select
+                  id="minBlockWait"
+                  name="minBlockWait"
+                  value={formik.values.minBlockWait}
+                  onBlur={formik.handleBlur}
+                  onChange={formik.handleChange}
+                >
+                  <option defaultValue={0} disabled value={0}>
+                    Set a collection grace period
+                  </option>
+                  <option key="daily" value="24">
+                    Daily
+                  </option>
+                  <option key="monthly" value="720">
+                    Monthly
+                  </option>
+                  <option key="6-monthly" value="4320">
+                    6 months
+                  </option>
+                  <option key="12-monthly" value="8640">
+                    Yearly
+                  </option>
                 </Select>
                 <DateTimePicker
                   minDateTime={dynamicByCliff ? dynamicByCliff : undefined}

@@ -9,38 +9,24 @@ import Paper from "@mui/material/Paper";
 import { vestingContract } from "../../minima/libs/contracts";
 import * as RPC from "../../minima/libs/RPC";
 import styles from "./VestContractsTable.module.css";
-import { Button, Modal, Stack } from "@mui/material";
+import { Box, Button, Modal, Stack } from "@mui/material";
 
 import Decimal from "decimal.js";
 import MiRootModal from "../MiCustom/MiRootModal/MiRootModal";
 import { Coin } from "../../@types";
 import MiSuccessModal from "../MiCustom/MiSuccessModal/MiSuccessModal";
 import MiError from "../MiCustom/MiError/MiError";
-
-function createData(
-  name: string,
-  calories: number,
-  fat: number,
-  carbs: number,
-  protein: number
-) {
-  return { name, calories, fat, carbs, protein };
-}
-
-const rows = [
-  createData("Frozen yoghurt", 159, 6.0, 24, 4.0),
-  createData("Ice cream sandwich", 237, 9.0, 37, 4.3),
-  createData("Eclair", 262, 16.0, 24, 6.0),
-  createData("Cupcake", 305, 3.7, 67, 4.3),
-  createData("Gingerbread", 356, 16.0, 49, 3.9),
-];
+import { events } from "../../minima/libs/events";
 
 export default function DataTable() {
   const [relevantCoins, setRelevantCoins] = React.useState<any[]>([]);
 
   const [error, setError] = React.useState<false | string>(false);
   const [viewCoin, setView] = React.useState<false | Coin>(false);
-  const [canCollect, setCanCollect] = React.useState<false | number>(false);
+  const [viewCoinScriptData, setViewCoinScriptData] = React.useState<
+    false | any
+  >(false);
+
   const [showSuccessModal, setShowSuccessModal] = React.useState(false);
   const [viewRootModal, setViewRootModal] = React.useState(false);
   const closeRootModal = () => setViewRootModal(false);
@@ -48,12 +34,19 @@ export default function DataTable() {
 
   const collectCoin = async (
     coin: any,
-    cancollect: any,
+    cancollect: number,
+    changeAmount: number,
     root: boolean = false
   ) => {
     setError(false);
     try {
-      await RPC.withdrawVestingContract(coin, cancollect, root);
+      await RPC.withdrawVestingContract(
+        coin,
+        cancollect,
+        changeAmount,
+        root,
+        coin.state
+      );
 
       setShowSuccessModal(true);
     } catch (err: any) {
@@ -64,21 +57,53 @@ export default function DataTable() {
     }
   };
 
+  events.onNewBlock(() => {
+    if (viewCoin) {
+      RPC.getCurrentBlockHeight().then((height) => {
+        RPC.runScript(
+          vestingContract.checkMaths,
+          {
+            1: viewCoin.state[1].data,
+            2: viewCoin.state[2].data,
+            3: viewCoin.state[3].data,
+          },
+          {
+            "@AMOUNT": viewCoin.amount,
+            "@BLOCK": "" + height,
+          }
+        ).then((vars: any) => {
+          console.log(vars);
+          setViewCoinScriptData(vars);
+        });
+      });
+    }
+  });
+
   React.useEffect(() => {
     if (viewCoin) {
-      calculateBlockWithdrawalAmount(
-        parseInt(viewCoin.state[3].data),
-        parseInt(viewCoin.state[2].data),
-        parseInt(viewCoin.state[1].data),
-        parseInt(viewCoin.amount)
-      ).then((_canCollect) => {
-        setCanCollect(_canCollect);
+      RPC.getCurrentBlockHeight().then((height) => {
+        RPC.runScript(
+          vestingContract.checkMaths,
+          {
+            1: viewCoin.state[1].data,
+            2: viewCoin.state[2].data,
+            3: viewCoin.state[3].data,
+          },
+          {
+            "@AMOUNT": viewCoin.amount,
+            "@BLOCK": "" + height,
+          }
+        ).then((vars: any) => {
+          console.log(vars);
+          setViewCoinScriptData(vars);
+        });
       });
     }
   }, [viewCoin]);
 
   React.useEffect(() => {
     setView(false);
+    setViewCoinScriptData(false);
 
     RPC.getCoinsByAddress(vestingContract.scriptaddress)
       .then((result: any) => {
@@ -95,18 +120,23 @@ export default function DataTable() {
   return (
     <div className={styles["table-wrapper"]}>
       <Modal open={showSuccessModal}>
-        <MiSuccessModal
-          title="Withdrew Successfully"
-          subtitle="Check your Wallet Minidapp balance"
-          closeModal={closeSuccessModal}
-        />
+        <Box>
+          <MiSuccessModal
+            title="Withdrew Successfully"
+            subtitle="Check your Wallet Minidapp balance"
+            closeModal={closeSuccessModal}
+          />
+        </Box>
       </Modal>
       <Modal open={viewRootModal}>
-        <MiRootModal
-          viewCoin={viewCoin}
-          closeModal={closeRootModal}
-          setError={setError}
-        />
+        <Box>
+          <MiRootModal
+            viewCoin={viewCoin}
+            viewCoinScriptData={viewCoinScriptData}
+            closeModal={closeRootModal}
+            setError={setError}
+          />
+        </Box>
       </Modal>
 
       {!viewCoin && (
@@ -161,7 +191,7 @@ export default function DataTable() {
         </>
       )}
 
-      {viewCoin && (
+      {viewCoin && viewCoinScriptData && (
         <>
           <Stack className={styles["view"]} spacing={4}>
             {error && (
@@ -177,7 +207,10 @@ export default function DataTable() {
               <h6>Contract {viewCoin.coinid}</h6>
               <button
                 className={styles["back-btn"]}
-                onClick={() => setView(false)}
+                onClick={() => {
+                  setView(false);
+                  setViewCoinScriptData(false);
+                }}
               >
                 Go back
               </button>
@@ -199,20 +232,38 @@ export default function DataTable() {
                 </li>
                 <li>
                   <h6>Cliff Period</h6>
-                  <p>{viewCoin.state[4].data}</p>
+                  <p>{viewCoin.state[3].data}</p>
                 </li>
                 <li>
                   <h6>Root Key</h6>
-                  <p>{viewCoin.state[5].data}</p>
+                  <p>{viewCoin.state[4].data}</p>
                 </li>
                 <li>
                   <h6>Withdrawal Address</h6>
                   <p>{viewCoin.state[0].data}</p>
                 </li>
                 <li>
-                  <h6>Can Withdraw now</h6>
+                  <h6>Can Withdraw Now</h6>
                   <p>
-                    {canCollect ? canCollect + " / " + viewCoin.amount : "N/a"}
+                    {viewCoinScriptData
+                      ? viewCoinScriptData.cancollect + " / " + viewCoin.amount
+                      : "N/a"}
+                  </p>
+                </li>
+                <li>
+                  <h6>Already Collected</h6>
+                  <p>
+                    {viewCoinScriptData
+                      ? viewCoinScriptData.alreadycollected
+                      : "N/a"}
+                  </p>
+                </li>
+                <li>
+                  <h6>Change</h6>
+                  <p>
+                    {viewCoinScriptData
+                      ? viewCoinScriptData.change + " / " + viewCoin.amount
+                      : "N/a"}
                   </p>
                 </li>
               </ul>
@@ -224,7 +275,15 @@ export default function DataTable() {
                 fullWidth
                 color="inherit"
                 variant="contained"
-                onClick={() => collectCoin(viewCoin, canCollect)}
+                onClick={() => {
+                  console.log(viewCoinScriptData.cancollect);
+                  console.log(viewCoinScriptData.change);
+                  collectCoin(
+                    viewCoin,
+                    viewCoinScriptData.cancollect,
+                    viewCoinScriptData.change
+                  );
+                }}
               >
                 Withdraw
               </Button>

@@ -13,13 +13,13 @@ import MiSuccessModal from "../MiSuccessModal/MiSuccessModal";
 const MiRootModal = (props: any) => {
   const [maxAmount, setMaxAmount] = useState<number>(0);
   const [desiredAmount, setDesiredAmount] = useState(0);
-  const { viewCoin, closeModal, setError } = props;
+  const { viewCoin, closeModal, setError, viewCoinScriptData } = props;
 
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const closeSuccessModal = () => setShowSuccessModal(false);
 
   const [loading, setLoading] = useState(false);
-
+  console.log("viewCoin", viewCoin);
   useEffect(() => {
     const neverWithdrew = new Decimal(viewCoin.state[1].data)
       .minus(viewCoin.amount)
@@ -40,7 +40,17 @@ const MiRootModal = (props: any) => {
   const withdraw = async () => {
     setLoading(true);
     try {
-      await RPC.withdrawVestingContract(viewCoin, desiredAmount, true);
+      if (!viewCoinScriptData) throw new Error("Coin script data not found");
+
+      console.log(viewCoin);
+      const changeAmount = viewCoinScriptData.change;
+      await RPC.withdrawVestingContract(
+        viewCoin,
+        desiredAmount,
+        changeAmount,
+        true,
+        viewCoin.state
+      );
       closeModal();
       setShowSuccessModal(true);
     } catch (error: any) {

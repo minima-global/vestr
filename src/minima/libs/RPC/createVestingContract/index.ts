@@ -1,3 +1,4 @@
+import { runScript } from "./../runScript/index";
 import { addMonths } from "date-fns";
 import { MinimaToken } from "../../../../@types";
 import { vestingContract } from "../../contracts";
@@ -20,7 +21,8 @@ export const createVestingContract = async (
   address: string,
   token: MinimaToken,
   root: string,
-  endContract: Date
+  endContract: Date,
+  minBlockWait: number
 ) => {
   try {
     // calculate block in time
@@ -28,13 +30,26 @@ export const createVestingContract = async (
       endContract
     );
     // get currentBlockHeight
-    const startingBlockHeight = await RPC.getCurrentBlockHeight();
+    const currentBlockHeight = await RPC.getCurrentBlockHeight();
 
-    // calculate more accurately the cliff amount
+    /**
+     * Calculate the Cliff period, when can the user start collecting this contract
+     */
     const then = addMonths(new Date(), cliff);
     const now = new Decimal(new Date().getTime()).dividedBy(1000); // time now in seconds
     const difference = new Decimal(then.getTime()).dividedBy(1000).minus(now);
-    const estimateCliffPeriod = difference.dividedBy(50).round().toNumber();
+    const estimateCliffPeriod = difference.dividedBy(50);
+    const startingBlockHeightOfContract = new Decimal(currentBlockHeight)
+      .plus(estimateCliffPeriod)
+      .round()
+      .toNumber();
+
+    /**
+     * Calculate the minimum block wait the user must wait before he collects again
+     */
+    const minimumTimeUserMustWaitToCollectAgain = new Decimal(minBlockWait)
+      .times(3600)
+      .dividedBy(50);
 
     return new Promise((resolve, reject) => {
       MDS.cmd(
@@ -42,7 +57,7 @@ export const createVestingContract = async (
           vestingContract.scriptaddress
         } tokenid:${
           token.tokenid
-        } state:{"0":"${address}","1":"${amount}","3":"${startingBlockHeight}", "4":"${endContractBlockHeight}","5":"${estimateCliffPeriod}","6":"${
+        } state:{"0":"${address}","1":"${amount}","2":"${startingBlockHeightOfContract}", "3":"${endContractBlockHeight}","4":"${minimumTimeUserMustWaitToCollectAgain}","5":"${
           root.length === 0 ? "0x21" : root
         }"}`,
         (res) => {

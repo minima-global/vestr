@@ -1,13 +1,8 @@
 import { useEffect, useState } from "react";
 
 import { Stack } from "@mui/system";
-import { Button, CircularProgress, TextField } from "@mui/material";
 import styles from "./MiModalLayout.module.css";
 import CloseIcon from "@mui/icons-material/Close";
-
-import * as RPC from "../../../minima/libs/RPC";
-
-import Decimal from "decimal.js";
 
 const MiSuccessModal = (props: any) => {
   const { closeModal, title, subtitle } = props;

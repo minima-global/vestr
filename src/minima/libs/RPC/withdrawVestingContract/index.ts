@@ -3,20 +3,19 @@ import { vestingContract } from "../../contracts";
 export const withdrawVestingContract = (
   coin: any,
   cancollect: number,
-  root: boolean
+  change: number,
+  root: boolean,
+  state: any[]
 ) => {
   const coinid = coin.coinid;
   const withdrawalAddress = coin.state[0].data;
   const tokenid = coin.tokenid;
-  const amountRemaining = coin.amount;
-  const rootKey = coin.state[5].data;
+  const rootKey = coin.state[4].data;
 
   console.log(`Collecting amount..`, cancollect);
 
   return new Promise((resolve, reject) => {
     const id = Math.floor(Math.random() * 1000000000);
-    let change = amountRemaining - cancollect;
-    // calculate change
 
     const command = `
             txncreate id:${id};
@@ -24,11 +23,21 @@ export const withdrawVestingContract = (
             txnoutput id:${id} address:${withdrawalAddress} amount:${cancollect} tokenid:${tokenid} storestate:false;
             ${
               change && change > 0
-                ? `txnoutput id:${id} address:${vestingContract.scriptaddress} amount:${change} tokenid:${tokenid} storestate:true;`
+                ? `
+                txnoutput id:${id} address:${vestingContract.scriptaddress} amount:${change} tokenid:${tokenid} storestate:true;
+                txnstate id:${id} port:0 value:${state[0].data};
+                txnstate id:${id} port:1 value:${state[1].data};
+                txnstate id:${id} port:2 value:${state[2].data};
+                txnstate id:${id} port:3 value:${state[3].data};
+                txnstate id:${id} port:4 value:${state[4].data};                
+                txnstate id:${id} port:5 value:${state[5].data};                
+                `
                 : ""
             }
+            
             ${root ? `txnsign id:${id} publickey:${rootKey};` : ""}
-            txnpost id:${id}
+            txnpost id:${id};
+            txndelete id:${id}
         `;
 
     MDS.cmd(command, (res) => {
