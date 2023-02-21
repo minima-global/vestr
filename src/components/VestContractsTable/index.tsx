@@ -48,6 +48,8 @@ export default function DataTable() {
         coin.state
       );
 
+      setView(false);
+      setViewCoinScriptData(false);
       setShowSuccessModal(true);
     } catch (err: any) {
       console.error(err);
@@ -58,6 +60,17 @@ export default function DataTable() {
   };
 
   events.onNewBlock(() => {
+    RPC.getCoinsByAddress(vestingContract.scriptaddress)
+      .then((result: any) => {
+        console.log(result);
+        setRelevantCoins(result.relevantCoins);
+      })
+      .catch((err) => {
+        const errorMessage =
+          err && err.message ? err.message : err ? err : "Failed to fetch data";
+        setError(errorMessage);
+      });
+
     if (viewCoin) {
       RPC.getCurrentBlockHeight().then((height) => {
         RPC.runScript(
