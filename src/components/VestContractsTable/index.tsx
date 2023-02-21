@@ -85,10 +85,12 @@ export default function DataTable() {
             1: viewCoin.state[1].data,
             2: viewCoin.state[2].data,
             3: viewCoin.state[3].data,
+            4: viewCoin.state[4].data,
           },
           {
             "@AMOUNT": viewCoin.amount,
             "@BLOCK": "" + height,
+            "@COINAGE": viewCoin.created,
           }
         ).then((vars: any) => {
           console.log(vars);
@@ -107,10 +109,12 @@ export default function DataTable() {
             1: viewCoin.state[1].data,
             2: viewCoin.state[2].data,
             3: viewCoin.state[3].data,
+            4: viewCoin.state[4].data,
           },
           {
             "@AMOUNT": viewCoin.amount,
             "@BLOCK": "" + height,
+            "@COINAGE": viewCoin.created,
           }
         ).then((vars: any) => {
           console.log(vars);
@@ -231,7 +235,7 @@ export default function DataTable() {
                     This contract has a cliffing period, can start withdrawing
                     in
                     {" " +
-                      new Decimal(viewCoin.state[3].data)
+                      new Decimal(viewCoin.state[2].data)
                         .minus(currentBlockHeight)
                         .toNumber()}{" "}
                     blocks
@@ -316,6 +320,7 @@ export default function DataTable() {
                   <Button
                     type="button"
                     disableElevation
+                    disabled={viewCoinScriptData.mustwait === "TRUE"}
                     fullWidth
                     color="inherit"
                     variant="contained"
@@ -329,7 +334,11 @@ export default function DataTable() {
                       );
                     }}
                   >
-                    Withdraw
+                    {viewCoinScriptData.mustwait === "TRUE"
+                      ? `Can collect in ${new Decimal(viewCoin.state[4].data)
+                          .minus(currentBlockHeight)
+                          .toNumber()}`
+                      : "Withdraw"}
                   </Button>
 
                   <Button
