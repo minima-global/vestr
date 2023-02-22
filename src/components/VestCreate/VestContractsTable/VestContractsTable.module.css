@@ -1,16 +1,15 @@
-.table-wrapper {
-  min-height: 400px;
-  width: 100%;
-  background-color: #282b2e;
-  border: 1px solid  #585f63;
-  padding: 30px;
+
+.view-wrapper {
+  background-color: #fff;
+  color: #000;
+  padding: 16px;
 }
-.table-wrapper * {
-  font-family: Manrope-regular;
+.view * {
+  color: #000;
 }
 .view div button {
   background-color: inherit;
-  color: #fff;
+  color: #000;
   border: 1px solid #585f63;
   padding: 8px;
 }
@@ -21,7 +20,6 @@
   margin:0;
   padding:0;
   font-family: Manrope-semibold;
-  color: #fff;
   font-size: 1.1rem;
   max-width: 220px;
   text-align: left;
@@ -47,6 +45,7 @@ ul * {
 }
 
 .view button {
+  color: #000;
   border: none;
   height: 48px;
   font-family: Manrope-bold;
@@ -54,4 +53,12 @@ ul * {
 }
 .view button:hover {
   cursor:pointer;
+}
+
+.table-container {
+  border-radius: 0;
+}
+
+.unavailable {
+  color: #fff;
 }

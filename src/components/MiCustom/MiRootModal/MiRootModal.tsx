@@ -9,14 +9,14 @@ import * as RPC from "../../../minima/libs/RPC";
 
 import Decimal from "decimal.js";
 import MiSuccessModal from "../MiSuccessModal/MiSuccessModal";
+import { vestingContract } from "../../../minima/libs/contracts";
 
+Decimal.set({ precision: 64 });
 const MiRootModal = (props: any) => {
   const [maxAmount, setMaxAmount] = useState<number>(0);
   const [desiredAmount, setDesiredAmount] = useState(0);
-  const { viewCoin, closeModal, setError, viewCoinScriptData } = props;
-
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const closeSuccessModal = () => setShowSuccessModal(false);
+  const { viewCoin, closeModal, setError, viewCoinScriptData, setSuccess } =
+    props;
 
   const [loading, setLoading] = useState(false);
   console.log("viewCoin", viewCoin);
@@ -29,10 +29,11 @@ const MiRootModal = (props: any) => {
     }
 
     if (!neverWithdrew) {
+      console.log(viewCoinScriptData);
+      console.log("already colect", viewCoinScriptData.alreadycollected);
       const change = new Decimal(viewCoin.state[1].data)
-        .minus(viewCoin.amount)
+        .minus(viewCoinScriptData.alreadycollected)
         .toNumber();
-
       setMaxAmount(change);
     }
   }, []);
@@ -41,18 +42,26 @@ const MiRootModal = (props: any) => {
     setLoading(true);
     try {
       if (!viewCoinScriptData) throw new Error("Coin script data not found");
-
-      console.log(viewCoin);
-      const changeAmount = viewCoinScriptData.change;
-      await RPC.withdrawVestingContract(
-        viewCoin,
-        desiredAmount,
-        changeAmount,
-        true,
-        viewCoin.state
-      );
-      closeModal();
-      setShowSuccessModal(true);
+      console.log("desiredAmount", desiredAmount);
+      RPC.runScript(
+        vestingContract.checkMathsRoot,
+        {
+          1: desiredAmount,
+        },
+        {
+          "@AMOUNT": viewCoin.amount,
+        }
+      ).then(async (vars: any) => {
+        await RPC.withdrawVestingContract(
+          viewCoin,
+          desiredAmount,
+          vars.change,
+          true,
+          viewCoin.state
+        );
+        closeModal();
+        setSuccess();
+      });
     } catch (error: any) {
       console.error(error);
       const errorMessage =
@@ -69,13 +78,6 @@ const MiRootModal = (props: any) => {
 
   return (
     <div className={styles["modal-wrapper"]}>
-      <Modal open={showSuccessModal}>
-        <MiSuccessModal
-          title="Root Withdrawal Successful"
-          subtitle="Check your Wallet Minidapp balance"
-          closeModal={closeSuccessModal}
-        />
-      </Modal>
       <Stack spacing={2}>
         <Stack alignItems="flex-end">
           <CloseIcon onClick={closeModal} />

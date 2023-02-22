@@ -10,7 +10,7 @@ export const withdrawVestingContract = (
   const coinid = coin.coinid;
   const withdrawalAddress = coin.state[0].data;
   const tokenid = coin.tokenid;
-  const rootKey = coin.state[4].data;
+  const rootKey = coin.state[5].data;
 
   console.log(`Collecting amount..`, cancollect);
 

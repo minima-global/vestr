@@ -8,15 +8,13 @@
 }
 
 form {
-  background-color: #282b2e;
-  border: 1px solid  #585f63;
+  background-color: #fff;
   padding: 30px;
 }
 .form-error {
   color: #fff;
   text-align: left;
 }
-
 
 .address-selection label {
   font-family: Manrope-semibold;

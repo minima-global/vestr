@@ -5,5 +5,13 @@
   justify-content: center;
 }
 .App > div {
-  min-width: 480px;
+  min-width: 80vw;
+  max-width: 80vw;
+}
+
+@media only screen and (max-width: 480px) {
+  .App > div {
+    min-width: 200px!important;
+    max-width: 80vw;
+  }
 }

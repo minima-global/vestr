@@ -153,7 +153,6 @@ const MiSelect = (props: any) => {
                   sx={{
                     width: "56px",
                     height: "56px",
-                    background: "#fff",
                   }}
                   className={styles["avatar"]}
                   variant="rounded"

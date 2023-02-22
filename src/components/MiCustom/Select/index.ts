@@ -7,14 +7,14 @@ const Select = styled("select")`
 
   height: 58px;
   width: 100%;
-  background-color: #16181c;
-  background: #16181c;
+  background-color: #fff;
+  background: #fff;
   border: 1px solid #585f63;
-  color: #fff;
+  color: #000;
   font-weight: 800;
   padding: 16.5px 16px;
   font-size: 1rem;
-  font-family: Manrope-regular;
+  font-family: Manrope-bold;
   > option {
     color: #fff;
   }

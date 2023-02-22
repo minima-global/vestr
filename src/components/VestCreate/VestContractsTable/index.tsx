@@ -6,18 +6,18 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import { vestingContract } from "../../minima/libs/contracts";
-import * as RPC from "../../minima/libs/RPC";
+import { vestingContract } from "../../../minima/libs/contracts";
+import * as RPC from "../../../minima/libs/RPC";
 import styles from "./VestContractsTable.module.css";
 import { Box, Button, Modal, Stack } from "@mui/material";
 
 import Decimal from "decimal.js";
-import MiRootModal from "../MiCustom/MiRootModal/MiRootModal";
-import { Coin } from "../../@types";
-import MiSuccessModal from "../MiCustom/MiSuccessModal/MiSuccessModal";
-import MiError from "../MiCustom/MiError/MiError";
-import { events } from "../../minima/libs/events";
-import { MiTitle } from "../MiCustom/MiTitle/MiTitle";
+import MiRootModal from "../../MiCustom/MiRootModal/MiRootModal";
+import { Coin } from "../../../@types";
+import MiSuccessModal from "../../MiCustom/MiSuccessModal/MiSuccessModal";
+import MiError from "../../MiCustom/MiError/MiError";
+import { events } from "../../../minima/libs/events";
+import { MiTitle } from "../../MiCustom/MiTitle/MiTitle";
 
 export default function DataTable() {
   const [relevantCoins, setRelevantCoins] = React.useState<any[]>([]);
@@ -34,6 +34,7 @@ export default function DataTable() {
   const closeRootModal = () => setViewRootModal(false);
   const closeSuccessModal = () => setShowSuccessModal(false);
 
+  console.log("viewCoin 222", viewCoin);
   const collectCoin = async (
     coin: any,
     cancollect: number,
@@ -68,7 +69,7 @@ export default function DataTable() {
 
     RPC.getCoinsByAddress(vestingContract.scriptaddress)
       .then((result: any) => {
-        console.log(result);
+        // console.log(result);
         setRelevantCoins(result.relevantCoins);
       })
       .catch((err) => {
@@ -93,7 +94,7 @@ export default function DataTable() {
             "@COINAGE": viewCoin.created,
           }
         ).then((vars: any) => {
-          console.log(vars);
+          // console.log(vars);
           setViewCoinScriptData(vars);
         });
       });
@@ -124,6 +125,12 @@ export default function DataTable() {
     }
   }, [viewCoin]);
 
+  const setWithdrawalSuccess = () => {
+    setView(false);
+    setViewCoinScriptData(false);
+    setShowSuccessModal(true);
+  };
+
   React.useEffect(() => {
     RPC.getCurrentBlockHeight().then((h) => {
       setCurrentBlockHeight(h);
@@ -147,7 +154,7 @@ export default function DataTable() {
   }, []);
 
   return (
-    <div className={styles["table-wrapper"]}>
+    <>
       <Modal open={showSuccessModal}>
         <Box>
           <MiSuccessModal
@@ -164,6 +171,7 @@ export default function DataTable() {
             viewCoinScriptData={viewCoinScriptData}
             closeModal={closeRootModal}
             setError={setError}
+            setSuccess={setWithdrawalSuccess}
           />
         </Box>
       </Modal>
@@ -175,15 +183,21 @@ export default function DataTable() {
               <label>{error}</label>
             </MiError>
           )}
-          {relevantCoins.length === 0 && <div>No contracts found</div>}
+          {relevantCoins.length === 0 && (
+            <div className={styles["unavailable"]}>No contracts available</div>
+          )}
 
           {relevantCoins.length > 0 && (
-            <TableContainer component={Paper}>
+            <TableContainer
+              className={styles["table-container"]}
+              component={Paper}
+            >
               <Table sx={{ minWidth: 650 }} aria-label="simple table">
                 <TableHead>
                   <TableRow>
                     <TableCell>Contract</TableCell>
                     <TableCell align="right">Amount</TableCell>
+                    <TableCell align="right">Name</TableCell>
                     <TableCell align="right">Token ID</TableCell>
                     <TableCell align="right">Contract Start</TableCell>
                     <TableCell align="right">Contract Ends</TableCell>
@@ -198,8 +212,36 @@ export default function DataTable() {
                       <TableCell component="th" scope="row">
                         {i}
                       </TableCell>
-                      <TableCell align="right">{row.amount}</TableCell>
-                      <TableCell align="right">{row.tokenid}</TableCell>
+                      <TableCell
+                        align="right"
+                        sx={{
+                          maxWidth: "100px",
+                          textOverflow: "ellipsis",
+                          overflow: "hidden",
+                        }}
+                      >
+                        {row.amount}
+                      </TableCell>
+                      {row.tokenid !== "0x00" &&
+                        row.token &&
+                        row.token.name && (
+                          <TableCell align="right">
+                            {row.token.name.name}
+                          </TableCell>
+                        )}
+                      {row.tokenid === "0x00" && (
+                        <TableCell align="right">Minima</TableCell>
+                      )}
+                      <TableCell
+                        align="right"
+                        sx={{
+                          maxWidth: "100px",
+                          textOverflow: "ellipsis",
+                          overflow: "hidden",
+                        }}
+                      >
+                        {row.tokenid}
+                      </TableCell>
                       <TableCell align="right">{row.state[2].data}</TableCell>
                       <TableCell align="right">{row.state[3].data}</TableCell>
                       <TableCell align="right">
@@ -220,8 +262,13 @@ export default function DataTable() {
         </>
       )}
 
+      {viewCoin && !viewCoinScriptData && (
+        <Box className={styles["view-wrapper"]}>
+          <div>Data not found, refresh</div>
+        </Box>
+      )}
       {viewCoin && viewCoinScriptData && (
-        <>
+        <Box className={styles["view-wrapper"]}>
           <Stack className={styles["view"]} spacing={4}>
             {error && (
               <MiError>
@@ -265,7 +312,11 @@ export default function DataTable() {
                 <ul>
                   <li>
                     <h6>Total Amount Locked</h6>
-                    <p>{viewCoin.amount}</p>
+
+                    {viewCoin.tokenid === "0x00" && <p>{viewCoin.amount}</p>}
+                    {viewCoin.tokenid !== "0x00" && (
+                      <p>{viewCoin.tokenamount}</p>
+                    )}
                   </li>
                   <li>
                     <h6>Contract Starts</h6>
@@ -288,11 +339,21 @@ export default function DataTable() {
                     <h6>Can Withdraw Now</h6>
                     <p>
                       {viewCoinScriptData &&
-                      viewCoinScriptData.cliffed !== "TRUE"
-                        ? viewCoinScriptData.cancollect +
+                        viewCoinScriptData.cliffed !== "TRUE" &&
+                        viewCoinScriptData.cancollect > 0 &&
+                        viewCoin.tokenid === "0x00" &&
+                        viewCoinScriptData.cancollect + " / " + viewCoin.amount}
+                      {viewCoinScriptData &&
+                        viewCoinScriptData.cliffed !== "TRUE" &&
+                        viewCoinScriptData.cancollect > 0 &&
+                        viewCoin.tokenid !== "0x00" &&
+                        viewCoinScriptData.cancollect +
                           " / " +
-                          viewCoin.amount
-                        : "N/a"}
+                          viewCoin.tokenamount}
+                      {viewCoinScriptData &&
+                        viewCoinScriptData.cliffed !== "TRUE" &&
+                        viewCoinScriptData.cancollect <= 0 &&
+                        "N/a"}
                     </p>
                   </li>
                   <li>
@@ -320,7 +381,10 @@ export default function DataTable() {
                   <Button
                     type="button"
                     disableElevation
-                    disabled={viewCoinScriptData.mustwait === "TRUE"}
+                    disabled={
+                      viewCoinScriptData.mustwait === "TRUE" ||
+                      viewCoinScriptData.cancollect <= 0
+                    }
                     fullWidth
                     color="inherit"
                     variant="contained"
@@ -355,64 +419,8 @@ export default function DataTable() {
               )}
             </>
           </Stack>
-        </>
+        </Box>
       )}
-    </div>
+    </>
   );
 }
-
-const calculateBlockWithdrawalAmount = async (
-  finalBlock: number,
-  startBlock: number,
-  totalAmountLocked: number,
-  currentCoinAmount: number
-) => {
-  try {
-    const currentBlockHeight = await RPC.getCurrentBlockHeight();
-    const dTotalAmountLocked = new Decimal(totalAmountLocked);
-    const totalduration = new Decimal(finalBlock).minus(
-      new Decimal(startBlock)
-    );
-
-    const contractAlreadyFinished = new Decimal(currentBlockHeight).greaterThan(
-      new Decimal(finalBlock)
-    );
-    // you can collect all amount since you contract finished
-    if (contractAlreadyFinished) {
-      console.log(
-        "Contract already ended.. can collect all amount/rest of amount in full"
-      );
-      const howMuchHaveIAlreadyCollected = dTotalAmountLocked.minus(
-        new Decimal(currentCoinAmount)
-      );
-
-      return howMuchHaveIAlreadyCollected.equals(0)
-        ? dTotalAmountLocked.toNumber()
-        : dTotalAmountLocked.minus(new Decimal(currentCoinAmount)).toNumber();
-    }
-
-    let blockamount = new Decimal(0);
-    if (totalduration.lessThanOrEqualTo(0)) {
-      blockamount = new Decimal(currentCoinAmount);
-    }
-
-    if (totalduration.greaterThan(0)) {
-      blockamount = dTotalAmountLocked.dividedBy(totalduration);
-    }
-
-    let totalAmountTime = new Decimal(currentBlockHeight).minus(
-      new Decimal(startBlock)
-    );
-
-    let totalOwedAmount = totalAmountTime.times(blockamount);
-    let alreadyCollected = dTotalAmountLocked.minus(
-      new Decimal(currentCoinAmount)
-    );
-
-    let canCollect = totalOwedAmount.minus(alreadyCollected);
-
-    return canCollect.toNumber();
-  } catch (error) {
-    throw error;
-  }
-};

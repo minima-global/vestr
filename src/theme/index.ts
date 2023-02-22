@@ -88,13 +88,12 @@ theme = createTheme(theme, {
     MuiTextField: {
       styleOverrides: {
         root: {
-          backgroundColor: "#16181C",
+          backgroundColor: "#fff",
           borderRadius: 8,
           input: {
-            color: "#fff",
+            color: "#000",
             border: "1px solid #585f63",
             paddingLeft: 16,
-
             fontWeight: "600",
             textOverflow: "ellipsis",
             paddingRight: 16,

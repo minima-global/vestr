@@ -26,11 +26,12 @@ import { isDate } from "date-fns";
 import { TabButton, Tabs } from "../MiCustom/MiTabs";
 import useTabs from "../../hooks/useTabs";
 
-import DataTable from "../VestContractsTable";
+import DataTable from "./VestContractsTable";
 import { addMonths } from "date-fns";
 import MiSuccessModal from "../MiCustom/MiSuccessModal/MiSuccessModal";
 import MiError from "../MiCustom/MiError/MiError";
 import { Box } from "@mui/system";
+import { makeTokenImage } from "../../utils/utils";
 
 const VestCreate = () => {
   // create wallet state
@@ -65,7 +66,14 @@ const VestCreate = () => {
   events.onNewBalance(() => {
     RPC.getMinimaBalance()
       .then((balance) => {
-        setWallet(balance);
+        const b = balance.map((t: MinimaToken) => {
+          if (t.token.url && t.token.url.startsWith("<artimage>", 0)) {
+            t.token.url = makeTokenImage(t.token.url, t.tokenid);
+          }
+          return t;
+        });
+
+        setWallet(b);
       })
       .catch((err) => {
         const errorMessage = err && err.message ? err.message : err;
@@ -78,7 +86,14 @@ const VestCreate = () => {
     // get balance and set state
     RPC.getMinimaBalance()
       .then((balance) => {
-        setWallet(balance);
+        const b = balance.map((t: MinimaToken) => {
+          if (t.token.url && t.token.url.startsWith("<artimage>", 0)) {
+            t.token.url = makeTokenImage(t.token.url, t.tokenid);
+          }
+          return t;
+        });
+
+        setWallet(b);
       })
       .catch((err) => {
         const errorMessage = err && err.message ? err.message : err;
@@ -150,8 +165,7 @@ const VestCreate = () => {
           />
         </Box>
       </Modal>
-      <Stack textAlign="center" spacing={1}>
-        <h6 className={styles["form-header"]}>Lock up tokens</h6>
+      <Stack mt={2} textAlign="center" spacing={1}>
         <Tabs>
           <TabButton
             onClick={() => toggleTab(0)}
