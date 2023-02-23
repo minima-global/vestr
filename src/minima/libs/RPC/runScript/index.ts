@@ -22,7 +22,7 @@ export const runScript = async (
       )} globals:${JSON.stringify(globals)}"`,
       (res) => {
         if (!res.status) reject("RPC Failed");
-        // console.log(res);
+        console.log(res);
         resolve(res.response.variables);
       }
     );

@@ -37,8 +37,8 @@ export default function DataTable() {
   // console.log("viewCoin 222", viewCoin);
   const collectCoin = async (
     coin: any,
-    cancollect: number,
-    changeAmount: number,
+    cancollect: string,
+    changeAmount: string,
     root: boolean = false
   ) => {
     setError(false);
@@ -63,13 +63,14 @@ export default function DataTable() {
   };
 
   events.onNewBlock(() => {
+    console.log("Running events");
     RPC.getCurrentBlockHeight().then((h) => {
       setCurrentBlockHeight(h);
     });
 
     RPC.getCoinsByAddress(vestingContract.scriptaddress)
       .then((result: any) => {
-        // console.log(result);
+        console.log(result);
         setRelevantCoins(result.relevantCoins);
       })
       .catch((err) => {
@@ -89,12 +90,15 @@ export default function DataTable() {
             4: viewCoin.state[4].data,
           },
           {
-            "@AMOUNT": viewCoin.amount,
+            "@AMOUNT":
+              viewCoin.tokenid === "0x00"
+                ? viewCoin.amount
+                : viewCoin.tokenamount,
             "@BLOCK": "" + height,
             "@COINAGE": viewCoin.created,
           }
         ).then((vars: any) => {
-          // console.log(vars);
+          console.log(vars);
           setViewCoinScriptData(vars);
         });
       });
@@ -113,12 +117,15 @@ export default function DataTable() {
             4: viewCoin.state[4].data,
           },
           {
-            "@AMOUNT": viewCoin.amount,
+            "@AMOUNT":
+              viewCoin.tokenid === "0x00"
+                ? viewCoin.amount
+                : viewCoin.tokenamount,
             "@BLOCK": "" + height,
             "@COINAGE": viewCoin.created,
           }
         ).then((vars: any) => {
-          // console.log(vars);
+          console.log(vars);
           setViewCoinScriptData(vars);
         });
       });
@@ -143,7 +150,7 @@ export default function DataTable() {
 
     RPC.getCoinsByAddress(vestingContract.scriptaddress)
       .then((result: any) => {
-        // console.log(result);
+        console.log(result);
         setRelevantCoins(result.relevantCoins);
       })
       .catch((err) => {
@@ -371,9 +378,15 @@ export default function DataTable() {
                     <h6>Change</h6>
                     <p>
                       {viewCoinScriptData &&
-                      viewCoinScriptData.cliffed !== "TRUE"
-                        ? viewCoinScriptData.change + " / " + viewCoin.amount
-                        : "N/A"}
+                        viewCoin.tokenid === "0x00" &&
+                        viewCoinScriptData.cliffed !== "TRUE" &&
+                        viewCoinScriptData.change + " / " + viewCoin.amount}
+                      {viewCoinScriptData &&
+                        viewCoin.tokenid !== "0x00" &&
+                        viewCoinScriptData.cliffed !== "TRUE" &&
+                        viewCoinScriptData.change +
+                          " / " +
+                          viewCoin.tokenamount}
                     </p>
                   </li>
                 </ul>

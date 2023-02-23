@@ -1,9 +1,10 @@
 import { vestingContract } from "../../contracts";
+import Decimal from "decimal.js";
 
 export const withdrawVestingContract = (
   coin: any,
-  cancollect: number,
-  change: number,
+  cancollect: string,
+  change: string,
   root: boolean,
   state: any[]
 ) => {
@@ -16,13 +17,13 @@ export const withdrawVestingContract = (
 
   return new Promise((resolve, reject) => {
     const id = Math.floor(Math.random() * 1000000000);
-
+    console.log("CHANGE1212", change);
     const command = `
             txncreate id:${id};
             txninput id:${id} coinid:${coinid} scriptmmr:true;
             txnoutput id:${id} address:${withdrawalAddress} amount:${cancollect} tokenid:${tokenid} storestate:false;
             ${
-              change && change > 0
+              change && new Decimal(change).greaterThan(0)
                 ? `
                 txnoutput id:${id} address:${vestingContract.scriptaddress} amount:${change} tokenid:${tokenid} storestate:true;
                 txnstate id:${id} port:0 value:${state[0].data};
