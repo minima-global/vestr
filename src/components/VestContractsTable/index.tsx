@@ -6,18 +6,18 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import { vestingContract } from "../../../minima/libs/contracts";
-import * as RPC from "../../../minima/libs/RPC";
+import { vestingContract } from "../../minima/libs/contracts";
+import * as RPC from "../../minima/libs/RPC";
 import styles from "./VestContractsTable.module.css";
-import { Box, Button, Modal, Stack } from "@mui/material";
+import { Box, Button, Card, Modal, Stack } from "@mui/material";
 
 import Decimal from "decimal.js";
-import MiRootModal from "../../MiCustom/MiRootModal/MiRootModal";
-import { Coin } from "../../../@types";
-import MiSuccessModal from "../../MiCustom/MiSuccessModal/MiSuccessModal";
-import MiError from "../../MiCustom/MiError/MiError";
-import { events } from "../../../minima/libs/events";
-import { MiTitle } from "../../MiCustom/MiTitle/MiTitle";
+import MiRootModal from "../MiCustom/MiRootModal/MiRootModal";
+import { Coin } from "../../@types";
+import MiSuccessModal from "../MiCustom/MiSuccessModal/MiSuccessModal";
+import MiError from "../MiCustom/MiError/MiError";
+import { events } from "../../minima/libs/events";
+import { MiTitle } from "../MiCustom/MiTitle/MiTitle";
 
 export default function DataTable() {
   const [relevantCoins, setRelevantCoins] = React.useState<any[]>([]);
@@ -34,7 +34,7 @@ export default function DataTable() {
   const closeRootModal = () => setViewRootModal(false);
   const closeSuccessModal = () => setShowSuccessModal(false);
 
-  console.log("viewCoin 222", viewCoin);
+  // console.log("viewCoin 222", viewCoin);
   const collectCoin = async (
     coin: any,
     cancollect: number,
@@ -118,7 +118,7 @@ export default function DataTable() {
             "@COINAGE": viewCoin.created,
           }
         ).then((vars: any) => {
-          console.log(vars);
+          // console.log(vars);
           setViewCoinScriptData(vars);
         });
       });
@@ -143,7 +143,7 @@ export default function DataTable() {
 
     RPC.getCoinsByAddress(vestingContract.scriptaddress)
       .then((result: any) => {
-        console.log(result);
+        // console.log(result);
         setRelevantCoins(result.relevantCoins);
       })
       .catch((err) => {
@@ -339,6 +339,9 @@ export default function DataTable() {
                     <h6>Can Withdraw Now</h6>
                     <p>
                       {viewCoinScriptData &&
+                        viewCoinScriptData.cliffed === "TRUE" &&
+                        "N/A"}
+                      {viewCoinScriptData &&
                         viewCoinScriptData.cliffed !== "TRUE" &&
                         viewCoinScriptData.cancollect > 0 &&
                         viewCoin.tokenid === "0x00" &&
@@ -353,7 +356,7 @@ export default function DataTable() {
                       {viewCoinScriptData &&
                         viewCoinScriptData.cliffed !== "TRUE" &&
                         viewCoinScriptData.cancollect <= 0 &&
-                        "N/a"}
+                        "N/A"}
                     </p>
                   </li>
                   <li>
@@ -361,7 +364,7 @@ export default function DataTable() {
                     <p>
                       {viewCoinScriptData
                         ? viewCoinScriptData.alreadycollected
-                        : "N/a"}
+                        : "N/A"}
                     </p>
                   </li>
                   <li>
@@ -370,7 +373,7 @@ export default function DataTable() {
                       {viewCoinScriptData &&
                       viewCoinScriptData.cliffed !== "TRUE"
                         ? viewCoinScriptData.change + " / " + viewCoin.amount
-                        : "N/a"}
+                        : "N/A"}
                     </p>
                   </li>
                 </ul>
@@ -389,8 +392,8 @@ export default function DataTable() {
                     color="inherit"
                     variant="contained"
                     onClick={() => {
-                      console.log(viewCoinScriptData.cancollect);
-                      console.log(viewCoinScriptData.change);
+                      // console.log(viewCoinScriptData.cancollect);
+                      // console.log(viewCoinScriptData.change);
                       collectCoin(
                         viewCoin,
                         viewCoinScriptData.cancollect,
@@ -400,7 +403,7 @@ export default function DataTable() {
                   >
                     {viewCoinScriptData.mustwait === "TRUE"
                       ? `Can collect in ${new Decimal(viewCoin.state[4].data)
-                          .minus(currentBlockHeight)
+                          .minus(viewCoin.created)
                           .toNumber()}`
                       : "Withdraw"}
                   </Button>
@@ -421,6 +424,13 @@ export default function DataTable() {
           </Stack>
         </Box>
       )}
+      <Stack mt={2}>
+        <Box>
+          <p className={styles["block"]}>
+            Current block height: {currentBlockHeight}
+          </p>
+        </Box>
+      </Stack>
     </>
   );
 }

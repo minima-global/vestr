@@ -24,9 +24,9 @@ import styles from "./VestCreate.module.css";
 
 import { isDate } from "date-fns";
 import { TabButton, Tabs } from "../MiCustom/MiTabs";
-import useTabs from "../../hooks/useTabs";
+import useTabs from "../../minima/hooks/useTabs";
 
-import DataTable from "./VestContractsTable";
+import DataTable from "../VestContractsTable";
 import { addMonths } from "date-fns";
 import MiSuccessModal from "../MiCustom/MiSuccessModal/MiSuccessModal";
 import MiError from "../MiCustom/MiError/MiError";

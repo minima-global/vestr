@@ -19,7 +19,7 @@ const MiRootModal = (props: any) => {
     props;
 
   const [loading, setLoading] = useState(false);
-  console.log("viewCoin", viewCoin);
+  // console.log("viewCoin", viewCoin);
   useEffect(() => {
     const neverWithdrew = new Decimal(viewCoin.state[1].data)
       .minus(viewCoin.amount)
@@ -29,8 +29,8 @@ const MiRootModal = (props: any) => {
     }
 
     if (!neverWithdrew) {
-      console.log(viewCoinScriptData);
-      console.log("already colect", viewCoinScriptData.alreadycollected);
+      // console.log(viewCoinScriptData);
+      // console.log("already colect", viewCoinScriptData.alreadycollected);
       const change = new Decimal(viewCoin.state[1].data)
         .minus(viewCoinScriptData.alreadycollected)
         .toNumber();

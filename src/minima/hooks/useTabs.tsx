@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { tabStyles } from "../components/MiCustom/MiTabs";
+import { tabStyles } from "../../components/MiCustom/MiTabs";
 const useTabs = () => {
   const [tabs, setTabOpen] = useState(0);
 

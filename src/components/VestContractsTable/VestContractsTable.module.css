@@ -6,6 +6,8 @@
 }
 .view * {
   color: #000;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 .view div button {
   background-color: inherit;
@@ -61,4 +63,9 @@ ul * {
 
 .unavailable {
   color: #fff;
+}
+
+.block {
+  color: #fff;
+  font-family: Manrope-semibold;
 }

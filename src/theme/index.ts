@@ -90,6 +90,7 @@ theme = createTheme(theme, {
         root: {
           backgroundColor: "#fff",
           borderRadius: 8,
+
           input: {
             color: "#000",
             border: "1px solid #585f63",
@@ -103,7 +104,7 @@ theme = createTheme(theme, {
               color: "#585f63",
             },
             "&:focus": {
-              backgroundColor: "#16181C",
+              backgroundColor: "#fff",
             },
           },
         },
