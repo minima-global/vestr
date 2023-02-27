@@ -88,6 +88,7 @@ export default function DataTable() {
             2: viewCoin.state[2].data,
             3: viewCoin.state[3].data,
             4: viewCoin.state[4].data,
+            5: viewCoin.state[5].data,
           },
           {
             "@AMOUNT":
@@ -115,6 +116,7 @@ export default function DataTable() {
             2: viewCoin.state[2].data,
             3: viewCoin.state[3].data,
             4: viewCoin.state[4].data,
+            5: viewCoin.state[5].data,
           },
           {
             "@AMOUNT":
@@ -227,7 +229,7 @@ export default function DataTable() {
                           overflow: "hidden",
                         }}
                       >
-                        {row.amount}
+                        {row.state[1].data}
                       </TableCell>
                       {row.tokenid !== "0x00" &&
                         row.token &&
@@ -336,7 +338,7 @@ export default function DataTable() {
 
                   <li>
                     <h6>Root Key</h6>
-                    <p>{viewCoin.state[4].data}</p>
+                    <p>{viewCoin.state[5].data}</p>
                   </li>
                   <li>
                     <h6>Withdrawal Address</h6>
@@ -423,6 +425,7 @@ export default function DataTable() {
 
                   <Button
                     type="button"
+                    disabled={viewCoinScriptData.isrooted === "FALSE"}
                     disableElevation
                     fullWidth
                     color="inherit"
