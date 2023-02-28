@@ -61,7 +61,9 @@ export const createVestingContract = async (
           root.length === 0 ? "0x21" : root
         }"}`,
         (res) => {
-          if (!res.status) reject(res.error ? res.error : "RPC Failed");
+          if (!res.status && !res.pending)
+            reject(res.error ? res.error : "RPC Failed");
+          if (!res.status && res.pending) resolve(res.error);
 
           console.log(res);
           resolve(res.response);

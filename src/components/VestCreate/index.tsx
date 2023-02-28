@@ -32,6 +32,53 @@ import MiSuccessModal from "../MiCustom/MiSuccessModal/MiSuccessModal";
 import MiError from "../MiCustom/MiError/MiError";
 import { Box } from "@mui/system";
 import { makeTokenImage } from "../../utils/utils";
+import * as yup from "yup";
+import { checkAddress } from "../../minima/libs/RPC";
+
+const formValidation = yup.object().shape({
+  token: yup.object().required("Field is required"),
+  endContract: yup
+    .mixed()
+    .required("Field is required")
+    .test("check-datetime", "Invalid datetime", function (val) {
+      const { path, createError, parent } = this;
+
+      if (val === undefined) {
+        return false;
+      }
+
+      if (!isDate(val)) {
+        return createError({ path, message: `Please select a valid date` });
+      }
+
+      return true;
+    }),
+  amount: yup
+    .string()
+    .required("Field is required")
+    .matches(/^[^a-zA-Z\\;'"]+$/, "Invalid characters."),
+  address: yup
+    .string()
+    .required("Field is required.")
+    .matches(/0|M[xX][0-9a-zA-Z]+/, "Invalid Address.")
+    .min(59, "Invalid Address, too short.")
+    .max(66, "Invalid Address, too long.")
+    .test("check-address", "Invalid address", function (val) {
+      const { path, createError } = this;
+
+      if (val === undefined) {
+        return false;
+      }
+
+      return checkAddress(val)
+        .then(() => {
+          return true;
+        })
+        .catch((err) => {
+          return createError({ path, message: err });
+        });
+    }),
+});
 
 const VestCreate = () => {
   // create wallet state
@@ -41,7 +88,13 @@ const VestCreate = () => {
   );
 
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const closeModal = () => setShowSuccessModal(false);
+  const [transactionPending, setTransactionPending] = useState(false);
+  const closeModal = () => {
+    setShowSuccessModal(false);
+    if (transactionPending) {
+      setTransactionPending(false);
+    }
+  };
   const { tabs, toggleTab, tabStyles } = useTabs();
 
   const handleAddressSelection = (e: any) => {
@@ -77,7 +130,7 @@ const VestCreate = () => {
       })
       .catch((err) => {
         const errorMessage = err && err.message ? err.message : err;
-        console.log(err);
+        // console.log(err);
         formik.setStatus(errorMessage);
       });
   });
@@ -114,7 +167,7 @@ const VestCreate = () => {
       token: wallet[0],
       address: "",
       amount: "",
-      endContract: undefined,
+      endContract: null,
       cliff: 0,
       root: "",
       minBlockWait: 0,
@@ -130,7 +183,7 @@ const VestCreate = () => {
           formInput.endContract &&
           isDate(formInput.endContract)
         ) {
-          await RPC.createVestingContract(
+          const result = await RPC.createVestingContract(
             Number(formInput.amount),
             formInput.cliff,
             formInput.address,
@@ -140,7 +193,13 @@ const VestCreate = () => {
             formInput.minBlockWait
           );
 
+          const transactionIsPending = typeof result === "string";
+          if (transactionIsPending) {
+            setTransactionPending(true);
+          }
+
           setShowSuccessModal(true);
+          formik.resetForm();
         }
       } catch (error: any) {
         const formError =
@@ -153,14 +212,23 @@ const VestCreate = () => {
       }
     },
     enableReinitialize: !!wallet,
+    validationSchema: formValidation,
   });
   return (
     <>
       <Modal open={showSuccessModal}>
         <Box>
           <MiSuccessModal
-            title="Contract Created!"
-            subtitle="Navigate to Track to find your pending contracts"
+            title={
+              !transactionPending
+                ? "Contract Created!"
+                : "Contract Creation Pending!"
+            }
+            subtitle={
+              !transactionPending
+                ? "Navigate to Track to find your pending contracts"
+                : "Now go to your pending transactions to accept this action"
+            }
             closeModal={closeModal}
           />
         </Box>
@@ -232,17 +300,23 @@ const VestCreate = () => {
                   id="address"
                   name="address"
                   placeholder="address"
+                  helperText={formik.dirty && formik.errors.address}
+                  error={
+                    formik.touched.address && Boolean(formik.errors.address)
+                  }
                   value={formik.values.address}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   disabled={formik.isSubmitting}
                 />
                 <TextField
-                  type="number"
+                  type="text"
                   fullWidth
                   id="amount"
                   name="amount"
                   placeholder="amount"
+                  helperText={formik.dirty && formik.errors.amount}
+                  error={formik.touched.amount && Boolean(formik.errors.amount)}
                   value={formik.values.amount}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
@@ -292,7 +366,7 @@ const VestCreate = () => {
                     setDynamicByCliff(
                       addMonths(new Date(), Number(e.target.value))
                     );
-                    console.log(e.target.value);
+                    // console.log(e.target.value);
                   }}
                   disabled={formik.isSubmitting}
                 >
@@ -318,6 +392,9 @@ const VestCreate = () => {
                   <option key="daily" value="24">
                     Daily
                   </option>
+                  <option key="weekly" value="168">
+                    Weekly
+                  </option>
                   <option key="monthly" value="720">
                     Monthly
                   </option>
@@ -329,6 +406,12 @@ const VestCreate = () => {
                   </option>
                 </Select>
                 <DateTimePicker
+                  // componentsProps={{
+                  //   actionBar: {
+                  //     actions: (variant) =>
+                  //       variant === "desktop" ? [] : ["clear"],
+                  //   },
+                  // }}
                   minDateTime={dynamicByCliff ? dynamicByCliff : undefined}
                   disablePast={true}
                   value={formik.values.endContract}
@@ -343,7 +426,10 @@ const VestCreate = () => {
                         InputProps={{
                           readOnly: true,
                         }}
-                        error={Boolean(formik.errors.endContract)}
+                        error={
+                          formik.touched.endContract &&
+                          Boolean(formik.errors.endContract)
+                        }
                         helperText={formik.dirty && formik.errors.endContract}
                         id="datetime"
                         name="datetime"
@@ -358,9 +444,9 @@ const VestCreate = () => {
                 type="submit"
                 disableElevation
                 fullWidth
-                color="inherit"
+                color="primary"
                 variant="contained"
-                disabled={formik.isSubmitting}
+                disabled={!formik.isValid || formik.isSubmitting}
               >
                 {!formik.isSubmitting && "Lock"}
                 {formik.isSubmitting && <CircularProgress size={16} />}

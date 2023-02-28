@@ -46,6 +46,8 @@ theme = createTheme(theme, {
           borderTopRightRadius: 0,
           marginTop: 4,
           borderRadius: 4,
+          overflow: "hidden",
+          textOverflow: "ellipsis",
         },
         "&$error": {
           color: "black",
@@ -62,6 +64,7 @@ theme = createTheme(theme, {
         // Name of the slot
         root: {
           // Some CSS
+
           borderRadius: 8,
           textTransform: "none",
           fontWeight: 800,
@@ -73,6 +76,7 @@ theme = createTheme(theme, {
           "&:disabled": {
             backgroundColor: "#D3D3D8",
             color: "#fff",
+            cursor: "not-allowed",
           },
         },
       },

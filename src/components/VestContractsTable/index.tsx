@@ -30,11 +30,16 @@ export default function DataTable() {
   >(false);
 
   const [showSuccessModal, setShowSuccessModal] = React.useState(false);
+  const [transactionPending, setTransactionPending] = React.useState(false);
   const [viewRootModal, setViewRootModal] = React.useState(false);
   const closeRootModal = () => setViewRootModal(false);
-  const closeSuccessModal = () => setShowSuccessModal(false);
+  const closeSuccessModal = () => {
+    setShowSuccessModal(false);
+    if (transactionPending) {
+      setTransactionPending(false);
+    }
+  };
 
-  // console.log("viewCoin 222", viewCoin);
   const collectCoin = async (
     coin: any,
     cancollect: string,
@@ -63,14 +68,13 @@ export default function DataTable() {
   };
 
   events.onNewBlock(() => {
-    console.log("Running events");
     RPC.getCurrentBlockHeight().then((h) => {
       setCurrentBlockHeight(h);
     });
 
     RPC.getCoinsByAddress(vestingContract.scriptaddress)
       .then((result: any) => {
-        console.log(result);
+        // console.log("getCoinsByAddress", result);
         setRelevantCoins(result.relevantCoins);
       })
       .catch((err) => {
@@ -99,7 +103,7 @@ export default function DataTable() {
             "@COINAGE": viewCoin.created,
           }
         ).then((vars: any) => {
-          console.log(vars);
+          // console.log("runScript", vars);
           setViewCoinScriptData(vars);
         });
       });
@@ -127,14 +131,17 @@ export default function DataTable() {
             "@COINAGE": viewCoin.created,
           }
         ).then((vars: any) => {
-          console.log(vars);
+          // console.log("runScript", vars);
           setViewCoinScriptData(vars);
         });
       });
     }
   }, [viewCoin]);
 
-  const setWithdrawalSuccess = () => {
+  const setWithdrawalSuccess = (isPending: boolean = false) => {
+    if (isPending) {
+      setTransactionPending(true);
+    }
     setView(false);
     setViewCoinScriptData(false);
     setShowSuccessModal(true);
@@ -152,7 +159,7 @@ export default function DataTable() {
 
     RPC.getCoinsByAddress(vestingContract.scriptaddress)
       .then((result: any) => {
-        console.log(result);
+        // console.log(result);
         setRelevantCoins(result.relevantCoins);
       })
       .catch((err) => {
@@ -167,8 +174,16 @@ export default function DataTable() {
       <Modal open={showSuccessModal}>
         <Box>
           <MiSuccessModal
-            title="Withdrew Successfully"
-            subtitle="Check your Wallet Minidapp balance"
+            title={
+              !transactionPending
+                ? "Withdrew Successfully"
+                : "Withdrawal Pending"
+            }
+            subtitle={
+              !transactionPending
+                ? "Check your Wallet Minidapp balance"
+                : "Now go to your pending transactions and accept this action"
+            }
             closeModal={closeSuccessModal}
           />
         </Box>
@@ -338,7 +353,11 @@ export default function DataTable() {
 
                   <li>
                     <h6>Root Key</h6>
-                    <p>{viewCoin.state[5].data}</p>
+                    <p>
+                      {viewCoin.state[5].data === "0x21"
+                        ? "No root key set"
+                        : viewCoin.state[5].data}
+                    </p>
                   </li>
                   <li>
                     <h6>Withdrawal Address</h6>
@@ -391,6 +410,12 @@ export default function DataTable() {
                           viewCoin.tokenamount}
                     </p>
                   </li>
+                  {viewCoinScriptData.mustwait === "TRUE" && (
+                    <li>
+                      <h6>Can collect every</h6>
+                      <p>{viewCoin.state[4].data + " blocks"}</p>
+                    </li>
+                  )}
                 </ul>
               </Stack>
 
@@ -418,7 +443,7 @@ export default function DataTable() {
                   >
                     {viewCoinScriptData.mustwait === "TRUE"
                       ? `Can collect in ${new Decimal(viewCoin.state[4].data)
-                          .minus(viewCoin.created)
+                          .minus(viewCoinScriptData.coinsage)
                           .toNumber()}`
                       : "Withdraw"}
                   </Button>
