@@ -131,7 +131,7 @@ export default function DataTable() {
             "@COINAGE": viewCoin.created,
           }
         ).then((vars: any) => {
-          // console.log("runScript", vars);
+          console.log("runScript", vars);
           setViewCoinScriptData(vars);
         });
       });
@@ -443,7 +443,11 @@ export default function DataTable() {
                   >
                     {viewCoinScriptData.mustwait === "TRUE"
                       ? `Can collect in ${new Decimal(viewCoin.state[4].data)
-                          .minus(viewCoinScriptData.coinsage)
+                          .minus(
+                            new Decimal(currentBlockHeight).minus(
+                              viewCoinScriptData.coinsage
+                            )
+                          )
                           .toNumber()}`
                       : "Withdraw"}
                   </Button>
