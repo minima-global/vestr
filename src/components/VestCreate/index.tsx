@@ -34,6 +34,7 @@ import { Box } from "@mui/system";
 import { makeTokenImage } from "../../utils/utils";
 import * as yup from "yup";
 import { checkAddress } from "../../minima/libs/RPC";
+import VestCalculateSchedules from "../VestCalculateSchedules";
 
 const formValidation = yup.object().shape({
   token: yup.object().required("Field is required"),
@@ -247,12 +248,18 @@ const VestCreate = () => {
           >
             Track
           </TabButton>
+          <TabButton
+            onClick={() => toggleTab(2)}
+            className={tabs === 2 ? tabStyles["tab-open"] : undefined}
+          >
+            Calculate
+          </TabButton>
         </Tabs>
 
         {tabs === 0 && (
           <form onSubmit={formik.handleSubmit}>
             <Stack spacing={5}>
-              <Stack spacing={1} alignItems="center">
+              <Stack spacing={1}>
                 {formik.status ? (
                   <MiError>
                     <label>{formik.status}</label>
@@ -406,12 +413,6 @@ const VestCreate = () => {
                   </option>
                 </Select>
                 <DateTimePicker
-                  // componentsProps={{
-                  //   actionBar: {
-                  //     actions: (variant) =>
-                  //       variant === "desktop" ? [] : ["clear"],
-                  //   },
-                  // }}
                   minDateTime={dynamicByCliff ? dynamicByCliff : undefined}
                   disablePast={true}
                   value={formik.values.endContract}
@@ -456,6 +457,7 @@ const VestCreate = () => {
         )}
 
         {tabs === 1 && <DataTable />}
+        {tabs === 2 && <VestCalculateSchedules />}
       </Stack>
     </>
   );

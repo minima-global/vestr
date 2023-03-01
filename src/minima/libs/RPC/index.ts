@@ -8,3 +8,4 @@ export * from "./withdrawVestingContract";
 export * from "./getAddress";
 export * from "./runScript";
 export * from "./checkAddress";
+export * from "./calculateVestingSchedule";
