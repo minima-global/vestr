@@ -1,0 +1,46 @@
+.drawer {
+  height: 100%;
+  position: relative;
+  left: 0;
+  bottom: 0;
+  top: 0;
+  max-width: 200px;
+  border-right: 1px solid #d3d3d3;
+}
+
+.toolbar {
+  border-bottom: 1px solid #d3d3d3;
+}
+
+
+.toolbar img {
+  width: 48px;
+  height: 48px;
+}
+
+.toolbar h6 {
+  margin: 0;
+  font-family: Manrope-regular;
+  font-size: 2.3rem;
+}
+
+.navigation a {
+  background: none;
+  padding: 4px;
+  border: none;
+  font-family: Manrope-semibold;
+  border-radius: 8px;
+  font-weight: 600;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 4px;
+}
+.navigation a:hover {
+  background: #d3d3d3;
+  cursor: pointer;
+}
+.navigation a:hover svg {
+  stroke:black;
+}

@@ -114,17 +114,6 @@ theme = createTheme(theme, {
         },
       },
     },
-    MuiToolbar: {
-      styleOverrides: {
-        root: {
-          zIndex: 0,
-          borderBottom: "none",
-          backgroundColor: "#0D0E10",
-          color: "#fff",
-          padding: "0px 8px!important",
-        },
-      },
-    },
     MuiList: {
       styleOverrides: {
         root: {
