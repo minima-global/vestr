@@ -11,6 +11,7 @@ import {
   ListItem,
   ListItemText,
   ListSubheader,
+  Toolbar,
 } from "@mui/material";
 import MiError from "../MiCustom/MiError/MiError";
 import styles from "./VestCalculateSchedules.module.css";
@@ -52,94 +53,101 @@ const VestCalculateSchedules = () => {
   });
 
   return (
-    <>
+    <Stack className={styles["calculate"]}>
+      <Toolbar />
       {!data && (
-        <form className={styles["form"]} onSubmit={formik.handleSubmit}>
-          <Stack spacing={5}>
-            <Stack spacing={1}>
-              {formik.status ? (
-                <MiError>
-                  <label>{formik.status}</label>
-                </MiError>
-              ) : null}
+        <>
+          <form className={styles["form"]} onSubmit={formik.handleSubmit}>
+            <Stack spacing={5}>
+              <Stack spacing={1}>
+                {formik.status ? (
+                  <MiError>
+                    <label>{formik.status}</label>
+                  </MiError>
+                ) : null}
 
-              <FormGroup>
-                <FormLabel htmlFor="amount">Amount</FormLabel>
-                <TextField
-                  type="text"
-                  fullWidth
-                  id="amount"
-                  name="amount"
-                  helperText={formik.dirty && formik.errors.amount}
-                  error={formik.touched.amount && Boolean(formik.errors.amount)}
-                  value={formik.values.amount}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  disabled={formik.isSubmitting}
-                />
-              </FormGroup>
-              <FormGroup>
-                <FormLabel htmlFor="percentageAtLaunch">
-                  Launch Percentage
-                </FormLabel>
-                <TextField
-                  type="number"
-                  fullWidth
-                  inputProps={{
-                    max: 100,
-                  }}
-                  id="percentageAtLaunch"
-                  name="percentageAtLaunch"
-                  helperText={formik.dirty && formik.errors.percentageAtLaunch}
-                  error={
-                    formik.touched.percentageAtLaunch &&
-                    Boolean(formik.errors.percentageAtLaunch)
-                  }
-                  value={formik.values.percentageAtLaunch}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  disabled={formik.isSubmitting}
-                />
-              </FormGroup>
+                <FormGroup>
+                  <FormLabel htmlFor="amount">Amount</FormLabel>
+                  <TextField
+                    type="text"
+                    fullWidth
+                    id="amount"
+                    name="amount"
+                    helperText={formik.dirty && formik.errors.amount}
+                    error={
+                      formik.touched.amount && Boolean(formik.errors.amount)
+                    }
+                    value={formik.values.amount}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    disabled={formik.isSubmitting}
+                  />
+                </FormGroup>
+                <FormGroup>
+                  <FormLabel htmlFor="percentageAtLaunch">
+                    Launch Percentage
+                  </FormLabel>
+                  <TextField
+                    type="number"
+                    fullWidth
+                    inputProps={{
+                      max: 100,
+                    }}
+                    id="percentageAtLaunch"
+                    name="percentageAtLaunch"
+                    helperText={
+                      formik.dirty && formik.errors.percentageAtLaunch
+                    }
+                    error={
+                      formik.touched.percentageAtLaunch &&
+                      Boolean(formik.errors.percentageAtLaunch)
+                    }
+                    value={formik.values.percentageAtLaunch}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    disabled={formik.isSubmitting}
+                  />
+                </FormGroup>
 
-              <FormGroup>
-                <FormLabel htmlFor="contractLength">
-                  Contract Length (months)
-                </FormLabel>
+                <FormGroup>
+                  <FormLabel htmlFor="contractLength">
+                    Contract Length (months)
+                  </FormLabel>
 
-                <TextField
-                  type="number"
-                  inputProps={{
-                    max: 100,
-                  }}
-                  fullWidth
-                  id="contractLength"
-                  name="contractLength"
-                  helperText={formik.dirty && formik.errors.contractLength}
-                  error={
-                    formik.touched.contractLength &&
-                    Boolean(formik.errors.contractLength)
-                  }
-                  value={formik.values.contractLength}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  disabled={formik.isSubmitting}
-                />
-              </FormGroup>
+                  <TextField
+                    type="number"
+                    inputProps={{
+                      max: 100,
+                    }}
+                    fullWidth
+                    id="contractLength"
+                    name="contractLength"
+                    helperText={formik.dirty && formik.errors.contractLength}
+                    error={
+                      formik.touched.contractLength &&
+                      Boolean(formik.errors.contractLength)
+                    }
+                    value={formik.values.contractLength}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    disabled={formik.isSubmitting}
+                  />
+                </FormGroup>
+              </Stack>
+              <Button
+                type="submit"
+                disableElevation
+                fullWidth
+                color="primary"
+                variant="contained"
+                disabled={!formik.isValid || formik.isSubmitting}
+              >
+                {!formik.isSubmitting && "Calculate"}
+                {formik.isSubmitting && <CircularProgress size={16} />}
+              </Button>
             </Stack>
-            <Button
-              type="submit"
-              disableElevation
-              fullWidth
-              color="primary"
-              variant="contained"
-              disabled={!formik.isValid || formik.isSubmitting}
-            >
-              {!formik.isSubmitting && "Calculate"}
-              {formik.isSubmitting && <CircularProgress size={16} />}
-            </Button>
-          </Stack>
-        </form>
+          </form>
+        </>
       )}
 
       {data && (
@@ -198,7 +206,7 @@ const VestCalculateSchedules = () => {
           </Stack>
         </form>
       )}
-    </>
+    </Stack>
   );
 };
 

@@ -1,7 +1,6 @@
 .form label {
   text-align: left;
   margin-bottom: 0;
-  padding: 0;
   font-family: Manrope-semibold;
 }
 
@@ -22,4 +21,8 @@
   opacity: 0.8;
 
   font-variant-numeric: tabular-nums;
+}
+
+.calculate {
+  padding: 0 16px;
 }
