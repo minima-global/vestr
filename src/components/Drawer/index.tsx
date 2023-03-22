@@ -25,19 +25,19 @@ const Drawer = () => {
       </Toolbar>
       <Stack mt={2} gap={2}>
         <Stack className={styles["navigation"]} ml={3} mr={3} gap={2}>
-          <a onClick={() => navigate("/home")}>
+          <a onClick={() => navigate("/dashboard/home")}>
             <HomeOutlined />
             Home
           </a>
-          <a onClick={() => navigate("/calculate")}>
+          <a onClick={() => navigate("/dashboard/calculate")}>
             <CalculateOutlined />
             Calculate
           </a>
-          <a onClick={() => navigate("/create")}>
+          <a onClick={() => navigate("/dashboard/create")}>
             <NoteAddOutlined />
             Create
           </a>
-          <a onClick={() => navigate("/track")}>
+          <a onClick={() => navigate("/dashboard/track")}>
             <LocationSearchingOutlined />
             Track
           </a>
