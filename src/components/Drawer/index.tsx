@@ -6,7 +6,7 @@ import {
   HomeOutlined,
   LocationSearchingOutlined,
 } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 const Drawer = () => {
   const navigate = useNavigate();
@@ -19,28 +19,64 @@ const Drawer = () => {
           alignItems="center"
           justifyContent="flex-start"
         >
-          <img src="./assets/icon.png" />
+          <img src="/assets/icon.png" />
           <h6>Vestr</h6>
         </Stack>
       </Toolbar>
       <Stack mt={2} gap={2}>
         <Stack className={styles["navigation"]} ml={3} mr={3} gap={2}>
-          <a onClick={() => navigate("/dashboard/home")}>
+          <NavLink
+            className={({ isActive, isPending }) =>
+              isPending
+                ? styles["pending"]
+                : isActive
+                ? styles["active"]
+                : styles[""]
+            }
+            to="/dashboard/home"
+          >
             <HomeOutlined />
             Home
-          </a>
-          <a onClick={() => navigate("/dashboard/calculate")}>
+          </NavLink>
+          <NavLink
+            className={({ isActive, isPending }) =>
+              isPending
+                ? styles["pending"]
+                : isActive
+                ? styles["active"]
+                : styles[""]
+            }
+            to="/dashboard/calculate"
+          >
             <CalculateOutlined />
             Calculate
-          </a>
-          <a onClick={() => navigate("/dashboard/create")}>
+          </NavLink>
+          <NavLink
+            className={({ isActive, isPending }) =>
+              isPending
+                ? styles["pending"]
+                : isActive
+                ? styles["active"]
+                : styles[""]
+            }
+            to="/dashboard/create"
+          >
             <NoteAddOutlined />
             Create
-          </a>
-          <a onClick={() => navigate("/dashboard/track")}>
+          </NavLink>
+          <NavLink
+            className={({ isActive, isPending }) =>
+              isPending
+                ? styles["pending"]
+                : isActive
+                ? styles["active"]
+                : styles[""]
+            }
+            to="/dashboard/track"
+          >
             <LocationSearchingOutlined />
             Track
-          </a>
+          </NavLink>
         </Stack>
       </Stack>
     </div>

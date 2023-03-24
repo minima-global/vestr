@@ -17,8 +17,24 @@ import MiError from "../MiCustom/MiError/MiError";
 import styles from "./VestCalculateSchedules.module.css";
 
 import * as RPC from "../../minima/libs/RPC";
+import * as Yup from "yup";
 
-const VestCalculateSchedules = () => {
+const formValidation = Yup.object().shape({
+  amount: Yup.string().required("Field required"),
+  contractLength: Yup.string().required("Field required"),
+  percentageAtLaunch: Yup.string().required("Field required"),
+});
+
+interface IProps {
+  totalLockedAmount?: string;
+  totalLaunchPercentage?: string;
+  totalPeriod?: string;
+}
+const VestCalculateSchedules = ({
+  totalLaunchPercentage,
+  totalLockedAmount,
+  totalPeriod,
+}: IProps) => {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<false | string>(false);
   const [data, setData] = React.useState<any>(undefined);
@@ -30,31 +46,44 @@ const VestCalculateSchedules = () => {
       contractLength: "",
     },
     onSubmit: async (formData) => {
+      const hasExampleValues =
+        totalLaunchPercentage && totalLockedAmount && totalPeriod;
+
       setLoading(true);
       setError(false);
       formik.setStatus(undefined);
 
       try {
-        const totalLockedAmount = formData.amount;
-        const launchPercentage = parseInt(formData.percentageAtLaunch) / 100;
-        const contractLength = formData.contractLength;
-        const calculatedSchedule = await RPC.calculateVestingSchedule(
-          totalLockedAmount,
-          launchPercentage,
-          contractLength
-        );
-        console.log(calculatedSchedule);
-        setData(calculatedSchedule);
+        if (hasExampleValues) {
+          const calculatedSchedule = await RPC.calculateVestingSchedule(
+            totalLockedAmount,
+            parseInt(totalLaunchPercentage) / 100,
+            totalPeriod
+          );
+          setData(calculatedSchedule);
+        }
+        if (!hasExampleValues) {
+          const totalLockedAmount = formData.amount;
+          const launchPercentage = parseInt(formData.percentageAtLaunch) / 100;
+          const contractLength = formData.contractLength;
+          const calculatedSchedule = await RPC.calculateVestingSchedule(
+            totalLockedAmount,
+            launchPercentage,
+            contractLength
+          );
+          console.log(calculatedSchedule);
+          setData(calculatedSchedule);
+        }
       } catch (error: any) {
         formik.setStatus(error.message);
         setError(error.message);
       }
     },
+    validationSchema: formValidation,
   });
 
   return (
     <Stack className={styles["calculate"]}>
-      <Toolbar />
       {!data && (
         <>
           <form className={styles["form"]} onSubmit={formik.handleSubmit}>
@@ -67,8 +96,9 @@ const VestCalculateSchedules = () => {
                 ) : null}
 
                 <FormGroup>
-                  <FormLabel htmlFor="amount">Amount</FormLabel>
+                  <FormLabel htmlFor="amount">Contract Amount</FormLabel>
                   <TextField
+                    placeholder="total locked amount"
                     type="text"
                     fullWidth
                     id="amount"
@@ -77,7 +107,14 @@ const VestCalculateSchedules = () => {
                     error={
                       formik.touched.amount && Boolean(formik.errors.amount)
                     }
-                    value={formik.values.amount}
+                    inputProps={{
+                      readOnly: !!totalLockedAmount && true,
+                    }}
+                    value={
+                      totalLockedAmount
+                        ? totalLockedAmount
+                        : formik.values.amount
+                    }
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     disabled={formik.isSubmitting}
@@ -85,13 +122,15 @@ const VestCalculateSchedules = () => {
                 </FormGroup>
                 <FormGroup>
                   <FormLabel htmlFor="percentageAtLaunch">
-                    Launch Percentage
+                    Initial Lump Sum Percentage
                   </FormLabel>
                   <TextField
+                    placeholder="percentage of amount to collect on first day"
                     type="number"
                     fullWidth
                     inputProps={{
                       max: 100,
+                      readOnly: !!totalLaunchPercentage && true,
                     }}
                     id="percentageAtLaunch"
                     name="percentageAtLaunch"
@@ -102,7 +141,11 @@ const VestCalculateSchedules = () => {
                       formik.touched.percentageAtLaunch &&
                       Boolean(formik.errors.percentageAtLaunch)
                     }
-                    value={formik.values.percentageAtLaunch}
+                    value={
+                      totalLaunchPercentage
+                        ? totalLaunchPercentage
+                        : formik.values.percentageAtLaunch
+                    }
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     disabled={formik.isSubmitting}
@@ -115,9 +158,11 @@ const VestCalculateSchedules = () => {
                   </FormLabel>
 
                   <TextField
+                    placeholder="contract total period in months"
                     type="number"
                     inputProps={{
                       max: 100,
+                      readOnly: !!totalPeriod && true,
                     }}
                     fullWidth
                     id="contractLength"
@@ -127,7 +172,9 @@ const VestCalculateSchedules = () => {
                       formik.touched.contractLength &&
                       Boolean(formik.errors.contractLength)
                     }
-                    value={formik.values.contractLength}
+                    value={
+                      totalPeriod ? totalPeriod : formik.values.contractLength
+                    }
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     disabled={formik.isSubmitting}
@@ -153,8 +200,8 @@ const VestCalculateSchedules = () => {
       {data && (
         <form>
           <Stack spacing={5}>
-            <List className={styles["schedule"]}>
-              <ListSubheader>Vesting Schedule</ListSubheader>
+            <List sx={{ p: 0, m: 0 }} className={styles["schedule"]}>
+              <h5 className={styles["list-title"]}>Vesting Schedule</h5>
               <ListItem>
                 <ListItemText
                   primary="Contract amount"
@@ -201,7 +248,7 @@ const VestCalculateSchedules = () => {
               variant="contained"
               disabled={!formik.isValid || formik.isSubmitting}
             >
-              Go back
+              Recalculate
             </Button>
           </Stack>
         </form>

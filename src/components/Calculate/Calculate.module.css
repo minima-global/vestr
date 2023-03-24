@@ -1,0 +1,23 @@
+.calculate h5 {
+  font-family: Manrope-regular;
+  font-size: 1.2rem;
+  margin: 0;
+  border-bottom: 1px solid #d3d3d3;
+  padding-bottom: 8px;
+}
+.calculate h6 {
+  font-family: Manrope-regular;
+  font-size: 1rem;
+  margin: 0;
+
+  border-bottom: 1px solid #d3d3d3;
+  padding-bottom: 8px;
+}
+.calculate {
+  padding: 0 16px;
+}
+
+#list-title {
+  font-size: 0.5rem!important;
+  color: red!important;
+}
