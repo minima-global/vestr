@@ -29,6 +29,6 @@ jobs:
           appname: "Minima APK + MiniDAPPS"
           version: Vestr v${{ steps.package-version.outputs.current-version}} - Github - ${{ steps.current-time.outputs.formattedTime }}
           createprofile: false
-          filepath: "maximize-src-${{ steps.package-version.outputs.current-version}}.mds.zip"
+          filepath: "vestr-src-${{ steps.package-version.outputs.current-version}}.mds.zip"
           vid: "${{ secrets.VERACODE_API_ID }}"
           vkey: "${{ secrets.VERACODE_API_KEY }}"
