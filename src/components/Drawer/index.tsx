@@ -59,7 +59,7 @@ const Drawer = () => {
                 ? styles["active"]
                 : styles[""]
             }
-            to="/dashboard/create"
+            to="/dashboard/createnew"
           >
             <NoteAddOutlined />
             Create

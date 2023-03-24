@@ -38,6 +38,8 @@ const VestCalculateSchedules = ({
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<false | string>(false);
   const [data, setData] = React.useState<any>(undefined);
+  const hasExampleValues =
+    totalLaunchPercentage && totalLockedAmount && totalPeriod;
 
   const formik = useFormik({
     initialValues: {
@@ -46,9 +48,6 @@ const VestCalculateSchedules = ({
       contractLength: "",
     },
     onSubmit: async (formData) => {
-      const hasExampleValues =
-        totalLaunchPercentage && totalLockedAmount && totalPeriod;
-
       setLoading(true);
       setError(false);
       formik.setStatus(undefined);
@@ -79,7 +78,7 @@ const VestCalculateSchedules = ({
         setError(error.message);
       }
     },
-    validationSchema: formValidation,
+    validationSchema: !hasExampleValues ? formValidation : undefined,
   });
 
   return (

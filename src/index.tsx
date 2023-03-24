@@ -19,8 +19,7 @@ root.render(
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        {/* <App /> */}
-        <RouterProvider router={router} />
+        <App />
       </ThemeProvider>
     </LocalizationProvider>
   </React.StrictMode>
