@@ -8,6 +8,8 @@ import theme from "./theme";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { RouterProvider } from "react-router-dom";
+import router from "./router";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement

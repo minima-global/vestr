@@ -2,7 +2,14 @@ import { createTheme } from "@mui/material/styles";
 
 let theme = createTheme({
   spacing: 8,
-
+  palette: {
+    primary: {
+      main: "#16181C",
+    },
+    secondary: {
+      main: "#317AFF",
+    },
+  },
   components: {
     MuiCssBaseline: {
       styleOverrides: `
@@ -61,10 +68,7 @@ theme = createTheme(theme, {
     },
     MuiButton: {
       styleOverrides: {
-        // Name of the slot
         root: {
-          // Some CSS
-
           borderRadius: 8,
           textTransform: "none",
           fontWeight: 800,
@@ -88,6 +92,14 @@ theme = createTheme(theme, {
         },
       },
     },
+    MuiFormLabel: {
+      styleOverrides: {
+        root: {
+          color: "#16181c",
+          fontSize: "1rem",
+        },
+      },
+    },
 
     MuiTextField: {
       styleOverrides: {
@@ -96,13 +108,11 @@ theme = createTheme(theme, {
           borderRadius: 8,
 
           input: {
+            padding: "8px",
             color: "#000",
             border: "1px solid #585f63",
-            paddingLeft: 16,
             fontWeight: "600",
             textOverflow: "ellipsis",
-            paddingRight: 16,
-
             "&::placeholder": {
               fontWeight: "600",
               color: "#585f63",
@@ -111,17 +121,6 @@ theme = createTheme(theme, {
               backgroundColor: "#fff",
             },
           },
-        },
-      },
-    },
-    MuiToolbar: {
-      styleOverrides: {
-        root: {
-          zIndex: 0,
-          borderBottom: "none",
-          backgroundColor: "#0D0E10",
-          color: "#fff",
-          padding: "0px 8px!important",
         },
       },
     },

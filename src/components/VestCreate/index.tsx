@@ -13,28 +13,21 @@ import {
   Stack,
   TextField,
 } from "@mui/material";
-import { MinimaToken } from "../../@types";
 import MiSelect from "../MiCustom/MiSelect/MiSelect";
 import Select from "../MiCustom/Select";
 import { DateTimePicker } from "@mui/x-date-pickers";
-
-import { events } from "../../minima/libs/events";
 import * as RPC from "../../minima/libs/RPC";
 import styles from "./VestCreate.module.css";
 
 import { isDate } from "date-fns";
-import { TabButton, Tabs } from "../MiCustom/MiTabs";
-import useTabs from "../../minima/hooks/useTabs";
-
-import DataTable from "../VestContractsTable";
 import { addMonths } from "date-fns";
 import MiSuccessModal from "../MiCustom/MiSuccessModal/MiSuccessModal";
 import MiError from "../MiCustom/MiError/MiError";
 import { Box } from "@mui/system";
-import { makeTokenImage } from "../../utils/utils";
 import * as yup from "yup";
 import { checkAddress } from "../../minima/libs/RPC";
-import VestCalculateSchedules from "../VestCalculateSchedules";
+import useWalletBalance from "../../hooks/useWalletBalance";
+import useWalletAddress from "../../hooks/useWalletAddress";
 
 const formValidation = yup.object().shape({
   token: yup.object().required("Field is required"),
@@ -82,31 +75,35 @@ const formValidation = yup.object().shape({
 });
 
 const VestCreate = () => {
-  // create wallet state
-  const [wallet, setWallet] = useState<MinimaToken[]>([]);
+  const wallet = useWalletBalance();
+  const { walletAddress, walletPublicKey } = useWalletAddress();
   const [dynamicByCliff, setDynamicByCliff] = useState<undefined | Date>(
     undefined
   );
 
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [transactionPending, setTransactionPending] = useState(false);
+
+  useEffect(() => {
+    formik.setFieldValue("address", walletAddress);
+    formik.setFieldValue("root", walletPublicKey);
+  }, [walletAddress, walletPublicKey]);
+
   const closeModal = () => {
     setShowSuccessModal(false);
     if (transactionPending) {
       setTransactionPending(false);
     }
   };
-  const { tabs, toggleTab, tabStyles } = useTabs();
 
   const handleAddressSelection = (e: any) => {
     if (e.target.value === "other-address") {
       return formik.setFieldValue("address", "");
     }
 
-    RPC.getAddress().then((res: any) => {
-      formik.setFieldValue("address", res.address);
-    });
+    formik.setFieldValue("address", walletAddress);
   };
+
   const handleKeySelection = (e: any) => {
     if (e.target.value === "other-key") {
       return formik.setFieldValue("root", "");
@@ -117,53 +114,7 @@ const VestCreate = () => {
     });
   };
 
-  events.onNewBalance(() => {
-    RPC.getMinimaBalance()
-      .then((balance) => {
-        const b = balance.map((t: MinimaToken) => {
-          if (t.token.url && t.token.url.startsWith("<artimage>", 0)) {
-            t.token.url = makeTokenImage(t.token.url, t.tokenid);
-          }
-          return t;
-        });
-
-        setWallet(b);
-      })
-      .catch((err) => {
-        const errorMessage = err && err.message ? err.message : err;
-        // console.log(err);
-        formik.setStatus(errorMessage);
-      });
-  });
-
-  useEffect(() => {
-    // get balance and set state
-    RPC.getMinimaBalance()
-      .then((balance) => {
-        const b = balance.map((t: MinimaToken) => {
-          if (t.token.url && t.token.url.startsWith("<artimage>", 0)) {
-            t.token.url = makeTokenImage(t.token.url, t.tokenid);
-          }
-          return t;
-        });
-
-        setWallet(b);
-      })
-      .catch((err) => {
-        const errorMessage = err && err.message ? err.message : err;
-        console.log(err);
-        formik.setStatus(errorMessage);
-      });
-
-    RPC.getAddress().then((res: any) => {
-      formik.setFieldValue("address", res.address);
-      formik.setFieldValue("root", res.publickey);
-    });
-  }, []);
-
-  // initialise formik to create form
   const formik = useFormik({
-    // create initial values of form
     initialValues: {
       token: wallet[0],
       address: "",
@@ -235,229 +186,206 @@ const VestCreate = () => {
         </Box>
       </Modal>
       <Stack mt={2} textAlign="center" spacing={1}>
-        <Tabs>
-          <TabButton
-            onClick={() => toggleTab(0)}
-            className={tabs === 0 ? tabStyles["tab-open"] : undefined}
-          >
-            Create
-          </TabButton>
-          <TabButton
-            onClick={() => toggleTab(1)}
-            className={tabs === 1 ? tabStyles["tab-open"] : undefined}
-          >
-            Track
-          </TabButton>
-          <TabButton
-            onClick={() => toggleTab(2)}
-            className={tabs === 2 ? tabStyles["tab-open"] : undefined}
-          >
-            Calculate
-          </TabButton>
-        </Tabs>
-
-        {tabs === 0 && (
-          <form onSubmit={formik.handleSubmit}>
-            <Stack spacing={5}>
-              <Stack spacing={1}>
-                {formik.status ? (
-                  <MiError>
-                    <label>{formik.status}</label>
-                  </MiError>
-                ) : null}
-                {formik.values.token ? (
-                  <MiSelect
-                    id="token"
-                    name="token"
-                    value={formik.values.token}
-                    onChange={formik.handleChange}
-                    fullWidth={true}
-                    error={
-                      formik.touched.token && Boolean(formik.errors.token)
-                        ? true
-                        : false
-                    }
-                    tokens={wallet}
-                    setFieldValue={formik.setFieldValue}
-                    resetForm={formik.resetForm}
-                  />
-                ) : null}
-                <FormControl className={styles["address-selection"]}>
-                  <FormLabel>Address</FormLabel>
-                  <RadioGroup
-                    onChange={handleAddressSelection}
-                    row
-                    defaultValue="my-address"
-                    name="radio-buttons-group"
-                  >
-                    <FormControlLabel
-                      value="my-address"
-                      control={<Radio />}
-                      label="My Address"
-                    />
-                    <FormControlLabel
-                      value="other-address"
-                      control={<Radio />}
-                      label="Other Address"
-                    />
-                  </RadioGroup>
-                </FormControl>
-                <TextField
-                  fullWidth
-                  id="address"
-                  name="address"
-                  placeholder="address"
-                  helperText={formik.dirty && formik.errors.address}
-                  error={
-                    formik.touched.address && Boolean(formik.errors.address)
+        <form onSubmit={formik.handleSubmit}>
+          <Stack spacing={5}>
+            <Stack spacing={1}>
+              {formik.status ? (
+                <MiError>
+                  <label>{formik.status}</label>
+                </MiError>
+              ) : null}
+              {formik.values.token ? (
+                <MiSelect
+                  id="token"
+                  name="token"
+                  placeholder={
+                    formik.values.address === "my-address"
+                      ? "Getting you a wallet address..."
+                      : ""
                   }
-                  value={formik.values.address}
+                  value={formik.values.token}
                   onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  disabled={formik.isSubmitting}
+                  fullWidth={true}
+                  error={
+                    formik.touched.token && Boolean(formik.errors.token)
+                      ? true
+                      : false
+                  }
+                  tokens={wallet}
+                  setFieldValue={formik.setFieldValue}
+                  resetForm={formik.resetForm}
                 />
-                <TextField
-                  type="text"
-                  fullWidth
-                  id="amount"
-                  name="amount"
-                  placeholder="amount"
-                  helperText={formik.dirty && formik.errors.amount}
-                  error={formik.touched.amount && Boolean(formik.errors.amount)}
-                  value={formik.values.amount}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  disabled={formik.isSubmitting}
-                />
-                <FormControl className={styles["address-selection"]}>
-                  <FormLabel>Select a root key</FormLabel>
-                  <RadioGroup
-                    onChange={handleKeySelection}
-                    row
-                    defaultValue="my-key"
-                    name="radio-buttons-group"
-                  >
-                    <FormControlLabel
-                      value="my-key"
-                      control={<Radio />}
-                      label="My Key"
-                    />
-                    <FormControlLabel
-                      value="other-key"
-                      control={<Radio />}
-                      label="Other Key"
-                    />
-                  </RadioGroup>
-                </FormControl>
-                <TextField
-                  fullWidth
-                  id="root"
-                  name="root"
-                  placeholder="root key"
-                  value={formik.values.root}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  disabled={formik.isSubmitting}
-                />
-                <Select
-                  id="cliff"
-                  name="cliff"
-                  value={formik.values.cliff}
-                  onBlur={formik.handleBlur}
-                  onChange={(e) => {
-                    formik.handleChange(e);
-                    // according to the cliff period, we have to set the date-time
-                    // picker to comply with this rule..
-                    // so if they select 2 months, then they can only select an end contract
-                    // after that date..
-                    setDynamicByCliff(
-                      addMonths(new Date(), Number(e.target.value))
-                    );
-                    // console.log(e.target.value);
-                  }}
-                  disabled={formik.isSubmitting}
+              ) : null}
+              <FormControl className={styles["address-selection"]}>
+                <FormLabel>Address</FormLabel>
+                <RadioGroup
+                  onChange={handleAddressSelection}
+                  row
+                  defaultValue="my-address"
+                  name="radio-buttons-group"
                 >
-                  <option defaultValue={0} disabled value={0}>
-                    Set a cliff period
-                  </option>
-                  {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((i) => (
-                    <option key={i} value={i}>
-                      {i} month
-                    </option>
-                  ))}
-                </Select>
-                <Select
-                  id="minBlockWait"
-                  name="minBlockWait"
-                  value={formik.values.minBlockWait}
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
-                >
-                  <option defaultValue={0} disabled value={0}>
-                    Set a collection grace period
-                  </option>
-                  <option key="daily" value="24">
-                    Daily
-                  </option>
-                  <option key="weekly" value="168">
-                    Weekly
-                  </option>
-                  <option key="monthly" value="720">
-                    Monthly
-                  </option>
-                  <option key="6-monthly" value="4320">
-                    6 months
-                  </option>
-                  <option key="12-monthly" value="8640">
-                    Yearly
-                  </option>
-                </Select>
-                <DateTimePicker
-                  minDateTime={dynamicByCliff ? dynamicByCliff : undefined}
-                  disablePast={true}
-                  value={formik.values.endContract}
-                  onChange={(value) => {
-                    formik.setFieldValue("endContract", value, true);
-                  }}
-                  renderInput={(params: any) => {
-                    return (
-                      <TextField
-                        disabled={formik.isSubmitting}
-                        fullWidth
-                        InputProps={{
-                          readOnly: true,
-                        }}
-                        error={
-                          formik.touched.endContract &&
-                          Boolean(formik.errors.endContract)
-                        }
-                        helperText={formik.dirty && formik.errors.endContract}
-                        id="datetime"
-                        name="datetime"
-                        onBlur={formik.handleBlur}
-                        {...params}
-                      />
-                    );
-                  }}
-                />
-              </Stack>
-              <Button
-                type="submit"
-                disableElevation
+                  <FormControlLabel
+                    value="my-address"
+                    control={<Radio />}
+                    label="My Address"
+                  />
+                  <FormControlLabel
+                    value="other-address"
+                    control={<Radio />}
+                    label="Other Address"
+                  />
+                </RadioGroup>
+              </FormControl>
+              <TextField
                 fullWidth
-                color="primary"
-                variant="contained"
-                disabled={!formik.isValid || formik.isSubmitting}
+                id="address"
+                name="address"
+                placeholder="address"
+                helperText={formik.dirty && formik.errors.address}
+                error={formik.touched.address && Boolean(formik.errors.address)}
+                value={formik.values.address}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                disabled={formik.isSubmitting}
+              />
+              <TextField
+                type="text"
+                fullWidth
+                id="amount"
+                name="amount"
+                placeholder="amount"
+                helperText={formik.dirty && formik.errors.amount}
+                error={formik.touched.amount && Boolean(formik.errors.amount)}
+                value={formik.values.amount}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                disabled={formik.isSubmitting}
+              />
+              <FormControl className={styles["address-selection"]}>
+                <FormLabel>Select a root key</FormLabel>
+                <RadioGroup
+                  onChange={handleKeySelection}
+                  row
+                  defaultValue="my-key"
+                  name="radio-buttons-group"
+                >
+                  <FormControlLabel
+                    value="my-key"
+                    control={<Radio />}
+                    label="My Key"
+                  />
+                  <FormControlLabel
+                    value="other-key"
+                    control={<Radio />}
+                    label="Other Key"
+                  />
+                </RadioGroup>
+              </FormControl>
+              <TextField
+                fullWidth
+                id="root"
+                name="root"
+                placeholder="root key"
+                value={formik.values.root}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                disabled={formik.isSubmitting}
+              />
+              <Select
+                id="cliff"
+                name="cliff"
+                value={formik.values.cliff}
+                onBlur={formik.handleBlur}
+                onChange={(e) => {
+                  formik.handleChange(e);
+                  // according to the cliff period, we have to set the date-time
+                  // picker to comply with this rule..
+                  // so if they select 2 months, then they can only select an end contract
+                  // after that date..
+                  setDynamicByCliff(
+                    addMonths(new Date(), Number(e.target.value))
+                  );
+                  // console.log(e.target.value);
+                }}
+                disabled={formik.isSubmitting}
               >
-                {!formik.isSubmitting && "Lock"}
-                {formik.isSubmitting && <CircularProgress size={16} />}
-              </Button>
+                <option defaultValue={0} disabled value={0}>
+                  Set a cliff period
+                </option>
+                {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((i) => (
+                  <option key={i} value={i}>
+                    {i} month
+                  </option>
+                ))}
+              </Select>
+              <Select
+                id="minBlockWait"
+                name="minBlockWait"
+                value={formik.values.minBlockWait}
+                onBlur={formik.handleBlur}
+                onChange={formik.handleChange}
+              >
+                <option defaultValue={0} disabled value={0}>
+                  Set a collection grace period
+                </option>
+                <option key="daily" value="24">
+                  Daily
+                </option>
+                <option key="weekly" value="168">
+                  Weekly
+                </option>
+                <option key="monthly" value="720">
+                  Monthly
+                </option>
+                <option key="6-monthly" value="4320">
+                  6 months
+                </option>
+                <option key="12-monthly" value="8640">
+                  Yearly
+                </option>
+              </Select>
+              <DateTimePicker
+                minDateTime={dynamicByCliff ? dynamicByCliff : undefined}
+                disablePast={true}
+                value={formik.values.endContract}
+                onChange={(value) => {
+                  formik.setFieldValue("endContract", value, true);
+                }}
+                renderInput={(params: any) => {
+                  return (
+                    <TextField
+                      disabled={formik.isSubmitting}
+                      fullWidth
+                      InputProps={{
+                        readOnly: true,
+                      }}
+                      error={
+                        formik.touched.endContract &&
+                        Boolean(formik.errors.endContract)
+                      }
+                      helperText={formik.dirty && formik.errors.endContract}
+                      id="datetime"
+                      name="datetime"
+                      onBlur={formik.handleBlur}
+                      {...params}
+                    />
+                  );
+                }}
+              />
             </Stack>
-          </form>
-        )}
-
-        {tabs === 1 && <DataTable />}
-        {tabs === 2 && <VestCalculateSchedules />}
+            <Button
+              type="submit"
+              disableElevation
+              fullWidth
+              color="primary"
+              variant="contained"
+              disabled={!formik.isValid || formik.isSubmitting}
+            >
+              {!formik.isSubmitting && "Lock"}
+              {formik.isSubmitting && <CircularProgress size={16} />}
+            </Button>
+          </Stack>
+        </form>
       </Stack>
     </>
   );

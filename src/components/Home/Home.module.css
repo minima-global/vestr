@@ -1,0 +1,34 @@
+.home h5 {
+  font-family: Manrope-regular;
+  font-size: 1.2rem;
+  margin: 0;
+  border-bottom: 1px solid #d3d3d3;
+  padding-bottom: 8px;
+}
+.home h6 {
+  font-family: Manrope-regular;
+  font-size: 1rem;
+  margin: 0;
+
+  border-bottom: 1px solid #d3d3d3;
+  padding-bottom: 8px;
+}
+.home {
+  padding: 0 16px;
+}
+
+.contract pre {
+  position: relative;
+  min-width: 100%;
+  max-width: 100%;
+  white-space: pre-line;
+  background-color: #16181c;
+  color: #d3d3d3;
+  padding: 16px;
+  border-radius: 4px;
+}
+
+.contract {
+  flex: 1;
+  min-width: 0;
+}

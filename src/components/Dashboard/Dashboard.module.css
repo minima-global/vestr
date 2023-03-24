@@ -1,0 +1,16 @@
+.app-wrapper {
+  width: 100%;
+  max-width: 780px;
+  height: 100%;
+  background-color: #fff;
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  
+}
+
+.app-wrapper p {
+  color: #000; 
+}
