@@ -34,6 +34,7 @@
     "build:dapp": "npm run build && rm dapp/vestr_* && cd build && zip -r vestr_$npm_package_version.mds.zip . && mv vestr_$npm_package_version.mds.zip ../dapp/",
     "package": "bash package.sh",
     "test": "react-scripts test",
+    "src:zip": "bash zip.sh",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
