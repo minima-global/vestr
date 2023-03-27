@@ -169,9 +169,13 @@ const VestCreate = () => {
       setContractCreationStatus("ongoing");
       setShowSuccessModal(true);
 
-      try {
-        if (!isDate(formInput.endContract)) throw new Error("Not a date..");
+      if (
+        typeof formInput.endContract === null ||
+        !isDate(formInput.endContract)
+      )
+        throw new Error("Select an appropriate time & date");
 
+      try {
         if (
           formInput &&
           formInput.endContract &&
@@ -187,65 +191,75 @@ const VestCreate = () => {
           const lumpSumAmount = percentage
             ? new Decimal(formInput.amount).times(percentage)
             : false;
-          let lumpPaymentPromise = undefined;
 
           if (lumpSumAmount) {
             setLumpSumStatus("ongoing");
-            lumpPaymentPromise = new Promise((resolve, reject) => {
+            return new Promise((resolve, reject) => {
               MDS.cmd(
                 `send amount:${lumpSumAmount} address:${formInput.address} tokenid:${formInput.token.tokenid}`,
                 (res: any) => {
-                  if (!res.status && !res.pending) reject(res.error);
+                  if (!res.status && !res.pending)
+                    reject(res.error ? res.error : "Rpc failed");
                   if (!res.status && res.pending) resolve(1);
                   console.log(res);
+
                   resolve(0);
                 }
               );
-            });
-          }
-
-          const result = await RPC.createVestingContract(
-            !lumpSumAmount
-              ? formInput.amount
-              : new Decimal(formInput.amount).minus(lumpSumAmount).toString(),
-            formInput.cliff,
-            formInput.address,
-            formInput.token,
-            formInput.root,
-            formInput.endContract,
-            formInput.minBlockWait
-          );
-
-          console.log(result);
-
-          Promise.all([lumpPaymentPromise, result])
-            .then((c) => {
-              console.log(c[0]);
-              console.log(c[1]);
-              const lumpPaymentPending = c[0] === 1;
-              const lumpPaymentCompleted = c[0] === 0;
-
-              const contractPaymentPending = c[1] === 1;
-              const contractPaymentCompleted = c[1] === 0;
-
-              if (lumpPaymentPending) setLumpSumStatus("pending");
-              if (lumpPaymentCompleted) setLumpSumStatus("complete");
-
-              if (contractPaymentPending) setContractCreationStatus("pending");
-              if (contractPaymentCompleted)
-                setContractCreationStatus("complete");
             })
-            .catch((err) => {
-              throw err;
-            });
+              .then(async (res) => {
+                const lumpPaymentPending = res === 1;
+                const lumpPaymentCompleted = res === 0;
+                if (lumpPaymentCompleted) {
+                  setLumpSumStatus("complete");
+                }
+                if (lumpPaymentPending) {
+                  setLumpSumStatus("pending");
+                }
 
-          const transactionIsPending = typeof result === "string";
-          if (transactionIsPending) {
-            setTransactionPending(true);
+                if (
+                  !isDate(formInput.endContract) ||
+                  formInput.endContract === null
+                )
+                  throw new Error("Select an appropriate date & time");
+
+                await RPC.createVestingContract(
+                  !lumpSumAmount
+                    ? formInput.amount
+                    : new Decimal(formInput.amount)
+                        .minus(lumpSumAmount)
+                        .toString(),
+                  formInput.cliff,
+                  formInput.address,
+                  formInput.token,
+                  formInput.root,
+                  formInput.endContract,
+                  formInput.minBlockWait
+                )
+                  .then((resp) => {
+                    const contractPaymentPending = resp === 1;
+                    const contractPaymentCompleted = resp === 0;
+
+                    if (contractPaymentPending)
+                      setContractCreationStatus("pending");
+                    if (contractPaymentCompleted)
+                      setContractCreationStatus("complete");
+
+                    formik.resetForm();
+                  })
+                  .catch((err) => {
+                    setContractCreationStatus("failed");
+                    formik.setStatus("Contract creation failed, " + err);
+                    setShowSuccessModal(false);
+                  });
+              })
+
+              .catch((err) => {
+                setLumpSumStatus("failed");
+                formik.setStatus("Lump sum payment failed, " + err);
+                setShowSuccessModal(false);
+              });
           }
-
-          setShowSuccessModal(true);
-          formik.resetForm();
         }
       } catch (error: any) {
         const formError =
@@ -299,6 +313,7 @@ const VestCreate = () => {
                   )}
                 </p>
               </li>
+              <li></li>
             </ul>
             <Stack alignItems="flex-end">
               <button onClick={() => setShowSuccessModal(false)}>Ok</button>
@@ -311,11 +326,6 @@ const VestCreate = () => {
         <form onSubmit={formik.handleSubmit}>
           <Stack spacing={5}>
             <Stack spacing={1}>
-              {formik.status ? (
-                <MiError>
-                  <label>{formik.status}</label>
-                </MiError>
-              ) : null}
               <InputWrapperRadio>
                 <InputLabel>Enter a wallet address</InputLabel>
                 {!formik.values.preferred && (
@@ -608,6 +618,11 @@ const VestCreate = () => {
               {!formik.isSubmitting && "Lock"}
               {formik.isSubmitting && <CircularProgress size={16} />}
             </Button>
+            {formik.status && (
+              <MiError>
+                <label>{formik.status}</label>
+              </MiError>
+            )}
           </Stack>
         </form>
       </Stack>
