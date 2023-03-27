@@ -349,6 +349,7 @@ const VestCreate = () => {
                   resetForm={formik.resetForm}
                 />
               )}
+              {!formik.values.token && <p>Fetching all your tokens...</p>}
               <InputWrapperRadio>
                 <InputLabel>Enter a wallet address</InputLabel>
                 {!formik.values.preferred && (
