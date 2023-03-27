@@ -8,7 +8,6 @@ const useWalletAddress = () => {
   useEffect(() => {
     RPC.getAddress()
       .then((res: any) => {
-        console.log("Called address");
         setAddress(res.miniaddress);
         setPublicKey(res.publickey);
       })

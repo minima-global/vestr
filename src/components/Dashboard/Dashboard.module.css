@@ -1,5 +1,6 @@
 .app-wrapper {
   width: 100%;
+  max-width: 60vw;
   max-width: 780px;
   height: 100%;
   background-color: #fff;

@@ -13,7 +13,7 @@ import {
   Stack,
   TextField,
 } from "@mui/material";
-import MiSelect from "../MiCustom/MiSelect/MiSelect";
+// import MiSelect from "../MiCustom/MiSelect/MiSelect";
 import Select from "../MiCustom/Select";
 import { DateTimePicker } from "@mui/x-date-pickers";
 import * as RPC from "../../minima/libs/RPC";
@@ -28,6 +28,12 @@ import * as yup from "yup";
 import { checkAddress } from "../../minima/libs/RPC";
 import useWalletBalance from "../../hooks/useWalletBalance";
 import useWalletAddress from "../../hooks/useWalletAddress";
+import {
+  InputLabel,
+  InputWrapper,
+  InputWrapperRadio,
+  InputHelper,
+} from "../InputWrapper/InputWrapper";
 
 const formValidation = yup.object().shape({
   token: yup.object().required("Field is required"),
@@ -80,6 +86,8 @@ const VestCreate = () => {
   const [dynamicByCliff, setDynamicByCliff] = useState<undefined | Date>(
     undefined
   );
+  const [loadingAddress, setLoadingAddress] = useState(false);
+  const [loadingPublicKey, setLoadingPublicKey] = useState(false);
 
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [transactionPending, setTransactionPending] = useState(false);
@@ -96,22 +104,44 @@ const VestCreate = () => {
     }
   };
 
-  const handleAddressSelection = (e: any) => {
-    if (e.target.value === "other-address") {
-      return formik.setFieldValue("address", "");
-    }
+  const handleAddressSelection = async (e: any) => {
+    formik.setFieldValue("preferred", e.target.value);
 
-    formik.setFieldValue("address", walletAddress);
+    try {
+      const userPrefersOwnAddress = e.target.value === "Own";
+      if (userPrefersOwnAddress) {
+        setLoadingAddress(true);
+        const wallet: any = await RPC.getAddress();
+        formik.setFieldValue("address", wallet.miniaddress);
+        setLoadingAddress(false);
+      }
+
+      if (!userPrefersOwnAddress) {
+        formik.setFieldValue("address", "");
+      }
+    } catch (error: any) {
+      formik.setFieldError("address", error.message);
+    }
   };
 
-  const handleKeySelection = (e: any) => {
-    if (e.target.value === "other-key") {
-      return formik.setFieldValue("root", "");
-    }
+  const handlePublicKeySelection = async (e: any) => {
+    formik.setFieldValue("rootPreferred", e.target.value);
 
-    RPC.getAddress().then((res: any) => {
-      formik.setFieldValue("root", res.publickey);
-    });
+    try {
+      const userPrefersOwnKey = e.target.value === "Own";
+      if (userPrefersOwnKey) {
+        setLoadingPublicKey(true);
+        const wallet: any = await RPC.getAddress();
+        formik.setFieldValue("root", wallet.publickey);
+        setLoadingPublicKey(false);
+      }
+
+      if (!userPrefersOwnKey) {
+        formik.setFieldValue("root", "");
+      }
+    } catch (error: any) {
+      formik.setFieldError("root", error.message);
+    }
   };
 
   const formik = useFormik({
@@ -123,6 +153,8 @@ const VestCreate = () => {
       cliff: 0,
       root: "",
       minBlockWait: 0,
+      preferred: false,
+      rootPreferred: false,
     },
     onSubmit: async (formInput) => {
       formik.setStatus(undefined);
@@ -194,60 +226,61 @@ const VestCreate = () => {
                   <label>{formik.status}</label>
                 </MiError>
               ) : null}
-              {formik.values.token ? (
-                <MiSelect
-                  id="token"
-                  name="token"
-                  placeholder={
-                    formik.values.address === "my-address"
-                      ? "Getting you a wallet address..."
-                      : ""
-                  }
-                  value={formik.values.token}
-                  onChange={formik.handleChange}
-                  fullWidth={true}
-                  error={
-                    formik.touched.token && Boolean(formik.errors.token)
-                      ? true
-                      : false
-                  }
-                  tokens={wallet}
-                  setFieldValue={formik.setFieldValue}
-                  resetForm={formik.resetForm}
-                />
-              ) : null}
-              <FormControl className={styles["address-selection"]}>
-                <FormLabel>Address</FormLabel>
-                <RadioGroup
-                  onChange={handleAddressSelection}
-                  row
-                  defaultValue="my-address"
-                  name="radio-buttons-group"
-                >
-                  <FormControlLabel
-                    value="my-address"
-                    control={<Radio />}
-                    label="My Address"
-                  />
-                  <FormControlLabel
-                    value="other-address"
-                    control={<Radio />}
-                    label="Other Address"
-                  />
-                </RadioGroup>
-              </FormControl>
-              <TextField
-                fullWidth
-                id="address"
-                name="address"
-                placeholder="address"
-                helperText={formik.dirty && formik.errors.address}
-                error={formik.touched.address && Boolean(formik.errors.address)}
-                value={formik.values.address}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                disabled={formik.isSubmitting}
-              />
+              <InputWrapperRadio>
+                <InputLabel>Enter a wallet address</InputLabel>
+                {!formik.values.preferred && (
+                  <RadioGroup
+                    defaultValue={formik.values.preferred}
+                    id="radio-group"
+                    onChange={handleAddressSelection}
+                  >
+                    <FormControlLabel
+                      label="Use my Minima wallet address"
+                      value="Own"
+                      control={<Radio />}
+                    ></FormControlLabel>
+                    <FormControlLabel
+                      value="Custom"
+                      label="Use a different wallet address"
+                      control={<Radio />}
+                    ></FormControlLabel>
+                  </RadioGroup>
+                )}
+                {formik.values.preferred && (
+                  <Stack spacing={1} sx={{ p: 2 }}>
+                    <InputWrapper>
+                      <TextField
+                        id="address"
+                        name="address"
+                        disabled={loadingAddress}
+                        placeholder={
+                          loadingAddress
+                            ? "Getting you an address..."
+                            : "Address"
+                        }
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        helperText={formik.dirty && formik.errors.address}
+                        error={
+                          formik.touched.address &&
+                          Boolean(formik.errors.address)
+                        }
+                        value={formik.values.address}
+                      />
+                    </InputWrapper>
+                    <Button
+                      onClick={() => formik.setFieldValue("preferred", false)}
+                      variant="outlined"
+                      color="inherit"
+                    >
+                      Back
+                    </Button>
+                  </Stack>
+                )}
+
+                <p>A withdrawal address for this contract.</p>
+              </InputWrapperRadio>
+
               <TextField
                 type="text"
                 fullWidth
@@ -261,36 +294,77 @@ const VestCreate = () => {
                 onBlur={formik.handleBlur}
                 disabled={formik.isSubmitting}
               />
-              <FormControl className={styles["address-selection"]}>
-                <FormLabel>Select a root key</FormLabel>
-                <RadioGroup
-                  onChange={handleKeySelection}
-                  row
-                  defaultValue="my-key"
-                  name="radio-buttons-group"
-                >
-                  <FormControlLabel
-                    value="my-key"
-                    control={<Radio />}
-                    label="My Key"
-                  />
-                  <FormControlLabel
-                    value="other-key"
-                    control={<Radio />}
-                    label="Other Key"
-                  />
-                </RadioGroup>
-              </FormControl>
-              <TextField
-                fullWidth
-                id="root"
-                name="root"
-                placeholder="root key"
-                value={formik.values.root}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                disabled={formik.isSubmitting}
-              />
+              <InputWrapperRadio>
+                <InputLabel>Enter a root key</InputLabel>
+                {!formik.values.rootPreferred && (
+                  <RadioGroup
+                    defaultValue={formik.values.rootPreferred}
+                    id="radio-group"
+                    onChange={handlePublicKeySelection}
+                  >
+                    <FormControlLabel
+                      label="Use my node's public key"
+                      value="Own"
+                      control={<Radio />}
+                    ></FormControlLabel>
+                    <FormControlLabel
+                      value="Custom"
+                      label="Use a different node's public key"
+                      control={<Radio />}
+                    ></FormControlLabel>
+                    <FormControlLabel
+                      value="None"
+                      label="Use none"
+                      control={<Radio />}
+                    ></FormControlLabel>
+                  </RadioGroup>
+                )}
+                {formik.values.rootPreferred && (
+                  <Stack spacing={1} sx={{ p: 2 }}>
+                    <InputWrapper>
+                      <TextField
+                        id="root"
+                        name="root"
+                        disabled={
+                          loadingPublicKey ||
+                          (typeof formik.values.rootPreferred === "string" &&
+                            formik.values.rootPreferred === "None")
+                        }
+                        placeholder={
+                          loadingPublicKey
+                            ? "Getting you a public key..."
+                            : typeof formik.values.rootPreferred === "string" &&
+                              formik.values.rootPreferred === "None"
+                            ? "Disabled"
+                            : "Public key"
+                        }
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        helperText={formik.dirty && formik.errors.root}
+                        error={
+                          formik.touched.root && Boolean(formik.errors.root)
+                        }
+                        value={formik.values.root}
+                      />
+                    </InputWrapper>
+                    <Button
+                      onClick={() =>
+                        formik.setFieldValue("rootPreferred", false)
+                      }
+                      variant="outlined"
+                      color="inherit"
+                    >
+                      Back
+                    </Button>
+                  </Stack>
+                )}
+
+                <p>
+                  As an optional, a root key that enables withdrawal at any
+                  given time.
+                </p>
+              </InputWrapperRadio>
+
               <Select
                 id="cliff"
                 name="cliff"
@@ -318,6 +392,10 @@ const VestCreate = () => {
                   </option>
                 ))}
               </Select>
+              <InputHelper>
+                (optional) A minimum amount of wait time required before the
+                contract is allowed to be interacted with.
+              </InputHelper>
               <Select
                 id="minBlockWait"
                 name="minBlockWait"
@@ -344,6 +422,9 @@ const VestCreate = () => {
                   Yearly
                 </option>
               </Select>
+              <InputHelper>
+                (optional) How often a user can collect.
+              </InputHelper>
               <DateTimePicker
                 minDateTime={dynamicByCliff ? dynamicByCliff : undefined}
                 disablePast={true}
@@ -354,10 +435,13 @@ const VestCreate = () => {
                 renderInput={(params: any) => {
                   return (
                     <TextField
+                      placeholder="Enter a date & time for contract's expiry"
                       disabled={formik.isSubmitting}
                       fullWidth
                       InputProps={{
                         readOnly: true,
+                        placeholder:
+                          "Enter a date & time for contract's expiry",
                       }}
                       error={
                         formik.touched.endContract &&
@@ -372,6 +456,10 @@ const VestCreate = () => {
                   );
                 }}
               />
+              <InputHelper>
+                A date & time for when this contract ends. After a contract ends
+                all funds can be collected.
+              </InputHelper>
             </Stack>
             <Button
               type="submit"
