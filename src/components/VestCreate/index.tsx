@@ -34,6 +34,7 @@ import Decimal from "decimal.js";
 import OngoingTransaction from "../OngoingTransaction";
 
 import styles from "./VestCreate.module.css";
+import MiSelect from "../MiCustom/MiSelect/MiSelect";
 
 const formValidation = yup.object().shape({
   token: yup.object().required("Field is required"),
@@ -326,6 +327,28 @@ const VestCreate = () => {
         <form onSubmit={formik.handleSubmit}>
           <Stack spacing={5}>
             <Stack spacing={1}>
+              {formik.values.token && (
+                <MiSelect
+                  id="token"
+                  name="token"
+                  placeholder={
+                    formik.values.address === "my-address"
+                      ? "Getting you a wallet address..."
+                      : ""
+                  }
+                  value={formik.values.token}
+                  onChange={formik.handleChange}
+                  fullWidth={true}
+                  error={
+                    formik.touched.token && Boolean(formik.errors.token)
+                      ? true
+                      : false
+                  }
+                  tokens={wallet}
+                  setFieldValue={formik.setFieldValue}
+                  resetForm={formik.resetForm}
+                />
+              )}
               <InputWrapperRadio>
                 <InputLabel>Enter a wallet address</InputLabel>
                 {!formik.values.preferred && (
