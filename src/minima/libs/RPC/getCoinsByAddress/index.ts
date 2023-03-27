@@ -1,4 +1,8 @@
-export const getCoinsByAddress = (address: string) => {
+import { Coin } from "../../../../@types";
+
+export const getCoinsByAddress = (
+  address: string
+): Promise<{ address: string; relevantCoins: Coin[] }> => {
   return new Promise((resolve, reject) => {
     MDS.cmd(`coins address:${address} relevant:true`, (res) => {
       if (!res.status) reject("RPC Failed");

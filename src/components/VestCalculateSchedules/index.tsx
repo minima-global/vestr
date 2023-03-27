@@ -10,14 +10,13 @@ import {
   List,
   ListItem,
   ListItemText,
-  ListSubheader,
-  Toolbar,
 } from "@mui/material";
 import MiError from "../MiCustom/MiError/MiError";
 import styles from "./VestCalculateSchedules.module.css";
 
 import * as RPC from "../../minima/libs/RPC";
 import * as Yup from "yup";
+import { InputPercentage } from "../InputWrapper/InputWrapper";
 
 const formValidation = Yup.object().shape({
   amount: Yup.string().required("Field required"),
@@ -145,6 +144,13 @@ const VestCalculateSchedules = ({
                         ? totalLaunchPercentage
                         : formik.values.percentageAtLaunch
                     }
+                    InputProps={{
+                      endAdornment: (
+                        <InputPercentage>
+                          <p>%</p>
+                        </InputPercentage>
+                      ),
+                    }}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     disabled={formik.isSubmitting}
@@ -174,6 +180,13 @@ const VestCalculateSchedules = ({
                     value={
                       totalPeriod ? totalPeriod : formik.values.contractLength
                     }
+                    InputProps={{
+                      endAdornment: (
+                        <InputPercentage>
+                          <p>months</p>
+                        </InputPercentage>
+                      ),
+                    }}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     disabled={formik.isSubmitting}

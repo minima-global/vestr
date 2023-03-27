@@ -1,0 +1,19 @@
+.track {
+  padding: 0 16px;
+}
+
+.track h5 {
+  font-family: Manrope-regular;
+  font-size: 1.2rem;
+  margin: 0;
+  border-bottom: 1px solid #d3d3d3;
+  padding-bottom: 8px;
+}
+.track h6 {
+  font-family: Manrope-regular;
+  font-size: 1rem;
+  margin: 0;
+
+  border-bottom: 1px solid #d3d3d3;
+  padding-bottom: 8px;
+}

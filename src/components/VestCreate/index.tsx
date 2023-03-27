@@ -4,26 +4,21 @@ import { useFormik } from "formik";
 import {
   Button,
   CircularProgress,
-  FormControl,
   FormControlLabel,
-  FormLabel,
   Modal,
   Radio,
   RadioGroup,
   Stack,
   TextField,
 } from "@mui/material";
-// import MiSelect from "../MiCustom/MiSelect/MiSelect";
+
 import Select from "../MiCustom/Select";
 import { DateTimePicker } from "@mui/x-date-pickers";
 import * as RPC from "../../minima/libs/RPC";
-import styles from "./VestCreate.module.css";
 
 import { isDate } from "date-fns";
 import { addMonths } from "date-fns";
-import MiSuccessModal from "../MiCustom/MiSuccessModal/MiSuccessModal";
 import MiError from "../MiCustom/MiError/MiError";
-import { Box } from "@mui/system";
 import * as yup from "yup";
 import { checkAddress } from "../../minima/libs/RPC";
 import useWalletBalance from "../../hooks/useWalletBalance";
@@ -33,7 +28,12 @@ import {
   InputWrapper,
   InputWrapperRadio,
   InputHelper,
+  InputPercentage,
 } from "../InputWrapper/InputWrapper";
+import Decimal from "decimal.js";
+import OngoingTransaction from "../OngoingTransaction";
+
+import styles from "./VestCreate.module.css";
 
 const formValidation = yup.object().shape({
   token: yup.object().required("Field is required"),
@@ -91,6 +91,13 @@ const VestCreate = () => {
 
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [transactionPending, setTransactionPending] = useState(false);
+
+  const [lumpSumPaymentStatus, setLumpSumStatus] = useState<
+    false | "pending" | "complete" | "failed" | "ongoing"
+  >(false);
+  const [contractCreationStatus, setContractCreationStatus] = useState<
+    false | "pending" | "complete" | "failed" | "ongoing"
+  >(false);
 
   useEffect(() => {
     formik.setFieldValue("address", walletAddress);
@@ -155,9 +162,12 @@ const VestCreate = () => {
       minBlockWait: 0,
       preferred: false,
       rootPreferred: false,
+      lumpsum: false,
     },
     onSubmit: async (formInput) => {
       formik.setStatus(undefined);
+      setContractCreationStatus("ongoing");
+      setShowSuccessModal(true);
 
       try {
         if (!isDate(formInput.endContract)) throw new Error("Not a date..");
@@ -167,8 +177,37 @@ const VestCreate = () => {
           formInput.endContract &&
           isDate(formInput.endContract)
         ) {
+          const hasLumpSumPayment =
+            typeof formInput.lumpsum === "number"
+              ? new Decimal(formInput.lumpsum)
+              : false;
+          const percentage = hasLumpSumPayment
+            ? hasLumpSumPayment.dividedBy(100)
+            : false;
+          const lumpSumAmount = percentage
+            ? new Decimal(formInput.amount).times(percentage)
+            : false;
+          let lumpPaymentPromise = undefined;
+
+          if (lumpSumAmount) {
+            setLumpSumStatus("ongoing");
+            lumpPaymentPromise = new Promise((resolve, reject) => {
+              MDS.cmd(
+                `send amount:${lumpSumAmount} address:${formInput.address} tokenid:${formInput.token.tokenid}`,
+                (res: any) => {
+                  if (!res.status && !res.pending) reject(res.error);
+                  if (!res.status && res.pending) resolve(1);
+                  console.log(res);
+                  resolve(0);
+                }
+              );
+            });
+          }
+
           const result = await RPC.createVestingContract(
-            Number(formInput.amount),
+            !lumpSumAmount
+              ? formInput.amount
+              : new Decimal(formInput.amount).minus(lumpSumAmount).toString(),
             formInput.cliff,
             formInput.address,
             formInput.token,
@@ -176,6 +215,29 @@ const VestCreate = () => {
             formInput.endContract,
             formInput.minBlockWait
           );
+
+          console.log(result);
+
+          Promise.all([lumpPaymentPromise, result])
+            .then((c) => {
+              console.log(c[0]);
+              console.log(c[1]);
+              const lumpPaymentPending = c[0] === 1;
+              const lumpPaymentCompleted = c[0] === 0;
+
+              const contractPaymentPending = c[1] === 1;
+              const contractPaymentCompleted = c[1] === 0;
+
+              if (lumpPaymentPending) setLumpSumStatus("pending");
+              if (lumpPaymentCompleted) setLumpSumStatus("complete");
+
+              if (contractPaymentPending) setContractCreationStatus("pending");
+              if (contractPaymentCompleted)
+                setContractCreationStatus("complete");
+            })
+            .catch((err) => {
+              throw err;
+            });
 
           const transactionIsPending = typeof result === "string";
           if (transactionIsPending) {
@@ -200,23 +262,51 @@ const VestCreate = () => {
   });
   return (
     <>
-      <Modal open={showSuccessModal}>
-        <Box>
-          <MiSuccessModal
-            title={
-              !transactionPending
-                ? "Contract Created!"
-                : "Contract Creation Pending!"
-            }
-            subtitle={
-              !transactionPending
-                ? "Navigate to Track to find your pending contracts"
-                : "Now go to your pending transactions to accept this action"
-            }
-            closeModal={closeModal}
-          />
-        </Box>
+      <Modal open={showSuccessModal} className={styles["modal"]}>
+        <OngoingTransaction>
+          <h5>Transaction in progress</h5>
+          <div id="content">
+            <ul id="list">
+              <li>
+                <h6>Lump Sum Payment</h6>
+                <p>
+                  {lumpSumPaymentStatus === "ongoing" ? (
+                    <CircularProgress size={8} />
+                  ) : lumpSumPaymentStatus === "complete" ? (
+                    "Completed!"
+                  ) : lumpSumPaymentStatus === "failed" ? (
+                    "Failed"
+                  ) : lumpSumPaymentStatus === "pending" ? (
+                    "Pending Action"
+                  ) : (
+                    "Not set"
+                  )}
+                </p>
+              </li>
+              <li>
+                <h6>Contract Creation Status</h6>{" "}
+                <p>
+                  {contractCreationStatus === "ongoing" ? (
+                    <CircularProgress size={8} />
+                  ) : contractCreationStatus === "complete" ? (
+                    "Completed!"
+                  ) : contractCreationStatus === "failed" ? (
+                    "Failed"
+                  ) : contractCreationStatus === "pending" ? (
+                    "Pending Action"
+                  ) : (
+                    "No transaction ongoing"
+                  )}
+                </p>
+              </li>
+            </ul>
+            <Stack alignItems="flex-end">
+              <button onClick={() => setShowSuccessModal(false)}>Ok</button>
+            </Stack>
+          </div>
+        </OngoingTransaction>
       </Modal>
+
       <Stack mt={2} textAlign="center" spacing={1}>
         <form onSubmit={formik.handleSubmit}>
           <Stack spacing={5}>
@@ -294,6 +384,52 @@ const VestCreate = () => {
                 onBlur={formik.handleBlur}
                 disabled={formik.isSubmitting}
               />
+              <TextField
+                type="number"
+                fullWidth
+                id="lumpsum"
+                name="lumpsum"
+                placeholder="lump sum percentage"
+                helperText={formik.dirty && formik.errors.lumpsum}
+                error={formik.touched.amount && Boolean(formik.errors.lumpsum)}
+                value={formik.values.lumpsum}
+                onChange={(e: any) => {
+                  formik.handleChange(e);
+
+                  if (
+                    typeof formik.values.lumpsum === "number" &&
+                    formik.values.lumpsum > 100
+                  ) {
+                    formik.setFieldValue("lumpsum", 100);
+                  }
+                  if (
+                    typeof formik.values.lumpsum === "number" &&
+                    formik.values.lumpsum < 0
+                  ) {
+                    formik.setFieldValue("lumpsum", 0);
+                  }
+                }}
+                onBlur={formik.handleBlur}
+                disabled={formik.isSubmitting}
+                InputProps={{
+                  endAdornment: (
+                    <InputPercentage>
+                      <p>%</p>
+                    </InputPercentage>
+                  ),
+                  inputProps: {
+                    max: 100,
+                    min: 0,
+                  },
+                }}
+              />
+              <InputHelper>
+                (optional) Percentage of the total locked{" "}
+                {formik.values.amount && formik.values.amount.length
+                  ? "(" + formik.values.amount + ")"
+                  : ""}{" "}
+                amount you want to send the user as soon on contract start.
+              </InputHelper>
               <InputWrapperRadio>
                 <InputLabel>Enter a root key</InputLabel>
                 {!formik.values.rootPreferred && (

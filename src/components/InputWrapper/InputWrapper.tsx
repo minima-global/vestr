@@ -47,4 +47,26 @@ const InputHelper = styled("div")`
   font-family: Manrope-regular;
   font-size: 0.975rem;
 `;
-export { InputWrapper, InputLabel, InputHelper, InputWrapperRadio };
+
+const InputPercentage = styled("div")`
+  text-align: center;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-left: 5px;
+  > p {
+    padding: 0;
+    margin: 0;
+    text-align: center;
+    font-weight: 700;
+    font-family: Manrope-regular;
+  }
+`;
+export {
+  InputWrapper,
+  InputLabel,
+  InputHelper,
+  InputWrapperRadio,
+  InputPercentage,
+};

@@ -16,7 +16,7 @@ import * as RPC from "../../RPC";
  * @returns
  */
 export const createVestingContract = async (
-  amount: number,
+  amount: string,
   cliff: number,
   address: string,
   token: MinimaToken,
@@ -53,7 +53,7 @@ export const createVestingContract = async (
 
     return new Promise((resolve, reject) => {
       MDS.cmd(
-        `send amount:${amount} address:${
+        `send debug:true amount:${amount} address:${
           vestingContract.scriptaddress
         } tokenid:${
           token.tokenid
@@ -63,10 +63,11 @@ export const createVestingContract = async (
         (res) => {
           if (!res.status && !res.pending)
             reject(res.error ? res.error : "RPC Failed");
-          if (!res.status && res.pending) resolve(res.error);
+          if (!res.status && !res.pending) resolve(res.error);
+          if (!res.status && res.pending) resolve(1);
 
           console.log(res);
-          resolve(res.response);
+          resolve(0);
         }
       );
     });

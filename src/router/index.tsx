@@ -10,6 +10,7 @@ import NotFound from "../components/NotFound";
 import Home from "../components/Home";
 import Calculate from "../components/Calculate";
 import Create from "../components/Create";
+import Track from "../components/Track";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -18,6 +19,7 @@ export const router = createBrowserRouter(
         <Route path="home" element={<Home />} />
         <Route path="calculate" element={<Calculate />} />
         <Route path="createnew" element={<Create />} />
+        <Route path="track" element={<Track />} />
         <Route path="*" element={<NotFound />} />
       </Route>
       <Route path="*" element={<Navigate replace to="dashboard" />} />

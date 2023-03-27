@@ -176,16 +176,17 @@ interface Address {
 
 interface Coin {
   coinid: string;
-  address: string;
-  mxaddress: string;
   amount: string;
-  tokenid: string;
-  floating: boolean;
+  address: string;
+  miniaddress: string;
+  token: any;
   storestate: boolean;
-  created: number;
-  mmrentry: string;
+  tokenid: string;
   state: State[];
-  token?: any;
+  floating: boolean;
+  spent: boolean;
+  mmrentry: string;
+  created: string;
   tokenamount?: string;
 }
 
