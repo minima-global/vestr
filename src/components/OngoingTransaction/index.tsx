@@ -58,6 +58,9 @@ const OngoingTransaction = styled("div")`
     font-family: Manrope-regular;
     font-size: 0.975rem;
   }
+  button:disabled {
+    background-color: #d3d3d3;
+  }
 `;
 
 export default OngoingTransaction;

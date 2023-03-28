@@ -1,15 +1,15 @@
-.track {
+.details {
   padding: 0 16px;
 }
 
-.track h5 {
+.details h5 {
   font-family: Manrope-regular;
   font-size: 1.2rem;
   margin: 0;
   border-bottom: 1px solid #d3d3d3;
   padding-bottom: 8px;
 }
-.track h6 {
+.details h6 {
   font-family: Manrope-regular;
   font-size: 1rem;
   margin: 0;
@@ -20,10 +20,13 @@
 
 .toolbar {
   justify-content: flex-end;
-  padding:0 !important;
+  padding:0!important;
 }
 .toolbar img {
-  width: 12px;
+  width: 24px;
+}
+.toolbar img:hover {
+  cursor: pointer;
 }
 
 .toolbar div * {
@@ -34,4 +37,22 @@
 .toolbar div * p {
   font-size: 0.565rem;
   margin:0;
+}
+
+.collect-btn {
+  padding: 12px;
+  border: none;
+  font-family: Manrope-regular;
+  background-color: #16181c;
+  color: #fff;
+  border-radius: 8px;
+}
+.collect-btn:hover {
+  opacity: 0.975;
+  cursor: pointer;
+}
+.collect-btn:disabled {
+  opacity: 0.5;
+  
+  cursor: not-allowed
 }

@@ -200,15 +200,21 @@ const VestCreate = () => {
                 `send amount:${lumpSumAmount} address:${formInput.address} tokenid:${formInput.token.tokenid}`,
                 (res: any) => {
                   if (!res.status && !res.pending)
-                    reject(res.error ? res.error : "Rpc failed");
+                    reject(
+                      res.error
+                        ? res.error
+                        : res.message
+                        ? res.message
+                        : "RPC Failed"
+                    );
                   if (!res.status && res.pending) resolve(1);
-                  console.log(res);
 
                   resolve(0);
                 }
               );
             })
               .then(async (res) => {
+                console.log("lumpSum", res);
                 const lumpPaymentPending = res === 1;
                 const lumpPaymentCompleted = res === 0;
                 if (lumpPaymentCompleted) {
@@ -238,6 +244,7 @@ const VestCreate = () => {
                   formInput.minBlockWait
                 )
                   .then((resp) => {
+                    console.log("createVesting", resp);
                     const contractPaymentPending = resp === 1;
                     const contractPaymentCompleted = resp === 0;
 
@@ -317,7 +324,20 @@ const VestCreate = () => {
               <li></li>
             </ul>
             <Stack alignItems="flex-end">
-              <button onClick={() => setShowSuccessModal(false)}>Ok</button>
+              <button
+                disabled={
+                  lumpSumPaymentStatus === "ongoing" ||
+                  contractCreationStatus === "ongoing"
+                }
+                onClick={() => setShowSuccessModal(false)}
+              >
+                {lumpSumPaymentStatus === "ongoing" ||
+                contractCreationStatus === "ongoing" ? (
+                  <CircularProgress size={8} />
+                ) : (
+                  "Ok"
+                )}
+              </button>
             </Stack>
           </div>
         </OngoingTransaction>
