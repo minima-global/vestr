@@ -1,4 +1,3 @@
-import { runScript } from "./../runScript/index";
 import { addMonths } from "date-fns";
 import { MinimaToken } from "../../../../@types";
 import { vestingContract } from "../../contracts";
@@ -22,7 +21,8 @@ export const createVestingContract = async (
   token: MinimaToken,
   root: string,
   endContract: Date,
-  minBlockWait: number
+  minBlockWait: number,
+  id: string
 ) => {
   try {
     // calculate block in time
@@ -31,6 +31,10 @@ export const createVestingContract = async (
     );
     // get currentBlockHeight
     const currentBlockHeight = await RPC.getCurrentBlockHeight();
+    // unique identifier for contract
+    const uniqueIdentityForContract = await RPC.hash(
+      encodeURIComponent(id) + Math.random() * 1000000
+    );
 
     /**
      * Calculate the Cliff period, when can the user start collecting this contract
@@ -59,7 +63,9 @@ export const createVestingContract = async (
           token.tokenid
         } state:{"0":"${address}","1":"${amount}","2":"${startingBlockHeightOfContract}", "3":"${endContractBlockHeight}","4":"${minimumTimeUserMustWaitToCollectAgain}","5":"${
           root.length === 0 ? "0x21" : root
-        }"}`,
+        }","6":"${new Date().getTime()}","7": "[${encodeURIComponent(
+          id
+        )}]", "199":"${uniqueIdentityForContract}"}`,
         (res) => {
           if (!res.status && !res.pending)
             reject(res.error ? res.error : "RPC Failed");

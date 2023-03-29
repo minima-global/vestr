@@ -4,8 +4,8 @@ const OngoingTransaction = styled("div")`
   border-radius: 4px;
   background-color: #fff;
   margin: 16px;
-  min-width: 360px;
-  max-width: auto;
+  width: 360px;
+  max-width: 360px;
   padding: 16px;
   overflow: overlay;
   outline: none;
@@ -23,6 +23,7 @@ const OngoingTransaction = styled("div")`
     padding-bottom: 8px;
     margin: 0;
     padding: 0;
+    padding-bottom: 8px;
   }
   #list {
     padding: 0;
@@ -48,6 +49,7 @@ const OngoingTransaction = styled("div")`
     display: flex;
     justify-content: space-between;
     flex-direction: column;
+    word-break: break-all;
   }
 
   button {

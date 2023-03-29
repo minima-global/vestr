@@ -9,15 +9,13 @@ export const withdrawVestingContract = (
   state: any[]
 ) => {
   const coinid = coin.coinid;
-  const withdrawalAddress = coin.state[0].data;
   const tokenid = coin.tokenid;
-  const rootKey = coin.state[5].data;
-
-  // console.log(`Collecting amount..`, cancollect);
+  const withdrawalAddress = MDS.util.getStateVariable(coin, 0);
+  const rootKey = MDS.util.getStateVariable(coin, 5);
 
   return new Promise((resolve, reject) => {
+    // reject("Failed purposefully");
     const id = Math.floor(Math.random() * 1000000000);
-    // console.log("CHANGE1212", change);
     const command = `
             txncreate id:${id};
             txninput id:${id} coinid:${coinid} scriptmmr:true;
@@ -29,12 +27,30 @@ export const withdrawVestingContract = (
                 `
                 : ""
             }
-            txnstate id:${id} port:0 value:${state[0].data};
-            txnstate id:${id} port:1 value:${state[1].data};
-            txnstate id:${id} port:2 value:${state[2].data};
-            txnstate id:${id} port:3 value:${state[3].data};
-            txnstate id:${id} port:4 value:${state[4].data};                
-            txnstate id:${id} port:5 value:${state[5].data};      
+            txnstate id:${id} port:0 value:${MDS.util.getStateVariable(
+      coin,
+      0
+    )};
+            txnstate id:${id} port:1 value:${MDS.util.getStateVariable(
+      coin,
+      1
+    )};
+            txnstate id:${id} port:2 value:${MDS.util.getStateVariable(
+      coin,
+      2
+    )};
+            txnstate id:${id} port:3 value:${MDS.util.getStateVariable(
+      coin,
+      3
+    )};
+            txnstate id:${id} port:4 value:${MDS.util.getStateVariable(
+      coin,
+      4
+    )};                
+            txnstate id:${id} port:5 value:${MDS.util.getStateVariable(
+      coin,
+      5
+    )};      
             
             ${
               root
@@ -46,7 +62,7 @@ export const withdrawVestingContract = (
         `;
 
     MDS.cmd(command, (res) => {
-      // console.log("withdrawVestingContract", res);
+      console.log(res);
       const multiResponse = res.length > 1;
       if (!multiResponse && !res.status)
         reject(res.error ? res.error : "RPC Failed");
@@ -54,7 +70,7 @@ export const withdrawVestingContract = (
       if (multiResponse) {
         res.map((r: any) => {
           if (!r.status && r.pending) {
-            resolve(r.error);
+            resolve(1);
           }
           if (!r.status) {
             const error = r.error
@@ -67,7 +83,7 @@ export const withdrawVestingContract = (
         });
       }
 
-      resolve(true);
+      resolve(0);
     });
   });
 };

@@ -5,7 +5,6 @@ import styles from "./Track.module.css";
 import { vestingContract } from "../../minima/libs/contracts";
 import { Coin } from "../../@types";
 import * as CustomComponents from "../MiCustom";
-import { NoResults } from "../MiCustom/MiToken";
 import Decimal from "decimal.js";
 import useChainHeight from "../../hooks/useChainHeight";
 import { Outlet, useMatch, useNavigate } from "react-router-dom";

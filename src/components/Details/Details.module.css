@@ -56,3 +56,9 @@
   
   cursor: not-allowed
 }
+
+.modal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

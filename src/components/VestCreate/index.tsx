@@ -37,6 +37,10 @@ import styles from "./VestCreate.module.css";
 import MiSelect from "../MiCustom/MiSelect/MiSelect";
 
 const formValidation = yup.object().shape({
+  id: yup
+    .string()
+    .max(255, "Contract name must be at most 255 characters")
+    .matches(/^[^\\;]+$/, "Invalid characters"),
   token: yup.object().required("Field is required"),
   endContract: yup
     .mixed()
@@ -57,7 +61,7 @@ const formValidation = yup.object().shape({
   amount: yup
     .string()
     .required("Field is required")
-    .matches(/^[^a-zA-Z\\;'"]+$/, "Invalid characters."),
+    .matches(/^[^a-zA-Z\\;'"]+$/, "Invalid characters"),
   address: yup
     .string()
     .required("Field is required.")
@@ -164,6 +168,7 @@ const VestCreate = () => {
       preferred: false,
       rootPreferred: false,
       lumpsum: false,
+      id: "",
     },
     onSubmit: async (formInput) => {
       formik.setStatus(undefined);
@@ -241,7 +246,8 @@ const VestCreate = () => {
                   formInput.token,
                   formInput.root,
                   formInput.endContract,
-                  formInput.minBlockWait
+                  formInput.minBlockWait,
+                  formInput.id.replace(`"`, `'`)
                 )
                   .then((resp) => {
                     console.log("createVesting", resp);
@@ -321,7 +327,6 @@ const VestCreate = () => {
                   )}
                 </p>
               </li>
-              <li></li>
             </ul>
             <Stack alignItems="flex-end">
               <button
@@ -347,6 +352,26 @@ const VestCreate = () => {
         <form onSubmit={formik.handleSubmit}>
           <Stack spacing={5}>
             <Stack spacing={1}>
+              <TextField
+                type="text"
+                fullWidth
+                id="id"
+                name="id"
+                placeholder="contract name"
+                helperText={formik.dirty && formik.errors.id}
+                error={formik.touched.id && Boolean(formik.errors.id)}
+                value={formik.values.id}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                disabled={formik.isSubmitting}
+                InputProps={{
+                  endAdornment: (
+                    <InputPercentage>
+                      <p>{formik.values.id.length}/255</p>
+                    </InputPercentage>
+                  ),
+                }}
+              />
               {formik.values.token && (
                 <MiSelect
                   id="token"

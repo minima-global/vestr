@@ -61,6 +61,10 @@ export const MiCoinDetails = styled("div")`
     font-weight: 800;
     text-align: right;
   }
+  li > #name {
+    white-space: normal;
+    word-break: break-word;
+  }
 
   li {
     background-color: #fff;
