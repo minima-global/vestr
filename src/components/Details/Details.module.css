@@ -1,0 +1,64 @@
+.details {
+  padding: 0 16px;
+}
+
+.details h5 {
+  font-family: Manrope-regular;
+  font-size: 1.2rem;
+  margin: 0;
+  border-bottom: 1px solid #d3d3d3;
+  padding-bottom: 8px;
+}
+.details h6 {
+  font-family: Manrope-regular;
+  font-size: 1rem;
+  margin: 0;
+
+  border-bottom: 1px solid #d3d3d3;
+  padding-bottom: 8px;
+}
+
+.toolbar {
+  justify-content: flex-end;
+  padding:0!important;
+}
+.toolbar img {
+  width: 24px;
+}
+.toolbar img:hover {
+  cursor: pointer;
+}
+
+.toolbar div * {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+}
+.toolbar div * p {
+  font-size: 0.565rem;
+  margin:0;
+}
+
+.collect-btn {
+  padding: 12px;
+  border: none;
+  font-family: Manrope-regular;
+  background-color: #16181c;
+  color: #fff;
+  border-radius: 8px;
+}
+.collect-btn:hover {
+  opacity: 0.975;
+  cursor: pointer;
+}
+.collect-btn:disabled {
+  opacity: 0.5;
+  
+  cursor: not-allowed
+}
+
+.modal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

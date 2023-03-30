@@ -1,6 +1,6 @@
 {
   "name": "VESTR",
-  "version": "1.1.0",
+  "version": "1.0.0",
   "private": true,
   "homepage": ".",
   "dependencies": {
@@ -31,7 +31,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "build:dapp": "npm run build && rm dapp/vestr_* && cd build && zip -r vestr_$npm_package_version.mds.zip . && mv vestr_$npm_package_version.mds.zip ../dapp/",
+    "build:dapp": "npm run build && rm dapp/vestr-* && cd build && zip -r vestr-$npm_package_version.mds.zip . && mv vestr-$npm_package_version.mds.zip ../dapp/",
     "package": "bash package.sh",
     "test": "react-scripts test",
     "src:zip": "bash zip.sh",

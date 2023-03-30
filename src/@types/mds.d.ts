@@ -14,4 +14,5 @@ declare namespace MDS {
     getParams: (param: string) => void;
   }
   let net: any;
+  let util: any;
 }

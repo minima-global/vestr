@@ -4,32 +4,43 @@ import { useFormik } from "formik";
 import {
   Button,
   CircularProgress,
-  FormControl,
   FormControlLabel,
-  FormLabel,
   Modal,
   Radio,
   RadioGroup,
   Stack,
   TextField,
 } from "@mui/material";
-import MiSelect from "../MiCustom/MiSelect/MiSelect";
+
 import Select from "../MiCustom/Select";
 import { DateTimePicker } from "@mui/x-date-pickers";
 import * as RPC from "../../minima/libs/RPC";
-import styles from "./VestCreate.module.css";
 
 import { isDate } from "date-fns";
 import { addMonths } from "date-fns";
-import MiSuccessModal from "../MiCustom/MiSuccessModal/MiSuccessModal";
 import MiError from "../MiCustom/MiError/MiError";
-import { Box } from "@mui/system";
 import * as yup from "yup";
 import { checkAddress } from "../../minima/libs/RPC";
 import useWalletBalance from "../../hooks/useWalletBalance";
 import useWalletAddress from "../../hooks/useWalletAddress";
+import {
+  InputLabel,
+  InputWrapper,
+  InputWrapperRadio,
+  InputHelper,
+  InputPercentage,
+} from "../InputWrapper/InputWrapper";
+import Decimal from "decimal.js";
+import OngoingTransaction from "../OngoingTransaction";
+
+import styles from "./VestCreate.module.css";
+import MiSelect from "../MiCustom/MiSelect/MiSelect";
 
 const formValidation = yup.object().shape({
+  id: yup
+    .string()
+    .max(255, "Contract name must be at most 255 characters")
+    .matches(/^[^\\;]+$/, "Invalid characters"),
   token: yup.object().required("Field is required"),
   endContract: yup
     .mixed()
@@ -50,7 +61,7 @@ const formValidation = yup.object().shape({
   amount: yup
     .string()
     .required("Field is required")
-    .matches(/^[^a-zA-Z\\;'"]+$/, "Invalid characters."),
+    .matches(/^[^a-zA-Z\\;'"]+$/, "Invalid characters"),
   address: yup
     .string()
     .required("Field is required.")
@@ -80,38 +91,61 @@ const VestCreate = () => {
   const [dynamicByCliff, setDynamicByCliff] = useState<undefined | Date>(
     undefined
   );
+  const [loadingAddress, setLoadingAddress] = useState(false);
+  const [loadingPublicKey, setLoadingPublicKey] = useState(false);
 
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [transactionPending, setTransactionPending] = useState(false);
+
+  const [lumpSumPaymentStatus, setLumpSumStatus] = useState<
+    false | "pending" | "complete" | "failed" | "ongoing"
+  >(false);
+  const [contractCreationStatus, setContractCreationStatus] = useState<
+    false | "pending" | "complete" | "failed" | "ongoing"
+  >(false);
 
   useEffect(() => {
     formik.setFieldValue("address", walletAddress);
     formik.setFieldValue("root", walletPublicKey);
   }, [walletAddress, walletPublicKey]);
 
-  const closeModal = () => {
-    setShowSuccessModal(false);
-    if (transactionPending) {
-      setTransactionPending(false);
+  const handleAddressSelection = async (e: any) => {
+    formik.setFieldValue("preferred", e.target.value);
+
+    try {
+      const userPrefersOwnAddress = e.target.value === "Own";
+      if (userPrefersOwnAddress) {
+        setLoadingAddress(true);
+        const wallet: any = await RPC.getAddress();
+        formik.setFieldValue("address", wallet.miniaddress);
+        setLoadingAddress(false);
+      }
+
+      if (!userPrefersOwnAddress) {
+        formik.setFieldValue("address", "");
+      }
+    } catch (error: any) {
+      formik.setFieldError("address", error.message);
     }
   };
 
-  const handleAddressSelection = (e: any) => {
-    if (e.target.value === "other-address") {
-      return formik.setFieldValue("address", "");
+  const handlePublicKeySelection = async (e: any) => {
+    formik.setFieldValue("rootPreferred", e.target.value);
+
+    try {
+      const userPrefersOwnKey = e.target.value === "Own";
+      if (userPrefersOwnKey) {
+        setLoadingPublicKey(true);
+        const wallet: any = await RPC.getAddress();
+        formik.setFieldValue("root", wallet.publickey);
+        setLoadingPublicKey(false);
+      }
+
+      if (!userPrefersOwnKey) {
+        formik.setFieldValue("root", "");
+      }
+    } catch (error: any) {
+      formik.setFieldError("root", error.message);
     }
-
-    formik.setFieldValue("address", walletAddress);
-  };
-
-  const handleKeySelection = (e: any) => {
-    if (e.target.value === "other-key") {
-      return formik.setFieldValue("root", "");
-    }
-
-    RPC.getAddress().then((res: any) => {
-      formik.setFieldValue("root", res.publickey);
-    });
   };
 
   const formik = useFormik({
@@ -123,35 +157,144 @@ const VestCreate = () => {
       cliff: 0,
       root: "",
       minBlockWait: 0,
+      preferred: false,
+      rootPreferred: false,
+      lumpsum: false,
+      id: "",
     },
     onSubmit: async (formInput) => {
       formik.setStatus(undefined);
+      setContractCreationStatus("ongoing");
+      setShowSuccessModal(true);
+
+      if (
+        typeof formInput.endContract === null ||
+        !isDate(formInput.endContract)
+      )
+        throw new Error("Select an appropriate time & date");
 
       try {
-        if (!isDate(formInput.endContract)) throw new Error("Not a date..");
-
         if (
           formInput &&
           formInput.endContract &&
           isDate(formInput.endContract)
         ) {
-          const result = await RPC.createVestingContract(
-            Number(formInput.amount),
-            formInput.cliff,
-            formInput.address,
-            formInput.token,
-            formInput.root,
-            formInput.endContract,
-            formInput.minBlockWait
-          );
+          const hasLumpSumPayment =
+            typeof formInput.lumpsum === "number"
+              ? new Decimal(formInput.lumpsum)
+              : false;
+          const percentage = hasLumpSumPayment
+            ? hasLumpSumPayment.dividedBy(100)
+            : false;
+          const lumpSumAmount = percentage
+            ? new Decimal(formInput.amount).times(percentage)
+            : false;
 
-          const transactionIsPending = typeof result === "string";
-          if (transactionIsPending) {
-            setTransactionPending(true);
+          if (lumpSumAmount) {
+            setLumpSumStatus("ongoing");
+            return new Promise((resolve, reject) => {
+              MDS.cmd(
+                `send amount:${lumpSumAmount} address:${formInput.address} tokenid:${formInput.token.tokenid}`,
+                (res: any) => {
+                  if (!res.status && !res.pending)
+                    reject(
+                      res.error
+                        ? res.error
+                        : res.message
+                        ? res.message
+                        : "RPC Failed"
+                    );
+                  if (!res.status && res.pending) resolve(1);
+
+                  resolve(0);
+                }
+              );
+            })
+              .then(async (res) => {
+                // console.log("lumpSum", res);
+                const lumpPaymentPending = res === 1;
+                const lumpPaymentCompleted = res === 0;
+                if (lumpPaymentCompleted) {
+                  setLumpSumStatus("complete");
+                }
+                if (lumpPaymentPending) {
+                  setLumpSumStatus("pending");
+                }
+
+                if (
+                  !isDate(formInput.endContract) ||
+                  formInput.endContract === null
+                )
+                  throw new Error("Select an appropriate date & time");
+
+                await RPC.createVestingContract(
+                  !lumpSumAmount
+                    ? formInput.amount
+                    : new Decimal(formInput.amount)
+                        .minus(lumpSumAmount)
+                        .toString(),
+                  formInput.cliff,
+                  formInput.address,
+                  formInput.token,
+                  formInput.root,
+                  formInput.endContract,
+                  formInput.minBlockWait,
+                  formInput.id.replace(`"`, `'`)
+                )
+                  .then((resp) => {
+                    console.log("createVesting", resp);
+                    const contractPaymentPending = resp === 1;
+                    const contractPaymentCompleted = resp === 0;
+
+                    if (contractPaymentPending)
+                      setContractCreationStatus("pending");
+                    if (contractPaymentCompleted)
+                      setContractCreationStatus("complete");
+
+                    formik.resetForm();
+                  })
+                  .catch((err) => {
+                    setContractCreationStatus("failed");
+                    formik.setStatus("Contract creation failed, " + err);
+                    setShowSuccessModal(false);
+                  });
+              })
+
+              .catch((err) => {
+                setLumpSumStatus("failed");
+                formik.setStatus("Lump sum payment failed, " + err);
+                setShowSuccessModal(false);
+              });
           }
 
-          setShowSuccessModal(true);
-          formik.resetForm();
+          if (!lumpSumAmount) {
+            await RPC.createVestingContract(
+              formInput.amount,
+              formInput.cliff,
+              formInput.address,
+              formInput.token,
+              formInput.root,
+              formInput.endContract,
+              formInput.minBlockWait,
+              formInput.id.replace(`"`, `'`)
+            )
+              .then((resp) => {
+                const contractPaymentPending = resp === 1;
+                const contractPaymentCompleted = resp === 0;
+
+                if (contractPaymentPending)
+                  setContractCreationStatus("pending");
+                if (contractPaymentCompleted)
+                  setContractCreationStatus("complete");
+
+                formik.resetForm();
+              })
+              .catch((err) => {
+                setContractCreationStatus("failed");
+                formik.setStatus("Contract creation failed, " + err);
+                setShowSuccessModal(false);
+              });
+          }
         }
       } catch (error: any) {
         const formError =
@@ -168,33 +311,89 @@ const VestCreate = () => {
   });
   return (
     <>
-      <Modal open={showSuccessModal}>
-        <Box>
-          <MiSuccessModal
-            title={
-              !transactionPending
-                ? "Contract Created!"
-                : "Contract Creation Pending!"
-            }
-            subtitle={
-              !transactionPending
-                ? "Navigate to Track to find your pending contracts"
-                : "Now go to your pending transactions to accept this action"
-            }
-            closeModal={closeModal}
-          />
-        </Box>
+      <Modal open={showSuccessModal} className={styles["modal"]}>
+        <OngoingTransaction>
+          <h5>Transaction in progress</h5>
+          <div id="content">
+            <ul id="list">
+              <li>
+                <h6>Lump Sum Payment</h6>
+                <p>
+                  {lumpSumPaymentStatus === "ongoing" ? (
+                    <CircularProgress size={8} />
+                  ) : lumpSumPaymentStatus === "complete" ? (
+                    "Completed!"
+                  ) : lumpSumPaymentStatus === "failed" ? (
+                    "Failed"
+                  ) : lumpSumPaymentStatus === "pending" ? (
+                    "Pending Action"
+                  ) : (
+                    "Not set"
+                  )}
+                </p>
+              </li>
+              <li>
+                <h6>Contract Creation Status</h6>{" "}
+                <p>
+                  {contractCreationStatus === "ongoing" ? (
+                    <CircularProgress size={8} />
+                  ) : contractCreationStatus === "complete" ? (
+                    "Completed!"
+                  ) : contractCreationStatus === "failed" ? (
+                    "Failed"
+                  ) : contractCreationStatus === "pending" ? (
+                    "Pending Action"
+                  ) : (
+                    "No transaction ongoing"
+                  )}
+                </p>
+              </li>
+            </ul>
+            <Stack alignItems="flex-end">
+              <button
+                disabled={
+                  lumpSumPaymentStatus === "ongoing" ||
+                  contractCreationStatus === "ongoing"
+                }
+                onClick={() => setShowSuccessModal(false)}
+              >
+                {lumpSumPaymentStatus === "ongoing" ||
+                contractCreationStatus === "ongoing" ? (
+                  <CircularProgress size={8} />
+                ) : (
+                  "Ok"
+                )}
+              </button>
+            </Stack>
+          </div>
+        </OngoingTransaction>
       </Modal>
+
       <Stack mt={2} textAlign="center" spacing={1}>
         <form onSubmit={formik.handleSubmit}>
           <Stack spacing={5}>
             <Stack spacing={1}>
-              {formik.status ? (
-                <MiError>
-                  <label>{formik.status}</label>
-                </MiError>
-              ) : null}
-              {formik.values.token ? (
+              <TextField
+                type="text"
+                fullWidth
+                id="id"
+                name="id"
+                placeholder="contract name"
+                helperText={formik.dirty && formik.errors.id}
+                error={formik.touched.id && Boolean(formik.errors.id)}
+                value={formik.values.id}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                disabled={formik.isSubmitting}
+                InputProps={{
+                  endAdornment: (
+                    <InputPercentage>
+                      <p>{formik.values.id.length}/255</p>
+                    </InputPercentage>
+                  ),
+                }}
+              />
+              {formik.values.token && (
                 <MiSelect
                   id="token"
                   name="token"
@@ -215,39 +414,63 @@ const VestCreate = () => {
                   setFieldValue={formik.setFieldValue}
                   resetForm={formik.resetForm}
                 />
-              ) : null}
-              <FormControl className={styles["address-selection"]}>
-                <FormLabel>Address</FormLabel>
-                <RadioGroup
-                  onChange={handleAddressSelection}
-                  row
-                  defaultValue="my-address"
-                  name="radio-buttons-group"
-                >
-                  <FormControlLabel
-                    value="my-address"
-                    control={<Radio />}
-                    label="My Address"
-                  />
-                  <FormControlLabel
-                    value="other-address"
-                    control={<Radio />}
-                    label="Other Address"
-                  />
-                </RadioGroup>
-              </FormControl>
-              <TextField
-                fullWidth
-                id="address"
-                name="address"
-                placeholder="address"
-                helperText={formik.dirty && formik.errors.address}
-                error={formik.touched.address && Boolean(formik.errors.address)}
-                value={formik.values.address}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                disabled={formik.isSubmitting}
-              />
+              )}
+              {!formik.values.token && <p>Fetching all your tokens...</p>}
+              <InputWrapperRadio>
+                <InputLabel>Enter a wallet address</InputLabel>
+                {!formik.values.preferred && (
+                  <RadioGroup
+                    defaultValue={formik.values.preferred}
+                    id="radio-group"
+                    onChange={handleAddressSelection}
+                  >
+                    <FormControlLabel
+                      label="Use my Minima wallet address"
+                      value="Own"
+                      control={<Radio />}
+                    ></FormControlLabel>
+                    <FormControlLabel
+                      value="Custom"
+                      label="Use a different wallet address"
+                      control={<Radio />}
+                    ></FormControlLabel>
+                  </RadioGroup>
+                )}
+                {formik.values.preferred && (
+                  <Stack spacing={1} sx={{ p: 2 }}>
+                    <InputWrapper>
+                      <TextField
+                        id="address"
+                        name="address"
+                        disabled={loadingAddress}
+                        placeholder={
+                          loadingAddress
+                            ? "Getting you an address..."
+                            : "Address"
+                        }
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        helperText={formik.dirty && formik.errors.address}
+                        error={
+                          formik.touched.address &&
+                          Boolean(formik.errors.address)
+                        }
+                        value={formik.values.address}
+                      />
+                    </InputWrapper>
+                    <Button
+                      onClick={() => formik.setFieldValue("preferred", false)}
+                      variant="outlined"
+                      color="inherit"
+                    >
+                      Back
+                    </Button>
+                  </Stack>
+                )}
+
+                <p>A withdrawal address for this contract.</p>
+              </InputWrapperRadio>
+
               <TextField
                 type="text"
                 fullWidth
@@ -261,36 +484,123 @@ const VestCreate = () => {
                 onBlur={formik.handleBlur}
                 disabled={formik.isSubmitting}
               />
-              <FormControl className={styles["address-selection"]}>
-                <FormLabel>Select a root key</FormLabel>
-                <RadioGroup
-                  onChange={handleKeySelection}
-                  row
-                  defaultValue="my-key"
-                  name="radio-buttons-group"
-                >
-                  <FormControlLabel
-                    value="my-key"
-                    control={<Radio />}
-                    label="My Key"
-                  />
-                  <FormControlLabel
-                    value="other-key"
-                    control={<Radio />}
-                    label="Other Key"
-                  />
-                </RadioGroup>
-              </FormControl>
               <TextField
+                type="number"
                 fullWidth
-                id="root"
-                name="root"
-                placeholder="root key"
-                value={formik.values.root}
-                onChange={formik.handleChange}
+                id="lumpsum"
+                name="lumpsum"
+                placeholder="lump sum percentage"
+                helperText={formik.dirty && formik.errors.lumpsum}
+                error={formik.touched.amount && Boolean(formik.errors.lumpsum)}
+                value={formik.values.lumpsum}
+                onChange={(e: any) => {
+                  formik.handleChange(e);
+
+                  if (
+                    typeof formik.values.lumpsum === "number" &&
+                    formik.values.lumpsum > 100
+                  ) {
+                    formik.setFieldValue("lumpsum", 100);
+                  }
+                  if (
+                    typeof formik.values.lumpsum === "number" &&
+                    formik.values.lumpsum < 0
+                  ) {
+                    formik.setFieldValue("lumpsum", 0);
+                  }
+                }}
                 onBlur={formik.handleBlur}
                 disabled={formik.isSubmitting}
+                InputProps={{
+                  endAdornment: (
+                    <InputPercentage>
+                      <p>%</p>
+                    </InputPercentage>
+                  ),
+                  inputProps: {
+                    max: 100,
+                    min: 0,
+                  },
+                }}
               />
+              <InputHelper>
+                (optional) Percentage of the total locked{" "}
+                {formik.values.amount && formik.values.amount.length
+                  ? "(" + formik.values.amount + ")"
+                  : ""}{" "}
+                amount you want to send the user as soon on contract start.
+              </InputHelper>
+              <InputWrapperRadio>
+                <InputLabel>Enter a root key</InputLabel>
+                {!formik.values.rootPreferred && (
+                  <RadioGroup
+                    defaultValue={formik.values.rootPreferred}
+                    id="radio-group"
+                    onChange={handlePublicKeySelection}
+                  >
+                    <FormControlLabel
+                      label="Use my node's public key"
+                      value="Own"
+                      control={<Radio />}
+                    ></FormControlLabel>
+                    <FormControlLabel
+                      value="Custom"
+                      label="Use a different node's public key"
+                      control={<Radio />}
+                    ></FormControlLabel>
+                    <FormControlLabel
+                      value="None"
+                      label="Use none"
+                      control={<Radio />}
+                    ></FormControlLabel>
+                  </RadioGroup>
+                )}
+                {formik.values.rootPreferred && (
+                  <Stack spacing={1} sx={{ p: 2 }}>
+                    <InputWrapper>
+                      <TextField
+                        id="root"
+                        name="root"
+                        disabled={
+                          loadingPublicKey ||
+                          (typeof formik.values.rootPreferred === "string" &&
+                            formik.values.rootPreferred === "None")
+                        }
+                        placeholder={
+                          loadingPublicKey
+                            ? "Getting you a public key..."
+                            : typeof formik.values.rootPreferred === "string" &&
+                              formik.values.rootPreferred === "None"
+                            ? "Disabled"
+                            : "Public key"
+                        }
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        helperText={formik.dirty && formik.errors.root}
+                        error={
+                          formik.touched.root && Boolean(formik.errors.root)
+                        }
+                        value={formik.values.root}
+                      />
+                    </InputWrapper>
+                    <Button
+                      onClick={() =>
+                        formik.setFieldValue("rootPreferred", false)
+                      }
+                      variant="outlined"
+                      color="inherit"
+                    >
+                      Back
+                    </Button>
+                  </Stack>
+                )}
+
+                <p>
+                  As an optional, a root key that enables withdrawal at any
+                  given time.
+                </p>
+              </InputWrapperRadio>
+
               <Select
                 id="cliff"
                 name="cliff"
@@ -318,6 +628,10 @@ const VestCreate = () => {
                   </option>
                 ))}
               </Select>
+              <InputHelper>
+                (optional) A minimum amount of wait time required before the
+                contract is allowed to be interacted with.
+              </InputHelper>
               <Select
                 id="minBlockWait"
                 name="minBlockWait"
@@ -344,6 +658,9 @@ const VestCreate = () => {
                   Yearly
                 </option>
               </Select>
+              <InputHelper>
+                (optional) How often a user can collect.
+              </InputHelper>
               <DateTimePicker
                 minDateTime={dynamicByCliff ? dynamicByCliff : undefined}
                 disablePast={true}
@@ -354,10 +671,13 @@ const VestCreate = () => {
                 renderInput={(params: any) => {
                   return (
                     <TextField
+                      placeholder="Enter a date & time for contract's expiry"
                       disabled={formik.isSubmitting}
                       fullWidth
                       InputProps={{
                         readOnly: true,
+                        placeholder:
+                          "Enter a date & time for contract's expiry",
                       }}
                       error={
                         formik.touched.endContract &&
@@ -372,6 +692,10 @@ const VestCreate = () => {
                   );
                 }}
               />
+              <InputHelper>
+                A date & time for when this contract ends. After a contract ends
+                all funds can be collected.
+              </InputHelper>
             </Stack>
             <Button
               type="submit"
@@ -384,6 +708,11 @@ const VestCreate = () => {
               {!formik.isSubmitting && "Lock"}
               {formik.isSubmitting && <CircularProgress size={16} />}
             </Button>
+            {formik.status && (
+              <MiError>
+                <label>{formik.status}</label>
+              </MiError>
+            )}
           </Stack>
         </form>
       </Stack>

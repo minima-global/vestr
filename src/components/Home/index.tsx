@@ -9,18 +9,31 @@ const Home = () => {
       <Toolbar />
       <h5>Welcome to Vestr</h5>
       <p>
-        Vestr is a vesting scheduler. You can calculate, create and track
-        relevant vesting contracts on the network.
+        Vestr is a vesting scheduler. Vesting is the process of locking up
+        Minima coins or custom tokens and distributing them within a given
+        timeframe.
+        <br />
+        You can calculate, create and track relevant vesting contracts on the
+        network.
+      </p>
+
+      <p>
+        <b>Cliff periods</b> in vesting contracts are a minimum time required
+        before the contracts starts.
+      </p>
+      <p>
+        <b>Grace periods</b> in vesting contracts are minimum time required
+        between each collection.
       </p>
 
       <h6>Tutorial</h6>
-      <p>Let's calculate a vesting schedule for a potential client.</p>
-
       <p>
-        Let's create a schedule by locking up 1,000,000 Minima coins with an
-        initial unlock of 5% and allow our client to collect once a month for 36
-        months.
+        Let's calculate a vesting schedule for a potential client as an example.
+        Say we want to issue a contract of 1,000,000 Minima coins, with an
+        initial lock up of 5% of the total amount and a monthly collection for a
+        period 36 months.
       </p>
+
       <p>
         Press the Calculate button in the form below to get an overview of the
         Vesting Schedule:
