@@ -42,6 +42,7 @@ const OngoingTransaction = styled("div")`
   }
   #list p {
     font-size: 0.875rem;
+    word-break: break-word;
   }
 
   #content {

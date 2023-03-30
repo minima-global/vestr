@@ -8,12 +8,18 @@ import * as RPC from "../../minima/libs/RPC";
 import { vestingContract } from "../../minima/libs/contracts";
 import useChainHeight from "../../hooks/useChainHeight";
 import OngoingTransaction from "../OngoingTransaction";
+import { format } from "date-fns";
+import { Coin } from "../../@types";
+import { events } from "../../minima/libs/events";
 
 const Details = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const tip = useChainHeight();
   const [runScriptData, setRunScript] = useState<false | any>(false);
+
+  const [endedModal, setOpenEndedModal] = useState(false);
+  const [contractEnded, setContractEnded] = useState(false);
 
   const [collectionStatus, setStatus] = useState<
     false | "ongoing" | "pending" | "complete" | "failed"
@@ -22,6 +28,30 @@ const Details = () => {
 
   const { C: viewingCoin } = location.state;
 
+  events.onNewBalance(() => {
+    RPC.getCoinsByAddress(vestingContract.scriptaddress)
+      .then((data) => {
+        const coins = data.relevantCoins;
+        const coin = data.relevantCoins.find(
+          (c) =>
+            MDS.util.getStateVariable(c, 199) ===
+            MDS.util.getStateVariable(viewingCoin, 199)
+        );
+        if (coin) {
+          navigate("/dashboard/track/" + MDS.util.getStateVariable(coin, 199), {
+            state: { C: coin },
+          });
+        }
+
+        if (!coin) {
+          setOpenEndedModal(true);
+          setContractEnded(true);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  });
   const collectCoin = (
     coin: any,
     cancollect: string,
@@ -38,7 +68,7 @@ const Details = () => {
       coin.state
     )
       .then((status) => {
-        console.log("withdrawVestingContract response", status);
+        // console.log("withdrawVestingContract response", status);
         const commandPending = status === 1; // a command is pending
         const commandCompleted = status === 0; // status completed!
 
@@ -66,7 +96,9 @@ const Details = () => {
         "@AMOUNT":
           viewingCoin.tokenid === "0x00"
             ? viewingCoin.amount
-            : viewingCoin.tokenamount,
+            : viewingCoin && "tokenamount" in viewingCoin
+            ? viewingCoin.tokenamount
+            : "0",
         "@BLOCK": tip && tip.block ? tip.block : "0",
         "@COINAGE": viewingCoin.created,
       }
@@ -98,16 +130,6 @@ const Details = () => {
                     "Not set"
                   )}
                 </p>
-
-                {collectionStatus === "ongoing" ||
-                  collectionStatus === "complete" ||
-                  (collectionStatus === "pending" && (
-                    <p>
-                      I understand that on every collection the coinid changes
-                      and so this contract will now update to a new one with a
-                      different coinid.
-                    </p>
-                  ))}
               </li>
             </ul>
             <Stack alignItems="flex-end">
@@ -125,6 +147,22 @@ const Details = () => {
           </div>
         </OngoingTransaction>
       </Modal>
+      <Modal open={endedModal} className={styles["modal"]}>
+        <OngoingTransaction>
+          <h5>Contract Completed</h5>
+          <div id="content">
+            <ul id="list">
+              <li>
+                <h6>Status</h6>
+                <p>Woohoo! You have collected all funds for this contract.</p>
+              </li>
+            </ul>
+            <Stack alignItems="flex-end">
+              <button onClick={() => navigate("/dashboard/track")}>Done</button>
+            </Stack>
+          </div>
+        </OngoingTransaction>
+      </Modal>
 
       <Stack className={styles["details"]}>
         <Toolbar className={styles["toolbar"]}>
@@ -135,12 +173,15 @@ const Details = () => {
             gap={0.5}
           >
             <div>
-              <img onClick={() => navigate(-1)} src="/assets/close.svg" />
+              <img
+                onClick={() => navigate("/dashboard/track")}
+                src="/assets/close.svg"
+              />
             </div>
           </Stack>
         </Toolbar>
         <h5>Your Contract</h5>
-        {!runScriptData && (
+        {(!runScriptData || !viewingCoin) && (
           <Stack alignItems="center" justifyContent="center">
             <CircularProgress size={16} />
           </Stack>
@@ -163,6 +204,7 @@ const Details = () => {
                     </h6>
                   </CustomComponents.Cliffed>
                 )}
+
               <CustomComponents.MiContractSummary>
                 <div>
                   <h6>Total Locked</h6>
@@ -177,7 +219,7 @@ const Details = () => {
                         .toString()}
                     </p>
                   )}
-                  {viewingCoin.tokenid !== "0x00" && (
+                  {viewingCoin.tokenid !== "0x00" && viewingCoin && (
                     <p>
                       {new Decimal(MDS.util.getStateVariable(viewingCoin, 1))
                         .minus(viewingCoin.tokenamount)
@@ -204,17 +246,32 @@ const Details = () => {
                   <li>
                     <p>Contract Name</p>
                     <p id="name">
-                      {MDS.util
-                        .getStateVariable(viewingCoin, 7)
-                        .substring(
-                          1,
-                          MDS.util.getStateVariable(viewingCoin, 7).length - 1
+                      {MDS.util.getStateVariable(viewingCoin, 7) !== "[]" &&
+                        decodeURIComponent(
+                          MDS.util
+                            .getStateVariable(viewingCoin, 7)
+                            .substring(
+                              1,
+                              MDS.util.getStateVariable(viewingCoin, 7).length -
+                                1
+                            )
                         )}
+                      {MDS.util.getStateVariable(viewingCoin, 7) === "[]" &&
+                        "N/A"}
                     </p>
                   </li>
                   <li>
                     <p>Contract ID</p>
                     <p>{MDS.util.getStateVariable(viewingCoin, 199)}</p>
+                  </li>
+                  <li>
+                    <p>Created At</p>
+                    <p>
+                      {format(
+                        parseInt(MDS.util.getStateVariable(viewingCoin, 6)),
+                        "hh:mm:ss a, dd/MM/y"
+                      )}
+                    </p>
                   </li>
                   <li>
                     <p>Coin ID</p>
@@ -253,39 +310,52 @@ const Details = () => {
               <Stack>
                 {runScriptData &&
                   "mustwait" in runScriptData &&
-                  runScriptData.mustwait === "TRUE" && <p></p>}
-                <button
-                  onClick={() =>
-                    collectCoin(
-                      viewingCoin,
-                      runScriptData.cancollect,
-                      runScriptData.change
-                    )
-                  }
-                  className={styles["collect-btn"]}
-                  disabled={
-                    (runScriptData &&
-                      "cliffed" in runScriptData &&
-                      runScriptData.cliffed === "TRUE") ||
-                    (runScriptData &&
-                      "mustwait" in runScriptData &&
-                      runScriptData.mustwait === "TRUE") ||
-                    (runScriptData &&
-                      "cancollect" in runScriptData &&
-                      runScriptData.cancollect <= 0)
-                  }
-                >
-                  {runScriptData &&
-                  "mustwait" in runScriptData &&
-                  runScriptData.mustwait === "TRUE"
-                    ? "Wait " +
-                      new Decimal(MDS.util.getStateVariable(viewingCoin, 3))
-                        .minus(new Decimal(tip ? tip.block : "0"))
-                        .minus(runScriptData.coinsage)
-                        .toString() +
-                      " blocks"
-                    : "Collect"}
-                </button>
+                  runScriptData.mustwait === "TRUE" && (
+                    <p>Grace period.. you have to wait another ... blocks</p>
+                  )}
+                {!contractEnded && (
+                  <button
+                    onClick={() =>
+                      collectCoin(
+                        viewingCoin,
+                        runScriptData.cancollect,
+                        runScriptData.change
+                      )
+                    }
+                    className={styles["collect-btn"]}
+                    disabled={
+                      (runScriptData &&
+                        "cliffed" in runScriptData &&
+                        runScriptData.cliffed === "TRUE") ||
+                      (runScriptData &&
+                        "mustwait" in runScriptData &&
+                        runScriptData.mustwait === "TRUE") ||
+                      (runScriptData &&
+                        "cancollect" in runScriptData &&
+                        runScriptData.cancollect <= 0)
+                    }
+                  >
+                    {runScriptData &&
+                    "mustwait" in runScriptData &&
+                    runScriptData.mustwait === "TRUE"
+                      ? "Wait " +
+                        new Decimal(MDS.util.getStateVariable(viewingCoin, 3))
+                          .minus(new Decimal(tip ? tip.block : "0"))
+                          .minus(runScriptData.coinsage)
+                          .toString() +
+                        " blocks"
+                      : "Collect"}
+                  </button>
+                )}
+
+                {contractEnded && (
+                  <button
+                    className={styles["collect-btn"]}
+                    onClick={() => navigate("/dashboard/track")}
+                  >
+                    Done
+                  </button>
+                )}
               </Stack>
             </Stack>
           </>
