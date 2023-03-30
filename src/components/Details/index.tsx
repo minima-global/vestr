@@ -31,7 +31,6 @@ const Details = () => {
   events.onNewBalance(() => {
     RPC.getCoinsByAddress(vestingContract.scriptaddress)
       .then((data) => {
-        const coins = data.relevantCoins;
         const coin = data.relevantCoins.find(
           (c) =>
             MDS.util.getStateVariable(c, 199) ===
@@ -68,7 +67,6 @@ const Details = () => {
       coin.state
     )
       .then((status) => {
-        // console.log("withdrawVestingContract response", status);
         const commandPending = status === 1; // a command is pending
         const commandCompleted = status === 0; // status completed!
 
@@ -103,7 +101,7 @@ const Details = () => {
         "@COINAGE": viewingCoin.created,
       }
     ).then((vars: any) => {
-      console.log(vars);
+      // console.log(vars);
       setRunScript(vars);
     });
   }, [tip, location.state]);
@@ -182,7 +180,7 @@ const Details = () => {
         </Toolbar>
         <h5>Your Contract</h5>
         {(!runScriptData || !viewingCoin) && (
-          <Stack alignItems="center" justifyContent="center">
+          <Stack mt={2} alignItems="center" justifyContent="center">
             <CircularProgress size={16} />
           </Stack>
         )}
@@ -195,12 +193,23 @@ const Details = () => {
                 tip && (
                   <CustomComponents.Cliffed>
                     <h6>
-                      Contract has a minimum wait time until you are allowed to
-                      begin collecting. You have to wait another{" "}
+                      Contract has a cliffing period set. Contract begins within
+                      another{" "}
                       {new Decimal(MDS.util.getStateVariable(viewingCoin, 3))
                         .minus(tip.block)
                         .toString()}{" "}
                       blocks.
+                    </h6>
+                  </CustomComponents.Cliffed>
+                )}
+              {!!runScriptData &&
+                "mustwait" in runScriptData &&
+                runScriptData.mustwait === "TRUE" &&
+                tip && (
+                  <CustomComponents.Cliffed>
+                    <h6>
+                      Contract has a grace period. You have to wait another{" "}
+                      {runScriptData.mustwaitblocks} blocks.
                     </h6>
                   </CustomComponents.Cliffed>
                 )}
@@ -228,7 +237,7 @@ const Details = () => {
                   )}
                 </div>
                 <div>
-                  <h6>Can Withdraw Now</h6>
+                  <h6>Available Withdrawal</h6>
                   <p>
                     {runScriptData &&
                     "cancollect" in runScriptData &&
@@ -261,11 +270,11 @@ const Details = () => {
                     </p>
                   </li>
                   <li>
-                    <p>Contract ID</p>
+                    <p>Contract id</p>
                     <p>{MDS.util.getStateVariable(viewingCoin, 199)}</p>
                   </li>
                   <li>
-                    <p>Created At</p>
+                    <p>Created at</p>
                     <p>
                       {format(
                         parseInt(MDS.util.getStateVariable(viewingCoin, 6)),
@@ -274,11 +283,11 @@ const Details = () => {
                     </p>
                   </li>
                   <li>
-                    <p>Coin ID</p>
+                    <p>Coin id</p>
                     <p>{viewingCoin.coinid}</p>
                   </li>
                   <li>
-                    <p>Contract Created On Block</p>
+                    <p>Contract began on block</p>
                     <p>
                       {runScriptData && "startblock" in runScriptData
                         ? runScriptData.startblock
@@ -286,7 +295,7 @@ const Details = () => {
                     </p>
                   </li>
                   <li>
-                    <p>Contract Rules Expire After Block</p>
+                    <p>Contract rules expire after block</p>
                     <p>
                       {runScriptData && "finalblock" in runScriptData
                         ? runScriptData.finalblock
@@ -294,11 +303,11 @@ const Details = () => {
                     </p>
                   </li>
                   <li>
-                    <p>Withdrawal Address</p>
+                    <p>Withdrawal address</p>
                     <p>{viewingCoin.address}</p>
                   </li>
                   <li>
-                    <p>Root Key</p>
+                    <p>Root key</p>
                     <p>
                       {runScriptData && "rootkey" in runScriptData
                         ? runScriptData.rootkey
@@ -307,12 +316,7 @@ const Details = () => {
                   </li>
                 </ul>
               </CustomComponents.MiCoinDetails>
-              <Stack>
-                {runScriptData &&
-                  "mustwait" in runScriptData &&
-                  runScriptData.mustwait === "TRUE" && (
-                    <p>Grace period.. you have to wait another ... blocks</p>
-                  )}
+              <Stack textAlign="center">
                 {!contractEnded && (
                   <button
                     onClick={() =>
@@ -338,12 +342,7 @@ const Details = () => {
                     {runScriptData &&
                     "mustwait" in runScriptData &&
                     runScriptData.mustwait === "TRUE"
-                      ? "Wait " +
-                        new Decimal(MDS.util.getStateVariable(viewingCoin, 3))
-                          .minus(new Decimal(tip ? tip.block : "0"))
-                          .minus(runScriptData.coinsage)
-                          .toString() +
-                        " blocks"
+                      ? "Wait " + runScriptData.mustwaitblocks + " blocks"
                       : "Collect"}
                   </button>
                 )}

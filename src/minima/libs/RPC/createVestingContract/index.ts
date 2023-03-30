@@ -75,7 +75,7 @@ export const createVestingContract = async (
             );
           if (!res.status && res.pending) resolve(1);
 
-          console.log(res);
+          // console.log(res);
           resolve(0);
         }
       );

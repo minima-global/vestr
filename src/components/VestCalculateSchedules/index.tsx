@@ -69,7 +69,7 @@ const VestCalculateSchedules = ({
             launchPercentage,
             contractLength
           );
-          console.log(calculatedSchedule);
+          // console.log(calculatedSchedule);
           setData(calculatedSchedule);
         }
       } catch (error: any) {

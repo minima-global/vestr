@@ -17,6 +17,15 @@ const Home = () => {
         network.
       </p>
 
+      <p>
+        <b>Cliff periods</b> in vesting contracts are a minimum time required
+        before the contracts starts.
+      </p>
+      <p>
+        <b>Grace periods</b> in vesting contracts are minimum time required
+        between each collection.
+      </p>
+
       <h6>Tutorial</h6>
       <p>
         Let's calculate a vesting schedule for a potential client as an example.

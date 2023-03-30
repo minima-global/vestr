@@ -11,12 +11,10 @@ import { Outlet, useMatch, useNavigate } from "react-router-dom";
 import { events } from "../../minima/libs/events";
 const Track = () => {
   const [contracts, setContracts] = useState<Map<string, Coin>>(new Map());
-  const tip = useChainHeight();
   const navigate = useNavigate();
   const isViewingDetail = useMatch("/dashboard/track/:id");
 
   events.onNewBalance(() => {
-    console.log("getting coins.. on newbalnce");
     RPC.getCoinsByAddress(vestingContract.scriptaddress)
       .then((data) => {
         const map = new Map();
@@ -24,8 +22,6 @@ const Track = () => {
         data.relevantCoins.map((c) =>
           map.set(MDS.util.getStateVariable(c, 199), c)
         );
-
-        console.log("mapData", map.size);
 
         setContracts(map);
       })
@@ -35,7 +31,6 @@ const Track = () => {
   });
 
   useEffect(() => {
-    console.log("getting coins again..");
     RPC.getCoinsByAddress(vestingContract.scriptaddress)
       .then((data) => {
         const map = new Map();
@@ -44,7 +39,7 @@ const Track = () => {
           map.set(MDS.util.getStateVariable(c, 199), c)
         );
 
-        console.log("mapData", map.size);
+        // console.log("mapData", map.size);
 
         setContracts(map);
       })
@@ -67,11 +62,11 @@ const Track = () => {
               gap={0.5}
             >
               <div>
-                <p>No wait between collections</p>
+                <p>Wait between collections disabled</p>
                 <img src="/assets/hourglass_disabled.svg" />
               </div>
               <div>
-                <p>Must wait per each collection</p>
+                <p>Wait between collections enabled</p>
                 <img src="/assets/hourglass_full.svg" />
               </div>
             </Stack>
@@ -95,15 +90,20 @@ const Track = () => {
                       <div>
                         <img src="/assets/toll.svg" />
                         <div>
-                          {C.tokenid === "0x00" && <h6>Minima</h6>}
-                          {C.tokenid !== "0x00" && (
+                          {MDS.util.getStateVariable(C, 7) !== "[]" && (
                             <h6>
-                              {C.token &&
-                              "name" in C.token &&
-                              "name" in C.token.name
-                                ? C.token.name.name
-                                : "Custom Token"}
+                              {decodeURIComponent(
+                                MDS.util
+                                  .getStateVariable(C, 7)
+                                  .substring(
+                                    1,
+                                    MDS.util.getStateVariable(C, 7).length - 1
+                                  )
+                              )}
                             </h6>
+                          )}
+                          {MDS.util.getStateVariable(C, 7) === "[]" && (
+                            <h6>{MDS.util.getStateVariable(C, 199)}</h6>
                           )}
                           {C.tokenid === "0x00" && (
                             <p>

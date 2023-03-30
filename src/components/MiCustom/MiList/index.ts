@@ -8,15 +8,24 @@ export const MiList = styled("ul")`
   display: grid;
 
   * {
+    white-space: nowrap;
+    overflow: hidden;
     text-overflow: ellipsis;
-    white-space: normal;
+  }
+
+  > p {
+    font-family: Manrope-regular;
+    font-size: 0.875rem;
+    text-align: center;
+    text-overflow: hidden;
+    white-space: nowrap;
   }
 
   > li {
     padding: 8px;
     display: grid;
     border-radius: 8px;
-    grid-template-columns: 1fr 3fr;
+    grid-template-columns: 3fr 3fr;
     background-color: #ffede9;
   }
   > li:hover {
@@ -46,10 +55,12 @@ export const MiList = styled("ul")`
 
   > li div:first-of-type img {
     font-size: 0.5rem;
+    min-width: 32px;
     width: 32px;
   }
   > li div:first-of-type div h6 {
     font-size: 0.975rem;
+    text-overflow: ellipsis;
   }
   > li div:first-of-type div p {
     font-size: 0.875rem;

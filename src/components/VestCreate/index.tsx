@@ -95,7 +95,6 @@ const VestCreate = () => {
   const [loadingPublicKey, setLoadingPublicKey] = useState(false);
 
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [transactionPending, setTransactionPending] = useState(false);
 
   const [lumpSumPaymentStatus, setLumpSumStatus] = useState<
     false | "pending" | "complete" | "failed" | "ongoing"
@@ -108,13 +107,6 @@ const VestCreate = () => {
     formik.setFieldValue("address", walletAddress);
     formik.setFieldValue("root", walletPublicKey);
   }, [walletAddress, walletPublicKey]);
-
-  const closeModal = () => {
-    setShowSuccessModal(false);
-    if (transactionPending) {
-      setTransactionPending(false);
-    }
-  };
 
   const handleAddressSelection = async (e: any) => {
     formik.setFieldValue("preferred", e.target.value);
@@ -219,7 +211,7 @@ const VestCreate = () => {
               );
             })
               .then(async (res) => {
-                console.log("lumpSum", res);
+                // console.log("lumpSum", res);
                 const lumpPaymentPending = res === 1;
                 const lumpPaymentCompleted = res === 0;
                 if (lumpPaymentCompleted) {
@@ -271,6 +263,35 @@ const VestCreate = () => {
               .catch((err) => {
                 setLumpSumStatus("failed");
                 formik.setStatus("Lump sum payment failed, " + err);
+                setShowSuccessModal(false);
+              });
+          }
+
+          if (!lumpSumAmount) {
+            await RPC.createVestingContract(
+              formInput.amount,
+              formInput.cliff,
+              formInput.address,
+              formInput.token,
+              formInput.root,
+              formInput.endContract,
+              formInput.minBlockWait,
+              formInput.id.replace(`"`, `'`)
+            )
+              .then((resp) => {
+                const contractPaymentPending = resp === 1;
+                const contractPaymentCompleted = resp === 0;
+
+                if (contractPaymentPending)
+                  setContractCreationStatus("pending");
+                if (contractPaymentCompleted)
+                  setContractCreationStatus("complete");
+
+                formik.resetForm();
+              })
+              .catch((err) => {
+                setContractCreationStatus("failed");
+                formik.setStatus("Contract creation failed, " + err);
                 setShowSuccessModal(false);
               });
           }
