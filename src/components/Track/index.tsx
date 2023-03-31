@@ -6,7 +6,8 @@ import { vestingContract } from "../../minima/libs/contracts";
 import { Coin } from "../../@types";
 import * as CustomComponents from "../MiCustom";
 import Decimal from "decimal.js";
-import useChainHeight from "../../hooks/useChainHeight";
+import KeyIcon from "@mui/icons-material/Key";
+
 import { Outlet, useMatch, useNavigate } from "react-router-dom";
 import { events } from "../../minima/libs/events";
 const Track = () => {
@@ -61,6 +62,10 @@ const Track = () => {
               justifyContent="flex-end"
               gap={0.5}
             >
+              <div>
+                <p>Has a root key</p>
+                <KeyIcon />
+              </div>
               <div>
                 <p>Wait between collections disabled</p>
                 <img src="/assets/hourglass_disabled.svg" />
@@ -120,6 +125,9 @@ const Track = () => {
                         </div>
                       </div>
                       <div>
+                        {MDS.util.getStateVariable(C, 5) !== "0x21" && (
+                          <KeyIcon />
+                        )}
                         {new Decimal(
                           MDS.util.getStateVariable(C, 4)
                         ).greaterThan(0) && (
@@ -128,6 +136,7 @@ const Track = () => {
                         {new Decimal(MDS.util.getStateVariable(C, 4)).equals(
                           0
                         ) && <img src="/assets/hourglass_disabled.svg" />}
+
                         {C.tokenid === "0x00" && (
                           <p>
                             Already collected:{" "}

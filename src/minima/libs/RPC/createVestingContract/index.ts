@@ -57,7 +57,7 @@ export const createVestingContract = async (
 
     return new Promise((resolve, reject) => {
       MDS.cmd(
-        `send debug:true amount:${amount} address:${
+        `send debug:false amount:${amount} address:${
           vestingContract.scriptaddress
         } tokenid:${
           token.tokenid

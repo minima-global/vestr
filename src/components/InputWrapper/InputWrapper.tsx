@@ -46,6 +46,7 @@ const InputHelper = styled("div")`
   margin-top: 13px;
   font-family: Manrope-regular;
   font-size: 0.975rem;
+  word-break: break-word;
 `;
 
 const InputPercentage = styled("div")`
