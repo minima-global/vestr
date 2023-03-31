@@ -19,7 +19,7 @@ const Drawer = () => {
           alignItems="center"
           justifyContent="flex-start"
         >
-          <img src="/assets/icon.png" />
+          <img src="./assets/icon.png" />
           <h6>Vestr</h6>
         </Stack>
       </Toolbar>

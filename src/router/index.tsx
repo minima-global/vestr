@@ -1,5 +1,5 @@
 import {
-  createBrowserRouter,
+  createHashRouter,
   createRoutesFromElements,
   Navigate,
   Route,
@@ -13,7 +13,7 @@ import Create from "../components/Create";
 import Track from "../components/Track";
 import Details from "../components/Details";
 
-export const router = createBrowserRouter(
+export const router = createHashRouter(
   createRoutesFromElements(
     <Route path="/" element={<Root />}>
       <Route path="dashboard" element={<Dashboard />}>

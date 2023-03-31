@@ -158,7 +158,7 @@ const MiSelect = (props: any) => {
                   variant="rounded"
                   src={
                     selectedOption.tokenid === "0x00"
-                      ? "/assets/minimaLogoSquare.png"
+                      ? "./assets/minimaLogoSquare.png"
                       : selectedOption.token.url &&
                         selectedOption.token.url.length
                       ? selectedOption.token.url
@@ -250,7 +250,7 @@ const MiSelect = (props: any) => {
                             variant="rounded"
                             src={
                               t.tokenid === "0x00"
-                                ? "/assets/minimaLogoSquare.png"
+                                ? "./assets/minimaLogoSquare.png"
                                 : t.token.url && t.token.url.length
                                 ? t.token.url
                                 : `https://robohash.org/${t.tokenid}`

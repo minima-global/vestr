@@ -382,7 +382,7 @@ const Details = () => {
           <div>
             <img
               onClick={() => navigate("/dashboard/track")}
-              src="/assets/close.svg"
+              src="./assets/close.svg"
             />
           </div>
         </Toolbar>

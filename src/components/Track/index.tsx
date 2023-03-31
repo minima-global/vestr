@@ -68,11 +68,11 @@ const Track = () => {
               </div>
               <div>
                 <p>Wait between collections disabled</p>
-                <img src="/assets/hourglass_disabled.svg" />
+                <img src="./assets/hourglass_disabled.svg" />
               </div>
               <div>
                 <p>Wait between collections enabled</p>
-                <img src="/assets/hourglass_full.svg" />
+                <img src="./assets/hourglass_full.svg" />
               </div>
             </Stack>
           </Toolbar>
@@ -93,7 +93,7 @@ const Track = () => {
                       key={C.coinid}
                     >
                       <div>
-                        <img src="/assets/toll.svg" />
+                        <img src="./assets/toll.svg" />
                         <div>
                           {MDS.util.getStateVariable(C, 7) !== "[]" && (
                             <h6>
@@ -131,11 +131,11 @@ const Track = () => {
                         {new Decimal(
                           MDS.util.getStateVariable(C, 4)
                         ).greaterThan(0) && (
-                          <img src="/assets/hourglass_full.svg" />
+                          <img src="./assets/hourglass_full.svg" />
                         )}
                         {new Decimal(MDS.util.getStateVariable(C, 4)).equals(
                           0
-                        ) && <img src="/assets/hourglass_disabled.svg" />}
+                        ) && <img src="./assets/hourglass_disabled.svg" />}
 
                         {C.tokenid === "0x00" && (
                           <p>

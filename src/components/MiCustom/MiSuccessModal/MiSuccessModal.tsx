@@ -14,7 +14,7 @@ const MiSuccessModal = (props: any) => {
           <CloseIcon onClick={closeModal} />
         </Stack>
         <Stack alignItems="center" justifyContent="center" spacing={2}>
-          <img src="/assets/completed.svg" />
+          <img src="./assets/completed.svg" />
           <h6>{title}</h6>
           <p>{subtitle}</p>
         </Stack>

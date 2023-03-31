@@ -10,7 +10,7 @@ const Root = () => {
       {!!isMatch && (
         <div className={styles["root"]}>
           <div>
-            <img src="/assets/icon.png" />
+            <img src="./assets/icon.png" />
             <h5>Welcome to VESTR</h5>
             <button onClick={() => navigate("/dashboard/home")}>Enter</button>
           </div>
