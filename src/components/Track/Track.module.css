@@ -25,6 +25,9 @@
 .toolbar img {
   width: 12px;
 }
+.toolbar svg {
+  font-size: 0.8rem;
+}
 
 .toolbar div * {
   display: flex;

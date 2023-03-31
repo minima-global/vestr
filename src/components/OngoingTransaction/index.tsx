@@ -53,7 +53,8 @@ const OngoingTransaction = styled("div")`
     word-break: break-all;
   }
 
-  button {
+  button:last-of-type {
+    border: 1px solid #16181c;
     padding: 4px 16px;
     border: none;
     background-color: #16181c;
@@ -61,8 +62,50 @@ const OngoingTransaction = styled("div")`
     font-family: Manrope-regular;
     font-size: 0.975rem;
   }
+  button#cancel {
+    border: 1px solid #16181c;
+    padding: 3.5px 16px;
+    border: none;
+    background-color: #fff;
+    color: #16181c;
+    border: 0.5px solid #16181c;
+    font-family: Manrope-regular;
+    font-size: 0.975rem;
+  }
+  button:hover {
+    cursor: pointer;
+  }
   button:disabled {
     background-color: #d3d3d3;
+  }
+
+  #withdraw h5 {
+    padding: 0;
+    margin: 0;
+    font-family: Manrope-regular;
+    font-weight: 400;
+  }
+  #withdraw div:first-of-type {
+    padding-right: 0 !important;
+  }
+  #withdraw button {
+    padding: 0;
+    min-width: 40px;
+    height: 100%;
+    font-size: 0.875rem;
+  }
+
+  #status {
+    background-color: #ebfff0;
+    padding: 4px;
+    font-family: Manrope-regular;
+    font-size: 0.875rem;
+    word-break: break-word;
+  }
+  #help {
+    font-family: Manrope-regular;
+    font-size: 0.875rem;
+    word-break: break-word;
   }
 `;
 

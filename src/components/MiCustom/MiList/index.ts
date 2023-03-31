@@ -76,6 +76,9 @@ export const MiList = styled("ul")`
   > li div:last-of-type img {
     width: 16px;
   }
+  > li div:last-of-type svg {
+    font-size: 0.975rem;
+  }
 `;
 
 export default MiList;

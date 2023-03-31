@@ -19,8 +19,28 @@
 }
 
 .toolbar {
-  justify-content: flex-end;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
   padding:0!important;
+}
+.toolbar button:hover {
+  opacity: 0.9;
+  cursor: pointer;
+}
+.toolbar button {
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Manrope-semibold;
+  border: none;
+  padding: 4px 8px;
+  background-color: #16181c;
+  color: #f2f2f2;
+}
+.toolbar button svg {
+  font-size: 0.975rem;
 }
 .toolbar img {
   width: 24px;
