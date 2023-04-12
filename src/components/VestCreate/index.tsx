@@ -239,7 +239,8 @@ const VestCreate = () => {
                   formInput.root,
                   formInput.endContract,
                   formInput.minBlockWait,
-                  formInput.id.replace(`"`, `'`)
+                  formInput.id.replace(`"`, `'`),
+                  lumpSumAmount.toString()
                 )
                   .then((resp) => {
                     console.log("createVesting", resp);
@@ -528,7 +529,7 @@ const VestCreate = () => {
                 {formik.values.amount && formik.values.amount.length
                   ? "(" + formik.values.amount + ")"
                   : ""}{" "}
-                amount you want to send the user as soon on contract start.
+                amount you want to send the user on contract creation.
               </InputHelper>
               <InputWrapperRadio>
                 <InputLabel>Enter a root key</InputLabel>

@@ -22,7 +22,8 @@ export const createVestingContract = async (
   root: string,
   endContract: Date,
   minBlockWait: number,
-  id: string
+  id: string,
+  lumpSumAmount?: string
 ) => {
   try {
     // calculate block in time
@@ -65,7 +66,9 @@ export const createVestingContract = async (
           root.length === 0 ? "0x21" : root
         }","6":"${new Date().getTime()}","7": "[${encodeURIComponent(
           id
-        )}]", "199":"${uniqueIdentityForContract}"}`,
+        )}]","8":"${
+          lumpSumAmount ? lumpSumAmount : "0x21"
+        }", "199":"${uniqueIdentityForContract}"}`,
         (res) => {
           if (!res.status && !res.pending)
             reject(res.error ? res.error : "RPC Failed");
