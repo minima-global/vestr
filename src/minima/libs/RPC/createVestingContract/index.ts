@@ -62,13 +62,7 @@ export const createVestingContract = async (
           vestingContract.scriptaddress
         } tokenid:${
           token.tokenid
-        } state:{"0":"${address}","1":"${amount}","2":"${startingBlockHeightOfContract}", "3":"${endContractBlockHeight}","4":"${minimumTimeUserMustWaitToCollectAgain}","5":"${
-          root.length === 0 ? "0x21" : root
-        }","6":"${new Date().getTime()}","7": "[${encodeURIComponent(
-          id
-        )}]","8":"${
-          lumpSumAmount ? lumpSumAmount : "0x21"
-        }", "199":"${uniqueIdentityForContract}"}`,
+        } state:{"0":"${address}","1":"${amount}","2":"${startingBlockHeightOfContract}", "3":"${endContractBlockHeight}","4":"${minimumTimeUserMustWaitToCollectAgain}","5":"${new Date().getTime()}", "199":"${uniqueIdentityForContract}"}`,
         (res) => {
           if (!res.status && !res.pending)
             reject(res.error ? res.error : "RPC Failed");

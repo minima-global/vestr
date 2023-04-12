@@ -24,10 +24,10 @@ const Details = () => {
   const tip = useChainHeight();
   const [runScriptData, setRunScript] = useState<false | any>(false);
 
-  const [rootOpen, setRootOpen] = useState(false);
-  const [rootPaymentStatus, setRootPaymentStatus] = useState<false | string>(
-    false
-  );
+  // const [rootOpen, setRootOpen] = useState(false);
+  // const [rootPaymentStatus, setRootPaymentStatus] = useState<false | string>(
+  //   false
+  // );
   const [desiredAmount, setDesiredAmount] = useState<string>("");
   const [endedModal, setOpenEndedModal] = useState(false);
   const [contractEnded, setContractEnded] = useState(false);
@@ -39,54 +39,54 @@ const Details = () => {
 
   const { C: viewingCoin } = location.state;
   // console.log("Viewing coin", viewingCoin);
-  const root = () => {
-    RPC.runScript(
-      vestingContract.checkMathsRoot,
-      {
-        1: desiredAmount,
-      },
-      {
-        "@AMOUNT":
-          viewingCoin.tokenid === "0x00"
-            ? viewingCoin.amount
-            : viewingCoin.tokenamount,
-      }
-    ).then(async (vars: any) => {
-      RPC.withdrawVestingContract(
-        viewingCoin,
-        desiredAmount,
-        vars.change,
-        true,
-        viewingCoin.state
-      )
-        .then((status) => {
-          const commandPending = status === 1; // a command is pending
-          const commandCompleted = status === 0; // status completed!
+  // const root = () => {
+  //   RPC.runScript(
+  //     vestingContract.checkMathsRoot,
+  //     {
+  //       1: desiredAmount,
+  //     },
+  //     {
+  //       "@AMOUNT":
+  //         viewingCoin.tokenid === "0x00"
+  //           ? viewingCoin.amount
+  //           : viewingCoin.tokenamount,
+  //     }
+  //   ).then(async (vars: any) => {
+  //     RPC.withdrawVestingContract(
+  //       viewingCoin,
+  //       desiredAmount,
+  //       vars.change,
+  //       true,
+  //       viewingCoin.state
+  //     )
+  //       .then((status) => {
+  //         const commandPending = status === 1; // a command is pending
+  //         const commandCompleted = status === 0; // status completed!
 
-          if (commandPending) {
-            setStatus("pending");
-            setRootPaymentStatus(
-              "Your payment must now be accepted in the pending actions."
-            );
-          }
-          if (commandCompleted) {
-            setStatus("complete");
-            setRootPaymentStatus(
-              "Your payment has completed and should arrive shortly to the withdrawal address, " +
-                MDS.util.getStateVariable(viewingCoin, 0)
-            );
-          }
+  //         if (commandPending) {
+  //           setStatus("pending");
+  //           setRootPaymentStatus(
+  //             "Your payment must now be accepted in the pending actions."
+  //           );
+  //         }
+  //         if (commandCompleted) {
+  //           setStatus("complete");
+  //           setRootPaymentStatus(
+  //             "Your payment has completed and should arrive shortly to the withdrawal address, " +
+  //               MDS.util.getStateVariable(viewingCoin, 0)
+  //           );
+  //         }
 
-          setDesiredAmount("");
-        })
-        .catch((err: any) => {
-          console.error(err);
-          setStatus("failed");
-          setRootPaymentStatus("Your payment has failed, " + err);
-          setError("Withdrawal failed! " + err);
-        });
-    });
-  };
+  //         setDesiredAmount("");
+  //       })
+  //       .catch((err: any) => {
+  //         console.error(err);
+  //         setStatus("failed");
+  //         setRootPaymentStatus("Your payment has failed, " + err);
+  //         setError("Withdrawal failed! " + err);
+  //       });
+  //   });
+  // };
 
   events.onNewBalance(() => {
     RPC.getCoinsByAddress(vestingContract.scriptaddress)
@@ -221,7 +221,7 @@ const Details = () => {
           </div>
         </OngoingTransaction>
       </Modal>
-      <Modal open={rootOpen} className={styles["modal"]}>
+      {/* <Modal open={rootOpen} className={styles["modal"]}>
         <OngoingTransaction>
           <h5>Root Withdraw</h5>
           <div id="content">
@@ -366,11 +366,11 @@ const Details = () => {
             </Stack>
           </div>
         </OngoingTransaction>
-      </Modal>
+      </Modal> */}
 
       <Stack className={styles["details"]}>
         <Toolbar className={styles["toolbar"]}>
-          <div>
+          {/* <div>
             {runScriptData &&
               "isrooted" &&
               runScriptData.isrooted === "TRUE" && (
@@ -378,7 +378,7 @@ const Details = () => {
                   Root <KeyIcon />
                 </button>
               )}
-          </div>
+          </div> */}
           <div>
             <img
               onClick={() => navigate("/dashboard/track")}
@@ -462,23 +462,6 @@ const Details = () => {
               <CustomComponents.MiCoinDetails>
                 <ul>
                   <li>
-                    <p>Contract Name</p>
-                    <p id="name">
-                      {MDS.util.getStateVariable(viewingCoin, 7) !== "[]" &&
-                        decodeURIComponent(
-                          MDS.util
-                            .getStateVariable(viewingCoin, 7)
-                            .substring(
-                              1,
-                              MDS.util.getStateVariable(viewingCoin, 7).length -
-                                1
-                            )
-                        )}
-                      {MDS.util.getStateVariable(viewingCoin, 7) === "[]" &&
-                        "N/A"}
-                    </p>
-                  </li>
-                  <li>
                     <p>Contract id</p>
                     <p>{MDS.util.getStateVariable(viewingCoin, 199)}</p>
                   </li>
@@ -486,8 +469,8 @@ const Details = () => {
                     <p>Created at</p>
                     <p>
                       {format(
-                        parseInt(MDS.util.getStateVariable(viewingCoin, 6)),
-                        "hh:mm:ss a, dd/MM/y"
+                        parseInt(MDS.util.getStateVariable(viewingCoin, 5)),
+                        "hh:mm a, dd/MM/y"
                       )}
                     </p>
                   </li>
@@ -514,14 +497,6 @@ const Details = () => {
                   <li>
                     <p>Withdrawal address</p>
                     <p>{viewingCoin.address}</p>
-                  </li>
-                  <li>
-                    <p>Root key</p>
-                    <p>
-                      {runScriptData && "rootkey" in runScriptData
-                        ? runScriptData.rootkey
-                        : "N/A"}
-                    </p>
                   </li>
                 </ul>
               </CustomComponents.MiCoinDetails>

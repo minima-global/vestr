@@ -6,7 +6,7 @@ import { vestingContract } from "../../minima/libs/contracts";
 import { Coin } from "../../@types";
 import * as CustomComponents from "../MiCustom";
 import Decimal from "decimal.js";
-import KeyIcon from "@mui/icons-material/Key";
+// import KeyIcon from "@mui/icons-material/Key";
 
 import { Outlet, useMatch, useNavigate } from "react-router-dom";
 import { events } from "../../minima/libs/events";
@@ -95,7 +95,7 @@ const Track = () => {
                       <div>
                         <img src="./assets/toll.svg" />
                         <div>
-                          {MDS.util.getStateVariable(C, 7) !== "[]" && (
+                          {/* {MDS.util.getStateVariable(C, 7) !== "[]" && (
                             <h6>
                               {decodeURIComponent(
                                 MDS.util
@@ -106,10 +106,10 @@ const Track = () => {
                                   )
                               )}
                             </h6>
-                          )}
-                          {MDS.util.getStateVariable(C, 7) === "[]" && (
-                            <h6>{MDS.util.getStateVariable(C, 199)}</h6>
-                          )}
+                          )} */}
+                          <h6>{MDS.util.getStateVariable(C, 199)}</h6>
+                          {/* {MDS.util.getStateVariable(C, 7) === "[]" && (
+                          )} */}
                           {C.tokenid === "0x00" && (
                             <p>
                               {C.amount + "/" + MDS.util.getStateVariable(C, 1)}
@@ -137,43 +137,22 @@ const Track = () => {
                           0
                         ) && <img src="./assets/hourglass_disabled.svg" />}
 
-                        {C.tokenid === "0x00" &&
-                          (MDS.util.getStateVariable(C, 8) &&
-                          MDS.util.getStateVariable(C, 8) !== "0x21" ? (
-                            <p>
-                              Already collected:{" "}
-                              {new Decimal(MDS.util.getStateVariable(C, 1))
-                                .minus(C.amount)
-                                .plus(MDS.util.getStateVariable(C, 8))
-                                .toString()}
-                            </p>
-                          ) : (
-                            <p>
-                              Already collected:{" "}
-                              {new Decimal(MDS.util.getStateVariable(C, 1))
-                                .minus(C.amount)
-                                .toString()}
-                            </p>
-                          ))}
-                        {C.tokenid !== "0x00" &&
-                          C.tokenamount &&
-                          (MDS.util.getStateVariable(C, 8) &&
-                          MDS.util.getStateVariable(C, 8) !== "0x21" ? (
-                            <p>
-                              Already collected:{" "}
-                              {new Decimal(MDS.util.getStateVariable(C, 1))
-                                .minus(C.tokenamount)
-                                .plus(MDS.util.getStateVariable(C, 8))
-                                .toString()}
-                            </p>
-                          ) : (
-                            <p>
-                              Already collected:{" "}
-                              {new Decimal(MDS.util.getStateVariable(C, 1))
-                                .minus(C.tokenamount)
-                                .toString()}
-                            </p>
-                          ))}
+                        {C.tokenid === "0x00" && (
+                          <p>
+                            Already collected:{" "}
+                            {new Decimal(MDS.util.getStateVariable(C, 1))
+                              .minus(C.amount)
+                              .toString()}
+                          </p>
+                        )}
+                        {C.tokenid !== "0x00" && C.tokenamount && (
+                          <p>
+                            Already collected:{" "}
+                            {new Decimal(MDS.util.getStateVariable(C, 1))
+                              .minus(C.tokenamount)
+                              .toString()}
+                          </p>
+                        )}
                       </div>
                     </li>
                   ))}
