@@ -9,7 +9,6 @@ import {
 import { NavLink, useNavigate } from "react-router-dom";
 
 const Drawer = () => {
-  const navigate = useNavigate();
   return (
     <div className={styles["drawer"]}>
       <Toolbar className={styles["toolbar"]}>

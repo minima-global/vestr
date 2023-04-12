@@ -62,10 +62,10 @@ const Track = () => {
               justifyContent="flex-end"
               gap={0.5}
             >
-              <div>
+              {/* <div>
                 <p>Has a root key</p>
                 <KeyIcon />
-              </div>
+              </div> */}
               <div>
                 <p>Wait between collections disabled</p>
                 <img src="./assets/hourglass_disabled.svg" />
@@ -125,9 +125,9 @@ const Track = () => {
                         </div>
                       </div>
                       <div>
-                        {MDS.util.getStateVariable(C, 5) !== "0x21" && (
+                        {/* {MDS.util.getStateVariable(C, 5) !== "0x21" && (
                           <KeyIcon />
-                        )}
+                        )} */}
                         {new Decimal(
                           MDS.util.getStateVariable(C, 4)
                         ).greaterThan(0) && (

@@ -179,123 +179,121 @@ const VestCreate = () => {
           formInput.endContract &&
           isDate(formInput.endContract)
         ) {
-          const hasLumpSumPayment =
-            typeof formInput.lumpsum === "number"
-              ? new Decimal(formInput.lumpsum)
-              : false;
-          const percentage = hasLumpSumPayment
-            ? hasLumpSumPayment.dividedBy(100)
-            : false;
-          const lumpSumAmount = percentage
-            ? new Decimal(formInput.amount).times(percentage)
-            : false;
+          // const hasLumpSumPayment =
+          //   typeof formInput.lumpsum === "number"
+          //     ? new Decimal(formInput.lumpsum)
+          //     : false;
+          // const percentage = hasLumpSumPayment
+          //   ? hasLumpSumPayment.dividedBy(100)
+          //   : false;
+          // const lumpSumAmount = percentage
+          //   ? new Decimal(formInput.amount).times(percentage)
+          //   : false;
 
-          if (lumpSumAmount) {
-            setLumpSumStatus("ongoing");
-            return new Promise((resolve, reject) => {
-              MDS.cmd(
-                `send amount:${lumpSumAmount} address:${formInput.address} tokenid:${formInput.token.tokenid}`,
-                (res: any) => {
-                  if (!res.status && !res.pending)
-                    reject(
-                      res.error
-                        ? res.error
-                        : res.message
-                        ? res.message
-                        : "RPC Failed"
-                    );
-                  if (!res.status && res.pending) resolve(1);
+          // if (lumpSumAmount) {
+          //   setLumpSumStatus("ongoing");
+          //   return new Promise((resolve, reject) => {
+          //     MDS.cmd(
+          //       `send amount:${lumpSumAmount} address:${formInput.address} tokenid:${formInput.token.tokenid}`,
+          //       (res: any) => {
+          //         if (!res.status && !res.pending)
+          //           reject(
+          //             res.error
+          //               ? res.error
+          //               : res.message
+          //               ? res.message
+          //               : "RPC Failed"
+          //           );
+          //         if (!res.status && res.pending) resolve(1);
 
-                  resolve(0);
-                }
-              );
+          //         resolve(0);
+          //       }
+          //     );
+          //   })
+          //     .then(async (res) => {
+          //       const lumpPaymentPending = res === 1;
+          //       const lumpPaymentCompleted = res === 0;
+          //       if (lumpPaymentCompleted) {
+          //         setLumpSumStatus("complete");
+          //       }
+          //       if (lumpPaymentPending) {
+          //         setLumpSumStatus("pending");
+          //       }
+
+          //       if (
+          //         !isDate(formInput.endContract) ||
+          //         formInput.endContract === null
+          //       )
+          //         throw new Error("Select an appropriate date & time");
+
+          //       await RPC.createVestingContract(
+          //         !lumpSumAmount
+          //           ? formInput.amount
+          //           : new Decimal(formInput.amount)
+          //               .minus(lumpSumAmount)
+          //               .toString(),
+          //         formInput.cliff,
+          //         formInput.address,
+          //         formInput.token,
+          //         formInput.root,
+          //         formInput.endContract,
+          //         formInput.minBlockWait,
+          //         formInput.id.replace(`"`, `'`),
+          //         lumpSumAmount.toString()
+          //       )
+          //         .then((resp) => {
+          //           console.log("createVesting", resp);
+          //           const contractPaymentPending = resp === 1;
+          //           const contractPaymentCompleted = resp === 0;
+
+          //           if (contractPaymentPending)
+          //             setContractCreationStatus("pending");
+          //           if (contractPaymentCompleted)
+          //             setContractCreationStatus("complete");
+
+          //           formik.resetForm();
+          //         })
+          //         .catch((err) => {
+          //           setContractCreationStatus("failed");
+          //           formik.setStatus("Contract creation failed, " + err);
+          //           setShowSuccessModal(false);
+          //         });
+          //     })
+
+          //     .catch((err) => {
+          //       setLumpSumStatus("failed");
+          //       formik.setStatus("Lump sum payment failed, " + err);
+          //       setShowSuccessModal(false);
+          //     });
+          // }
+
+          // if (!lumpSumAmount) {
+          // }
+          await RPC.createVestingContract(
+            formInput.amount,
+            formInput.cliff,
+            formInput.address,
+            formInput.token,
+            formInput.root,
+            formInput.endContract,
+            formInput.minBlockWait,
+            formInput.id.replace(`"`, `'`)
+          )
+            .then((resp) => {
+              const contractPaymentPending = resp === 1;
+              const contractPaymentCompleted = resp === 0;
+
+              if (contractPaymentPending) setContractCreationStatus("pending");
+              if (contractPaymentCompleted)
+                setContractCreationStatus("complete");
+
+              formik.resetForm();
             })
-              .then(async (res) => {
-                // console.log("lumpSum", res);
-                const lumpPaymentPending = res === 1;
-                const lumpPaymentCompleted = res === 0;
-                if (lumpPaymentCompleted) {
-                  setLumpSumStatus("complete");
-                }
-                if (lumpPaymentPending) {
-                  setLumpSumStatus("pending");
-                }
-
-                if (
-                  !isDate(formInput.endContract) ||
-                  formInput.endContract === null
-                )
-                  throw new Error("Select an appropriate date & time");
-
-                await RPC.createVestingContract(
-                  !lumpSumAmount
-                    ? formInput.amount
-                    : new Decimal(formInput.amount)
-                        .minus(lumpSumAmount)
-                        .toString(),
-                  formInput.cliff,
-                  formInput.address,
-                  formInput.token,
-                  formInput.root,
-                  formInput.endContract,
-                  formInput.minBlockWait,
-                  formInput.id.replace(`"`, `'`),
-                  lumpSumAmount.toString()
-                )
-                  .then((resp) => {
-                    console.log("createVesting", resp);
-                    const contractPaymentPending = resp === 1;
-                    const contractPaymentCompleted = resp === 0;
-
-                    if (contractPaymentPending)
-                      setContractCreationStatus("pending");
-                    if (contractPaymentCompleted)
-                      setContractCreationStatus("complete");
-
-                    formik.resetForm();
-                  })
-                  .catch((err) => {
-                    setContractCreationStatus("failed");
-                    formik.setStatus("Contract creation failed, " + err);
-                    setShowSuccessModal(false);
-                  });
-              })
-
-              .catch((err) => {
-                setLumpSumStatus("failed");
-                formik.setStatus("Lump sum payment failed, " + err);
-                setShowSuccessModal(false);
-              });
-          }
-
-          if (!lumpSumAmount) {
-            await RPC.createVestingContract(
-              formInput.amount,
-              formInput.cliff,
-              formInput.address,
-              formInput.token,
-              formInput.root,
-              formInput.endContract,
-              formInput.minBlockWait,
-              formInput.id.replace(`"`, `'`)
-            )
-              .then((resp) => {
-                const contractPaymentPending = resp === 1;
-                const contractPaymentCompleted = resp === 0;
-
-                if (contractPaymentPending)
-                  setContractCreationStatus("pending");
-                if (contractPaymentCompleted)
-                  setContractCreationStatus("complete");
-
-                formik.resetForm();
-              })
-              .catch((err) => {
-                setContractCreationStatus("failed");
-                formik.setStatus("Contract creation failed, " + err);
-                setShowSuccessModal(false);
-              });
-          }
+            .catch((err) => {
+              setContractCreationStatus("failed");
+              formik.setStatus("Contract creation failed, " + err);
+              setShowSuccessModal(false);
+            });
         }
       } catch (error: any) {
         const formError =
@@ -317,7 +315,7 @@ const VestCreate = () => {
           <h5>Transaction in progress</h5>
           <div id="content">
             <ul id="list">
-              <li>
+              {/* <li>
                 <h6>Lump Sum Payment</h6>
                 <p>
                   {lumpSumPaymentStatus === "ongoing" ? (
@@ -332,7 +330,7 @@ const VestCreate = () => {
                     "Not set"
                   )}
                 </p>
-              </li>
+              </li> */}
               <li>
                 <h6>Contract Creation Status</h6>{" "}
                 <p>
@@ -485,7 +483,7 @@ const VestCreate = () => {
                 onBlur={formik.handleBlur}
                 disabled={formik.isSubmitting}
               />
-              <TextField
+              {/* <TextField
                 type="number"
                 fullWidth
                 id="lumpsum"
@@ -523,15 +521,15 @@ const VestCreate = () => {
                     min: 0,
                   },
                 }}
-              />
-              <InputHelper>
+              /> */}
+              {/* <InputHelper>
                 (optional) Percentage of the total locked{" "}
                 {formik.values.amount && formik.values.amount.length
                   ? "(" + formik.values.amount + ")"
                   : ""}{" "}
                 amount you want to send the user on contract creation.
-              </InputHelper>
-              <InputWrapperRadio>
+              </InputHelper> */}
+              {/* <InputWrapperRadio>
                 <InputLabel>Enter a root key</InputLabel>
                 {!formik.values.rootPreferred && (
                   <RadioGroup
@@ -600,7 +598,7 @@ const VestCreate = () => {
                   As an optional, a root key that enables withdrawal at any
                   given time.
                 </p>
-              </InputWrapperRadio>
+              </InputWrapperRadio> */}
 
               <Select
                 id="cliff"

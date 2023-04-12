@@ -8,6 +8,12 @@
   border-right: 1px solid #d3d3d3;
 }
 
+@media screen and (max-width: 500px) {
+  .drawer {
+    display: none;
+  }
+}
+
 .toolbar {
   border-bottom: 1px solid #d3d3d3;
 }
