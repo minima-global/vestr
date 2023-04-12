@@ -2,11 +2,18 @@ import { Box, Stack, Toolbar } from "@mui/material";
 import styles from "./Home.module.css";
 import * as contracts from "../../minima/libs/contracts";
 import VestCalculateSchedules from "../VestCalculateSchedules";
+import { useDrawer } from "../Dashboard";
 
 const Home = () => {
+  const toggle = useDrawer();
+
   return (
     <Stack className={styles["home"]}>
-      <Toolbar />
+      <Toolbar className={styles["toolbar"]}>
+        <img onClick={toggle} id="home" src="./assets/menu.svg" />
+
+        <div />
+      </Toolbar>
       <h5>Welcome to Vestr</h5>
       <p>
         Vestr is a vesting scheduler. Vesting is the process of locking up

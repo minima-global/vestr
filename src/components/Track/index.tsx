@@ -10,7 +10,9 @@ import Decimal from "decimal.js";
 
 import { Outlet, useMatch, useNavigate } from "react-router-dom";
 import { events } from "../../minima/libs/events";
+import { useDrawer } from "../Dashboard";
 const Track = () => {
+  const toggle = useDrawer();
   const [contracts, setContracts] = useState<Map<string, Coin>>(new Map());
   const navigate = useNavigate();
   const isViewingDetail = useMatch("/dashboard/track/:id");
@@ -56,16 +58,20 @@ const Track = () => {
       {!isViewingDetail && (
         <Stack className={styles["track"]}>
           <Toolbar className={styles["toolbar"]}>
+            <div className={styles["home"]}>
+              <img onClick={toggle} id="home" src="./assets/menu.svg" />
+            </div>
             <Stack
               alignItems="flex-end"
               flexDirection="column"
-              justifyContent="flex-end"
+              justifyContent="space-between"
               gap={0.5}
             >
               {/* <div>
                 <p>Has a root key</p>
                 <KeyIcon />
               </div> */}
+
               <div>
                 <p>Wait between collections disabled</p>
                 <img src="./assets/hourglass_disabled.svg" />
