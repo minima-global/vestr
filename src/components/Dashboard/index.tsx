@@ -3,18 +3,28 @@ import { Box } from "@mui/material";
 import Drawer from "../Drawer";
 import styles from "./Dashboard.module.css";
 import Content from "../Content";
-import { Outlet } from "react-router-dom";
+import { Outlet, useOutletContext } from "react-router-dom";
 
 const Dashboard = () => {
-  const [mobile, setMobile] = useState(false);
+  const [drawerOpen, setOpen] = useState(false);
+
+  const drawerToggleHandler = () => {
+    setOpen((prevCheck) => !prevCheck);
+  };
+
   return (
     <Box className={styles["app-wrapper"]}>
-      <Drawer />
+      <Drawer closeDrawer={() => setOpen(false)} open={drawerOpen} />
       <Content>
-        <Outlet />
+        <Outlet context={drawerToggleHandler} />
       </Content>
     </Box>
   );
 };
+
+type ContextType = () => void;
+export function useDrawer() {
+  return useOutletContext<ContextType>();
+}
 
 export default Dashboard;

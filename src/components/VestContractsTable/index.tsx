@@ -131,7 +131,7 @@ export default function DataTable() {
             "@COINAGE": viewCoin.created,
           }
         ).then((vars: any) => {
-          console.log("runScript", vars);
+          // console.log("runScript", vars);
           setViewCoinScriptData(vars);
         });
       });

@@ -1,4 +1,4 @@
-.drawer {
+.drawer-persistent {
   height: 100%;
   position: relative;
   left: 0;
@@ -6,6 +6,37 @@
   top: 0;
   max-width: 200px;
   border-right: 1px solid #d3d3d3;
+  z-index: 200;
+  display: block;
+}
+.drawer-temporary  {
+  height: 100%;
+  top: 0;
+  max-width: 350px;
+  border-right: 1px solid #d3d3d3;
+  z-index: 200;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: #fff;
+  width: 60vw;
+  display: none;
+  overflow: overlay;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease-out;
+}
+.drawer-temporary.open {
+  transform: translateX(0);
+  transition: transform 0.3s ease-out;
+}
+
+@media screen and (max-width: 500px) {
+  .drawer-persistent {
+    display: none;
+  }
+  .drawer-temporary {
+    display: block;
+  }
 }
 
 .toolbar {

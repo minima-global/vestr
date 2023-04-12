@@ -23,11 +23,11 @@ const Details = () => {
   const location = useLocation();
   const tip = useChainHeight();
   const [runScriptData, setRunScript] = useState<false | any>(false);
-  console.log("Current chain height", tip);
-  const [rootOpen, setRootOpen] = useState(false);
-  const [rootPaymentStatus, setRootPaymentStatus] = useState<false | string>(
-    false
-  );
+
+  // const [rootOpen, setRootOpen] = useState(false);
+  // const [rootPaymentStatus, setRootPaymentStatus] = useState<false | string>(
+  //   false
+  // );
   const [desiredAmount, setDesiredAmount] = useState<string>("");
   const [endedModal, setOpenEndedModal] = useState(false);
   const [contractEnded, setContractEnded] = useState(false);
@@ -38,55 +38,55 @@ const Details = () => {
   const [error, setError] = useState<false | string>(false);
 
   const { C: viewingCoin } = location.state;
-  console.log("Viewing coin", viewingCoin);
-  const root = () => {
-    RPC.runScript(
-      vestingContract.checkMathsRoot,
-      {
-        1: desiredAmount,
-      },
-      {
-        "@AMOUNT":
-          viewingCoin.tokenid === "0x00"
-            ? viewingCoin.amount
-            : viewingCoin.tokenamount,
-      }
-    ).then(async (vars: any) => {
-      RPC.withdrawVestingContract(
-        viewingCoin,
-        desiredAmount,
-        vars.change,
-        true,
-        viewingCoin.state
-      )
-        .then((status) => {
-          const commandPending = status === 1; // a command is pending
-          const commandCompleted = status === 0; // status completed!
+  // console.log("Viewing coin", viewingCoin);
+  // const root = () => {
+  //   RPC.runScript(
+  //     vestingContract.checkMathsRoot,
+  //     {
+  //       1: desiredAmount,
+  //     },
+  //     {
+  //       "@AMOUNT":
+  //         viewingCoin.tokenid === "0x00"
+  //           ? viewingCoin.amount
+  //           : viewingCoin.tokenamount,
+  //     }
+  //   ).then(async (vars: any) => {
+  //     RPC.withdrawVestingContract(
+  //       viewingCoin,
+  //       desiredAmount,
+  //       vars.change,
+  //       true,
+  //       viewingCoin.state
+  //     )
+  //       .then((status) => {
+  //         const commandPending = status === 1; // a command is pending
+  //         const commandCompleted = status === 0; // status completed!
 
-          if (commandPending) {
-            setStatus("pending");
-            setRootPaymentStatus(
-              "Your payment must now be accepted in the pending actions."
-            );
-          }
-          if (commandCompleted) {
-            setStatus("complete");
-            setRootPaymentStatus(
-              "Your payment has completed and should arrive shortly to the withdrawal address, " +
-                MDS.util.getStateVariable(viewingCoin, 0)
-            );
-          }
+  //         if (commandPending) {
+  //           setStatus("pending");
+  //           setRootPaymentStatus(
+  //             "Your payment must now be accepted in the pending actions."
+  //           );
+  //         }
+  //         if (commandCompleted) {
+  //           setStatus("complete");
+  //           setRootPaymentStatus(
+  //             "Your payment has completed and should arrive shortly to the withdrawal address, " +
+  //               MDS.util.getStateVariable(viewingCoin, 0)
+  //           );
+  //         }
 
-          setDesiredAmount("");
-        })
-        .catch((err: any) => {
-          console.error(err);
-          setStatus("failed");
-          setRootPaymentStatus("Your payment has failed, " + err);
-          setError("Withdrawal failed! " + err);
-        });
-    });
-  };
+  //         setDesiredAmount("");
+  //       })
+  //       .catch((err: any) => {
+  //         console.error(err);
+  //         setStatus("failed");
+  //         setRootPaymentStatus("Your payment has failed, " + err);
+  //         setError("Withdrawal failed! " + err);
+  //       });
+  //   });
+  // };
 
   events.onNewBalance(() => {
     RPC.getCoinsByAddress(vestingContract.scriptaddress)
@@ -161,11 +161,11 @@ const Details = () => {
         "@COINAGE": viewingCoin.created,
       }
     ).then((vars: any) => {
-      console.log(vars);
+      // console.log(vars);
       setRunScript(vars);
     });
   }, [tip, location.state]);
-
+  // console.log(viewingCoin);
   return (
     <Stack mb={2}>
       <Modal open={!!collectionStatus} className={styles["modal"]}>
@@ -221,7 +221,7 @@ const Details = () => {
           </div>
         </OngoingTransaction>
       </Modal>
-      <Modal open={rootOpen} className={styles["modal"]}>
+      {/* <Modal open={rootOpen} className={styles["modal"]}>
         <OngoingTransaction>
           <h5>Root Withdraw</h5>
           <div id="content">
@@ -366,11 +366,11 @@ const Details = () => {
             </Stack>
           </div>
         </OngoingTransaction>
-      </Modal>
+      </Modal> */}
 
       <Stack className={styles["details"]}>
         <Toolbar className={styles["toolbar"]}>
-          <div>
+          {/* <div>
             {runScriptData &&
               "isrooted" &&
               runScriptData.isrooted === "TRUE" && (
@@ -378,7 +378,8 @@ const Details = () => {
                   Root <KeyIcon />
                 </button>
               )}
-          </div>
+          </div> */}
+          <div />
           <div>
             <img
               onClick={() => navigate("/dashboard/track")}
@@ -430,38 +431,20 @@ const Details = () => {
                 </div>
                 <div>
                   <h6>Amount Collected</h6>
-                  {viewingCoin.tokenid === "0x00" &&
-                    (MDS.util.getStateVariable(viewingCoin, 8) &&
-                    MDS.util.getStateVariable(viewingCoin, 8) !== "0x21" ? (
-                      <p>
-                        {new Decimal(MDS.util.getStateVariable(viewingCoin, 1))
-                          .minus(viewingCoin.amount)
-                          .plus(MDS.util.getStateVariable(viewingCoin, 8))
-                          .toString()}
-                      </p>
-                    ) : (
-                      <p>
-                        {new Decimal(MDS.util.getStateVariable(viewingCoin, 1))
-                          .minus(viewingCoin.amount)
-                          .toString()}
-                      </p>
-                    ))}
-                  {viewingCoin.tokenid !== "0x00" &&
-                    (MDS.util.getStateVariable(viewingCoin, 8) &&
-                    MDS.util.getStateVariable(viewingCoin, 8) !== "0x21" ? (
-                      <p>
-                        {new Decimal(MDS.util.getStateVariable(viewingCoin, 1))
-                          .minus(viewingCoin.tokenamount)
-                          .plus(MDS.util.getStateVariable(viewingCoin, 8))
-                          .toString()}
-                      </p>
-                    ) : (
-                      <p>
-                        {new Decimal(MDS.util.getStateVariable(viewingCoin, 1))
-                          .minus(viewingCoin.tokenamount)
-                          .toString()}
-                      </p>
-                    ))}
+                  {viewingCoin.tokenid === "0x00" && (
+                    <p>
+                      {new Decimal(MDS.util.getStateVariable(viewingCoin, 1))
+                        .minus(viewingCoin.amount)
+                        .toString()}
+                    </p>
+                  )}
+                  {viewingCoin.tokenid !== "0x00" && (
+                    <p>
+                      {new Decimal(MDS.util.getStateVariable(viewingCoin, 1))
+                        .minus(viewingCoin.tokenamount)
+                        .toString()}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <h6>Available Withdrawal</h6>
@@ -469,8 +452,7 @@ const Details = () => {
                     {runScriptData &&
                     "cancollect" in runScriptData &&
                     "cliffed" in runScriptData &&
-                    runScriptData.cliffed === "FALSE" &&
-                    new Decimal(runScriptData.cancollect).greaterThan(0)
+                    runScriptData.cliffed === "FALSE"
                       ? runScriptData.cancollect
                       : "N/A"}
                   </p>
@@ -481,21 +463,17 @@ const Details = () => {
               <CustomComponents.MiCoinDetails>
                 <ul>
                   <li>
-                    <p>Contract Name</p>
-                    <p id="name">
-                      {MDS.util.getStateVariable(viewingCoin, 7) !== "[]" &&
-                        decodeURIComponent(
-                          MDS.util
-                            .getStateVariable(viewingCoin, 7)
-                            .substring(
-                              1,
-                              MDS.util.getStateVariable(viewingCoin, 7).length -
-                                1
-                            )
-                        )}
-                      {MDS.util.getStateVariable(viewingCoin, 7) === "[]" &&
-                        "N/A"}
-                    </p>
+                    <p>Token Name</p>
+                    {viewingCoin.tokenid === "0x00" && <p>Minima</p>}
+                    {viewingCoin.tokenid !== "0x00" && (
+                      <p>
+                        {viewingCoin.token &&
+                        "name" in viewingCoin.token &&
+                        "name" in viewingCoin.token.name
+                          ? viewingCoin.token.name.name
+                          : "N/A"}
+                      </p>
+                    )}
                   </li>
                   <li>
                     <p>Contract id</p>
@@ -505,8 +483,8 @@ const Details = () => {
                     <p>Created at</p>
                     <p>
                       {format(
-                        parseInt(MDS.util.getStateVariable(viewingCoin, 6)),
-                        "hh:mm:ss a, dd/MM/y"
+                        parseInt(MDS.util.getStateVariable(viewingCoin, 5)),
+                        "hh:mm a, dd/MM/y"
                       )}
                     </p>
                   </li>
@@ -534,14 +512,6 @@ const Details = () => {
                     <p>Withdrawal address</p>
                     <p>{viewingCoin.address}</p>
                   </li>
-                  <li>
-                    <p>Root key</p>
-                    <p>
-                      {runScriptData && "rootkey" in runScriptData
-                        ? runScriptData.rootkey
-                        : "N/A"}
-                    </p>
-                  </li>
                 </ul>
               </CustomComponents.MiCoinDetails>
               <Stack textAlign="center">
@@ -561,10 +531,7 @@ const Details = () => {
                         runScriptData.cliffed === "TRUE") ||
                       (runScriptData &&
                         "mustwait" in runScriptData &&
-                        runScriptData.mustwait === "TRUE") ||
-                      (runScriptData &&
-                        "cancollect" in runScriptData &&
-                        runScriptData.cancollect <= 0)
+                        runScriptData.mustwait === "TRUE")
                     }
                   >
                     {runScriptData &&

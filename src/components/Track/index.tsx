@@ -6,11 +6,15 @@ import { vestingContract } from "../../minima/libs/contracts";
 import { Coin } from "../../@types";
 import * as CustomComponents from "../MiCustom";
 import Decimal from "decimal.js";
-import KeyIcon from "@mui/icons-material/Key";
+// import KeyIcon from "@mui/icons-material/Key";
 
 import { Outlet, useMatch, useNavigate } from "react-router-dom";
 import { events } from "../../minima/libs/events";
+import { useDrawer } from "../Dashboard";
+import useChainHeight from "../../hooks/useChainHeight";
 const Track = () => {
+  const toggle = useDrawer();
+  const tip = useChainHeight();
   const [contracts, setContracts] = useState<Map<string, Coin>>(new Map());
   const navigate = useNavigate();
   const isViewingDetail = useMatch("/dashboard/track/:id");
@@ -56,15 +60,21 @@ const Track = () => {
       {!isViewingDetail && (
         <Stack className={styles["track"]}>
           <Toolbar className={styles["toolbar"]}>
+            <div className={styles["home"]}>
+              <img onClick={toggle} id="home" src="./assets/menu.svg" />
+            </div>
             <Stack
               alignItems="flex-end"
               flexDirection="column"
-              justifyContent="flex-end"
+              justifyContent="space-between"
               gap={0.5}
             >
-              <div>
+              {/* <div>
                 <p>Has a root key</p>
                 <KeyIcon />
+              </div> */}
+              <div>
+                <p>Top block {tip && tip.block ? tip.block : "N/A"}</p>
               </div>
               <div>
                 <p>Wait between collections disabled</p>
@@ -95,7 +105,7 @@ const Track = () => {
                       <div>
                         <img src="./assets/toll.svg" />
                         <div>
-                          {MDS.util.getStateVariable(C, 7) !== "[]" && (
+                          {/* {MDS.util.getStateVariable(C, 7) !== "[]" && (
                             <h6>
                               {decodeURIComponent(
                                 MDS.util
@@ -106,10 +116,10 @@ const Track = () => {
                                   )
                               )}
                             </h6>
-                          )}
-                          {MDS.util.getStateVariable(C, 7) === "[]" && (
-                            <h6>{MDS.util.getStateVariable(C, 199)}</h6>
-                          )}
+                          )} */}
+                          <h6>{MDS.util.getStateVariable(C, 199)}</h6>
+                          {/* {MDS.util.getStateVariable(C, 7) === "[]" && (
+                          )} */}
                           {C.tokenid === "0x00" && (
                             <p>
                               {C.amount + "/" + MDS.util.getStateVariable(C, 1)}
@@ -125,9 +135,9 @@ const Track = () => {
                         </div>
                       </div>
                       <div>
-                        {MDS.util.getStateVariable(C, 5) !== "0x21" && (
+                        {/* {MDS.util.getStateVariable(C, 5) !== "0x21" && (
                           <KeyIcon />
-                        )}
+                        )} */}
                         {new Decimal(
                           MDS.util.getStateVariable(C, 4)
                         ).greaterThan(0) && (
@@ -137,43 +147,22 @@ const Track = () => {
                           0
                         ) && <img src="./assets/hourglass_disabled.svg" />}
 
-                        {C.tokenid === "0x00" &&
-                          (MDS.util.getStateVariable(C, 8) &&
-                          MDS.util.getStateVariable(C, 8) !== "0x21" ? (
-                            <p>
-                              Already collected:{" "}
-                              {new Decimal(MDS.util.getStateVariable(C, 1))
-                                .minus(C.amount)
-                                .plus(MDS.util.getStateVariable(C, 8))
-                                .toString()}
-                            </p>
-                          ) : (
-                            <p>
-                              Already collected:{" "}
-                              {new Decimal(MDS.util.getStateVariable(C, 1))
-                                .minus(C.amount)
-                                .toString()}
-                            </p>
-                          ))}
-                        {C.tokenid !== "0x00" &&
-                          C.tokenamount &&
-                          (MDS.util.getStateVariable(C, 8) &&
-                          MDS.util.getStateVariable(C, 8) !== "0x21" ? (
-                            <p>
-                              Already collected:{" "}
-                              {new Decimal(MDS.util.getStateVariable(C, 1))
-                                .minus(C.tokenamount)
-                                .plus(MDS.util.getStateVariable(C, 8))
-                                .toString()}
-                            </p>
-                          ) : (
-                            <p>
-                              Already collected:{" "}
-                              {new Decimal(MDS.util.getStateVariable(C, 1))
-                                .minus(C.tokenamount)
-                                .toString()}
-                            </p>
-                          ))}
+                        {C.tokenid === "0x00" && (
+                          <p>
+                            Already collected:{" "}
+                            {new Decimal(MDS.util.getStateVariable(C, 1))
+                              .minus(C.amount)
+                              .toString()}
+                          </p>
+                        )}
+                        {C.tokenid !== "0x00" && C.tokenamount && (
+                          <p>
+                            Already collected:{" "}
+                            {new Decimal(MDS.util.getStateVariable(C, 1))
+                              .minus(C.tokenamount)
+                              .toString()}
+                          </p>
+                        )}
                       </div>
                     </li>
                   ))}
