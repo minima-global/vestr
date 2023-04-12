@@ -161,11 +161,11 @@ const Details = () => {
         "@COINAGE": viewingCoin.created,
       }
     ).then((vars: any) => {
-      console.log(vars);
+      // console.log(vars);
       setRunScript(vars);
     });
   }, [tip, location.state]);
-
+  // console.log(viewingCoin);
   return (
     <Stack mb={2}>
       <Modal open={!!collectionStatus} className={styles["modal"]}>
@@ -379,6 +379,7 @@ const Details = () => {
                 </button>
               )}
           </div> */}
+          <div />
           <div>
             <img
               onClick={() => navigate("/dashboard/track")}
@@ -461,6 +462,19 @@ const Details = () => {
             <Stack spacing={5}>
               <CustomComponents.MiCoinDetails>
                 <ul>
+                  <li>
+                    <p>Token Name</p>
+                    {viewingCoin.tokenid === "0x00" && <p>Minima</p>}
+                    {viewingCoin.tokenid !== "0x00" && (
+                      <p>
+                        {viewingCoin.token &&
+                        "name" in viewingCoin.token &&
+                        "name" in viewingCoin.token.name
+                          ? viewingCoin.token.name.name
+                          : "N/A"}
+                      </p>
+                    )}
+                  </li>
                   <li>
                     <p>Contract id</p>
                     <p>{MDS.util.getStateVariable(viewingCoin, 199)}</p>

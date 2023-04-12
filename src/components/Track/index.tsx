@@ -11,8 +11,10 @@ import Decimal from "decimal.js";
 import { Outlet, useMatch, useNavigate } from "react-router-dom";
 import { events } from "../../minima/libs/events";
 import { useDrawer } from "../Dashboard";
+import useChainHeight from "../../hooks/useChainHeight";
 const Track = () => {
   const toggle = useDrawer();
+  const tip = useChainHeight();
   const [contracts, setContracts] = useState<Map<string, Coin>>(new Map());
   const navigate = useNavigate();
   const isViewingDetail = useMatch("/dashboard/track/:id");
@@ -71,7 +73,9 @@ const Track = () => {
                 <p>Has a root key</p>
                 <KeyIcon />
               </div> */}
-
+              <div>
+                <p>Top block {tip && tip.block ? tip.block : "N/A"}</p>
+              </div>
               <div>
                 <p>Wait between collections disabled</p>
                 <img src="./assets/hourglass_disabled.svg" />

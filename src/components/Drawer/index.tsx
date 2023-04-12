@@ -8,12 +8,14 @@ import {
 import { NavLink } from "react-router-dom";
 import Backdrop from "../Backdrop";
 import "./drawer.css";
+import useChainHeight from "../../hooks/useChainHeight";
 
 interface IProps {
   open: boolean;
   closeDrawer: () => void;
 }
 const Drawer = ({ open, closeDrawer }: IProps) => {
+  const tip = useChainHeight();
   let drawerClasses = ["drawer-temporary"];
   if (open) {
     drawerClasses = ["drawer-temporary", "open"];

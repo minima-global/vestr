@@ -372,7 +372,7 @@ const VestCreate = () => {
         <form onSubmit={formik.handleSubmit}>
           <Stack spacing={5}>
             <Stack spacing={1}>
-              <TextField
+              {/* <TextField
                 type="text"
                 fullWidth
                 id="id"
@@ -391,7 +391,7 @@ const VestCreate = () => {
                     </InputPercentage>
                   ),
                 }}
-              />
+              /> */}
               {formik.values.token && (
                 <MiSelect
                   id="token"
