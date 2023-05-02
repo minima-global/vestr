@@ -36,9 +36,8 @@ const Home = () => {
       <h6>Tutorial</h6>
       <p>
         Let's calculate a vesting schedule for a potential client as an example.
-        Say we want to issue a contract of 1,000,000 Minima coins, with an
-        initial lock up of 5% of the total amount and a monthly collection for a
-        period 36 months.
+        Say we want to issue a contract of 1,000,000 Minima coins and a monthly
+        collection for a period 36 months.
       </p>
 
       <p>
