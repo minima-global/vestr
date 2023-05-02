@@ -118,44 +118,6 @@ const VestCalculateSchedules = ({
                     disabled={formik.isSubmitting}
                   />
                 </FormGroup>
-                {/* <FormGroup>
-                  <FormLabel htmlFor="percentageAtLaunch">
-                    Initial Lump Sum Percentage
-                  </FormLabel>
-                  <TextField
-                    placeholder="percentage of amount to collect on first day"
-                    type="number"
-                    fullWidth
-                    inputProps={{
-                      max: 100,
-                      readOnly: !!totalLaunchPercentage && true,
-                    }}
-                    id="percentageAtLaunch"
-                    name="percentageAtLaunch"
-                    helperText={
-                      formik.dirty && formik.errors.percentageAtLaunch
-                    }
-                    error={
-                      formik.touched.percentageAtLaunch &&
-                      Boolean(formik.errors.percentageAtLaunch)
-                    }
-                    value={
-                      totalLaunchPercentage
-                        ? totalLaunchPercentage
-                        : formik.values.percentageAtLaunch
-                    }
-                    InputProps={{
-                      endAdornment: (
-                        <InputPercentage>
-                          <p>%</p>
-                        </InputPercentage>
-                      ),
-                    }}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    disabled={formik.isSubmitting}
-                  />
-                </FormGroup> */}
 
                 <FormGroup>
                   <FormLabel htmlFor="contractLength">

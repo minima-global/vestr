@@ -13,7 +13,8 @@ const OngoingTransaction = styled("div")`
   flex-direction: column;
   row-gap: 8px;
   position: relative;
-  height: 50vh;
+  max-height: 60vh;
+  height: 60vh;
   * {
     font-family: Manrope-regular;
     font-size: 1rem;
@@ -51,6 +52,14 @@ const OngoingTransaction = styled("div")`
     justify-content: space-between;
     flex-direction: column;
     word-break: break-all;
+  }
+
+  button:first-of-type {
+    border: 1px solid #16181c;
+    padding: 4px 16px;
+    max-height: 30px;
+    background: none;
+    font-size: 0.975rem;
   }
 
   button:last-of-type {

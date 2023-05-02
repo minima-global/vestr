@@ -2,22 +2,22 @@ import styled from "@emotion/styled";
 
 const Select = styled("select")`
   // hide default arrow
-  -webkit-appearance: none;
-  appearance: none;
+  // -webkit-appearance: none;
+  // appearance: none;
 
-  height: 58px;
+  height: 41px;
   width: 100%;
   background-color: #fff;
   background: #fff;
   border: 1px solid #585f63;
-  color: #000;
-  font-weight: 800;
-  padding: 16.5px 16px;
+  color: #16181c;
+  font-weight: 500;
+  padding-left: 8px;
   font-size: 1rem;
-  font-family: Manrope-bold;
-  > option {
-    color: #fff;
-  }
+  font-family: Manrope-regular;
+  // > option {
+  //   color: #fff;
+  // }
 
   > ::after {
     content: "▼";
