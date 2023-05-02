@@ -100,7 +100,7 @@ const Drawer = ({ open, closeDrawer }: IProps) => {
               className={({ isActive, isPending }) =>
                 isPending ? "pending" : isActive ? "active" : ""
               }
-              to="/dashboard/home"
+              to="/dashboard"
             >
               <HomeOutlined />
               Home

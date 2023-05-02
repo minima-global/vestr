@@ -17,7 +17,7 @@ export const router = createHashRouter(
   createRoutesFromElements(
     <Route path="/" element={<Root />}>
       <Route path="dashboard" element={<Dashboard />}>
-        <Route path="home" element={<Home />} />
+        <Route index element={<Home />} />
         <Route path="calculate" element={<Calculate />} />
         <Route path="createnew" element={<Create />} />
         <Route path="track" element={<Track />}>
