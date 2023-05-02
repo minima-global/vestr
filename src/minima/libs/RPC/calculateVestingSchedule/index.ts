@@ -3,12 +3,12 @@ import Decimal from "decimal.js";
 Decimal.set({ precision: 64 });
 export const calculateVestingSchedule = async (
   amount: string,
-  launchPercentage: number,
+  // launchPercentage: number,
   contractLength: string
 ) => {
   // are they receiving a lump sum token payment
-  const initialPayment = new Decimal(amount).times(launchPercentage);
-  const totalLockedAmount = new Decimal(amount).minus(initialPayment);
+  // const initialPayment = new Decimal(amount).times(launchPercentage);
+  const totalLockedAmount = new Decimal(amount);
   const startBlock = 0;
   const oneMonthInBlocks = 51840;
   const finalBlock = new Decimal(contractLength)
@@ -23,9 +23,9 @@ export const calculateVestingSchedule = async (
   const payPerMonth = payPerBlock.times(oneMonthInBlocks);
 
   return {
-    launchPercentage: launchPercentage,
+    // launchPercentage: launchPercentage,
     totalLockedAmount: amount,
-    initialPayout: initialPayment.toNumber(),
+    // initialPayout: initialPayment.toNumber(),
     paymentPerBlock: payPerBlock.toNumber(),
     paymentPerMonth: payPerMonth.toNumber(),
     contractLength: contractLength,

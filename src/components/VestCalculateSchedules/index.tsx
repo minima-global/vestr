@@ -21,7 +21,7 @@ import { InputPercentage } from "../InputWrapper/InputWrapper";
 const formValidation = Yup.object().shape({
   amount: Yup.string().required("Field required"),
   contractLength: Yup.string().required("Field required"),
-  percentageAtLaunch: Yup.string().required("Field required"),
+  // percentageAtLaunch: Yup.string().required("Field required"),
 });
 
 interface IProps {
@@ -43,7 +43,7 @@ const VestCalculateSchedules = ({
   const formik = useFormik({
     initialValues: {
       amount: "",
-      percentageAtLaunch: "",
+      // percentageAtLaunch: "",
       contractLength: "",
     },
     onSubmit: async (formData) => {
@@ -55,18 +55,18 @@ const VestCalculateSchedules = ({
         if (hasExampleValues) {
           const calculatedSchedule = await RPC.calculateVestingSchedule(
             totalLockedAmount,
-            parseInt(totalLaunchPercentage) / 100,
+            // parseInt(totalLaunchPercentage) / 100,
             totalPeriod
           );
           setData(calculatedSchedule);
         }
         if (!hasExampleValues) {
           const totalLockedAmount = formData.amount;
-          const launchPercentage = parseInt(formData.percentageAtLaunch) / 100;
+          // const launchPercentage = parseInt(formData.percentageAtLaunch) / 100;
           const contractLength = formData.contractLength;
           const calculatedSchedule = await RPC.calculateVestingSchedule(
             totalLockedAmount,
-            launchPercentage,
+            // launchPercentage,
             contractLength
           );
           // console.log(calculatedSchedule);
@@ -118,7 +118,7 @@ const VestCalculateSchedules = ({
                     disabled={formik.isSubmitting}
                   />
                 </FormGroup>
-                <FormGroup>
+                {/* <FormGroup>
                   <FormLabel htmlFor="percentageAtLaunch">
                     Initial Lump Sum Percentage
                   </FormLabel>
@@ -155,7 +155,7 @@ const VestCalculateSchedules = ({
                     onBlur={formik.handleBlur}
                     disabled={formik.isSubmitting}
                   />
-                </FormGroup>
+                </FormGroup> */}
 
                 <FormGroup>
                   <FormLabel htmlFor="contractLength">
@@ -220,7 +220,7 @@ const VestCalculateSchedules = ({
                   secondary={data.totalLockedAmount}
                 />
               </ListItem>
-              <ListItem>
+              {/* <ListItem>
                 <ListItemText
                   primary="On launch payout percentage"
                   secondary={data.launchPercentage}
@@ -231,7 +231,7 @@ const VestCalculateSchedules = ({
                   primary="Initial payout"
                   secondary={data.initialPayout}
                 />
-              </ListItem>
+              </ListItem> */}
               <ListItem>
                 <ListItemText
                   primary="Payment per block"
