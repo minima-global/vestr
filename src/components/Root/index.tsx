@@ -12,7 +12,7 @@ const Root = () => {
           <div>
             <img src="./assets/icon.png" />
             <h5>Welcome to VESTR</h5>
-            <button onClick={() => navigate("/dashboard/home")}>Enter</button>
+            <button onClick={() => navigate("/dashboard")}>Enter</button>
           </div>
         </div>
       )}
