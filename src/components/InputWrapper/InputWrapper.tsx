@@ -19,7 +19,6 @@ const InputWrapperRadio = styled("div")`
     border: 1px solid #16181c;
     border-radius: 8px;
     margin: 0;
-    padding: 4px;
   }
   > p {
     text-align: left;

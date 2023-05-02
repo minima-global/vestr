@@ -39,6 +39,19 @@ theme = createTheme(theme, {
         },
       },
     },
+    MuiFormControlLabel: {
+      styleOverrides: {
+        root: {
+          height: "41px",
+          fontFamily: "Manrope-regular",
+          lineHeight: "21px",
+          "> MuiTypography-root": {
+            fontSize: "0.875rem",
+            lineHeight: "21px",
+          },
+        },
+      },
+    },
     MuiFormHelperText: {
       styleOverrides: {
         root: {
@@ -95,8 +108,14 @@ theme = createTheme(theme, {
     MuiFormLabel: {
       styleOverrides: {
         root: {
-          color: "#16181c",
-          fontSize: "1rem",
+          color: "#ff7358",
+          fontSize: "0.875rem",
+          lineHeight: "21px",
+          letterSpacing: "0.02em",
+          fontFamily: "Manrope-regular",
+          fontWeight: 700,
+          marginLeft: "8px",
+          textAlign: "left",
         },
       },
     },
@@ -111,10 +130,11 @@ theme = createTheme(theme, {
             padding: "8px",
             color: "#000",
             border: "1px solid #585f63",
-            fontWeight: "600",
+            fontWeight: "400",
+            fontFamily: "Manrope-regular",
             textOverflow: "ellipsis",
             "&::placeholder": {
-              fontWeight: "600",
+              fontWeight: "400",
               color: "#585f63",
             },
             "&:focus": {

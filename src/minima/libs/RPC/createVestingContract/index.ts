@@ -20,15 +20,17 @@ export const createVestingContract = async (
   address: string,
   token: MinimaToken,
   root: string,
-  endContract: Date,
+  contractLength: number,
   minBlockWait: number,
   id: string,
   lumpSumAmount?: string
 ) => {
   try {
+    const calculateDate = addMonths(new Date(), contractLength);
+    // console.log(calculateDate);
     // calculate block in time
     const endContractBlockHeight = await RPC.calculateBlockHeightFromDate(
-      endContract
+      calculateDate
     );
     // get currentBlockHeight
     const currentBlockHeight = await RPC.getCurrentBlockHeight();
