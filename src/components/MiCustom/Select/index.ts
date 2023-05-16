@@ -15,9 +15,9 @@ const Select = styled("select")`
   padding-left: 8px;
   font-size: 1rem;
   font-family: Manrope-regular;
-  // > option {
-  //   color: #fff;
-  // }
+  > option {
+    color: #16181c;
+  }
 
   > ::after {
     content: "▼";
