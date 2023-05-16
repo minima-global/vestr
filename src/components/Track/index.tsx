@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Stack, Toolbar } from "@mui/material";
+import { CircularProgress, Stack, Toolbar } from "@mui/material";
 import * as RPC from "../../minima/libs/RPC";
 import styles from "./Track.module.css";
 import { vestingContract } from "../../minima/libs/contracts";
@@ -18,6 +18,7 @@ const Track = () => {
   const [contracts, setContracts] = useState<Map<string, Coin>>(new Map());
   const navigate = useNavigate();
   const isViewingDetail = useMatch("/dashboard/track/:id");
+  const [loading, setLoading] = useState(true);
 
   events.onNewBalance(() => {
     RPC.getCoinsByAddress(vestingContract.scriptaddress)
@@ -47,6 +48,7 @@ const Track = () => {
         // console.log("mapData", map.size);
 
         setContracts(map);
+        setLoading(false);
       })
       .catch((err) => {
         console.error(err);
@@ -90,7 +92,12 @@ const Track = () => {
           <Stack>
             <CustomComponents.MiList>
               <>
-                {contracts.size === 0 && <p>No contracts available yet...</p>}
+                {contracts.size === 0 && !loading && (
+                  <p>No contracts available yet...</p>
+                )}
+                {contracts.size === 0 && loading && (
+                  <CircularProgress sx={{ justifySelf: "center" }} size={16} />
+                )}
 
                 {contracts.size > 0 &&
                   Array.from(contracts.values()).map((C) => (

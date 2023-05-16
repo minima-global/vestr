@@ -6,6 +6,8 @@ import { events } from "../minima/libs/events";
 
 const useWalletBalance = () => {
   const [balance, setBalance] = useState<MinimaToken[]>([]);
+  const [loadingBalance, setLoading] = useState(true);
+  const [error, setError] = useState<false | string>(false);
 
   useEffect(() => {
     events.onNewBalance(() => {
@@ -21,6 +23,7 @@ const useWalletBalance = () => {
           setBalance(b);
         })
         .catch((err) => {
+          setError(err);
           console.error(err);
         });
     });
@@ -36,11 +39,15 @@ const useWalletBalance = () => {
         setBalance(b);
       })
       .catch((err) => {
+        setError(err);
         console.error(err);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   }, []);
 
-  return balance;
+  return { balance, loadingBalance, error };
 };
 
 export default useWalletBalance;

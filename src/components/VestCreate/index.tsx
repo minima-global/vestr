@@ -15,11 +15,8 @@ import {
 } from "@mui/material";
 
 import Select from "../MiCustom/Select";
-import { DateTimePicker } from "@mui/x-date-pickers";
 import * as RPC from "../../minima/libs/RPC";
 
-import { isDate } from "date-fns";
-import { addMonths } from "date-fns";
 import MiError from "../MiCustom/MiError/MiError";
 import * as yup from "yup";
 import { checkAddress } from "../../minima/libs/RPC";
@@ -51,7 +48,7 @@ const formValidation = yup.object().shape({
       if (val === undefined) {
         return false;
       }
-      if (val <= 0) {
+      if (val < 1) {
         return createError({
           path,
           message: "Please select a valid amount of month(s)",
@@ -85,7 +82,7 @@ const formValidation = yup.object().shape({
 });
 
 const VestCreate = () => {
-  const wallet = useWalletBalance();
+  const { balance: wallet, loadingBalance, error } = useWalletBalance();
   const { walletAddress, walletPublicKey } = useWalletAddress();
   const [calculatedSchedule, setCalculatedSchedule] = useState<any>(undefined);
   const [loadingAddress, setLoadingAddress] = useState(false);
@@ -202,7 +199,7 @@ const VestCreate = () => {
         formik.setStatus(formError);
       }
     },
-    enableReinitialize: !!wallet,
+    enableReinitialize: !loadingBalance,
     validationSchema: formValidation,
   });
   return (
@@ -213,20 +210,30 @@ const VestCreate = () => {
           <div id="content">
             <ul id="list">
               <li>
-                <h6>Contract Creation Status</h6>{" "}
-                <p>
-                  {contractCreationStatus === "ongoing" ? (
-                    <CircularProgress size={8} />
-                  ) : contractCreationStatus === "complete" ? (
-                    "Completed!"
-                  ) : contractCreationStatus === "failed" ? (
-                    formik.status
-                  ) : contractCreationStatus === "pending" ? (
-                    "Pending Action"
-                  ) : (
-                    "No transaction ongoing"
-                  )}
-                </p>
+                <h6>Contract Creation Status</h6>
+                {contractCreationStatus === "ongoing" && (
+                  <CircularProgress size={8} />
+                )}
+                {contractCreationStatus === "complete" && <p>Completed!</p>}
+                {contractCreationStatus === "failed" && <p>formik.status</p>}
+                {contractCreationStatus === "pending" && (
+                  <>
+                    <p>
+                      Your action is now pending, please accept the action by
+                      clicking the pending icon{" "}
+                      <img
+                        id="pending"
+                        alt="pending"
+                        src="assets/pendingTransaction.svg"
+                      />{" "}
+                      in the top-right of your apk.
+                    </p>
+                    <p>
+                      If you are on desktop, click the Pending Actions button in
+                      the header of your MDS hub.
+                    </p>
+                  </>
+                )}
               </li>
             </ul>
             <Stack alignItems="flex-end">
@@ -362,7 +369,10 @@ const VestCreate = () => {
                   />
                 </>
               )}
-              {!formik.values.token && <p>Fetching all your tokens...</p>}
+              {!formik.values.token && loadingBalance && (
+                <p>Fetching all your tokens...</p>
+              )}
+              {!formik.values.token && !loadingBalance && <p>{error}</p>}
               <InputWrapperRadio>
                 <InputLabel>Enter a wallet address</InputLabel>
                 {!formik.values.preferred && (

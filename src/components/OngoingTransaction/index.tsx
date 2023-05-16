@@ -13,8 +13,8 @@ const OngoingTransaction = styled("div")`
   flex-direction: column;
   row-gap: 8px;
   position: relative;
-  max-height: 60vh;
-  height: 60vh;
+  max-height: 50vh;
+  height: auto;
   * {
     font-family: Manrope-regular;
     font-size: 1rem;
@@ -25,6 +25,11 @@ const OngoingTransaction = styled("div")`
     margin: 0;
     padding: 0;
     padding-bottom: 8px;
+  }
+  #pending {
+    width: 16px;
+    height: 16px;
+    display: inline-block;
   }
   #list {
     padding: 0;

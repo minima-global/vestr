@@ -26,7 +26,6 @@ export const router = createHashRouter(
         <Route path="*" element={<NotFound />} />
       </Route>
       <Route path="*" element={<Navigate replace to="dashboard" />} />
-      {/* ... etc. */}
     </Route>
   )
 );
