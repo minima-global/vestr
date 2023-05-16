@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { CircularProgress, Stack, Toolbar } from "@mui/material";
+import { Avatar, CircularProgress, Stack, Toolbar } from "@mui/material";
 import * as RPC from "../../minima/libs/RPC";
 import styles from "./Track.module.css";
 import { vestingContract } from "../../minima/libs/contracts";
@@ -12,6 +12,7 @@ import { Outlet, useMatch, useNavigate } from "react-router-dom";
 import { events } from "../../minima/libs/events";
 import { useDrawer } from "../Dashboard";
 import useChainHeight from "../../hooks/useChainHeight";
+import { makeTokenImage } from "../../utils/utils";
 const Track = () => {
   const toggle = useDrawer();
   const tip = useChainHeight();
@@ -39,6 +40,7 @@ const Track = () => {
   useEffect(() => {
     RPC.getCoinsByAddress(vestingContract.scriptaddress)
       .then((data) => {
+        // console.log(data);
         const map = new Map();
 
         data.relevantCoins.map((c) =>
@@ -71,10 +73,6 @@ const Track = () => {
               justifyContent="space-between"
               gap={0.5}
             >
-              {/* <div>
-                <p>Has a root key</p>
-                <KeyIcon />
-              </div> */}
               <div>
                 <p>Top block {tip && tip.block ? tip.block : "N/A"}</p>
               </div>
@@ -110,23 +108,34 @@ const Track = () => {
                       key={C.coinid}
                     >
                       <div>
-                        <img src="./assets/toll.svg" />
+                        {C.tokenid === "0x00" && (
+                          <Avatar
+                            variant="rounded"
+                            alt="locked_token"
+                            src="./assets/minimaLogoSquare.png"
+                          />
+                        )}
+                        {C.tokenid !== "0x00" &&
+                          (!C.token.name.url ||
+                            C.token.name.url.length === 0) && (
+                            <Avatar
+                              variant="rounded"
+                              sx={{ background: "#fff" }}
+                              src={`https://robohash.org/${C.tokenid}`}
+                            />
+                          )}
+                        {C.tokenid !== "0x00" &&
+                          C.token.name.url &&
+                          C.token.name.url.length > 0 && (
+                            <Avatar
+                              variant="rounded"
+                              sx={{ background: "inherit" }}
+                              src={makeTokenImage(C.token.name.url, C.tokenid)}
+                            />
+                          )}
                         <div>
-                          {/* {MDS.util.getStateVariable(C, 7) !== "[]" && (
-                            <h6>
-                              {decodeURIComponent(
-                                MDS.util
-                                  .getStateVariable(C, 7)
-                                  .substring(
-                                    1,
-                                    MDS.util.getStateVariable(C, 7).length - 1
-                                  )
-                              )}
-                            </h6>
-                          )} */}
                           <h6>{MDS.util.getStateVariable(C, 199)}</h6>
-                          {/* {MDS.util.getStateVariable(C, 7) === "[]" && (
-                          )} */}
+
                           {C.tokenid === "0x00" && (
                             <p>
                               {C.amount + "/" + MDS.util.getStateVariable(C, 1)}
@@ -142,9 +151,6 @@ const Track = () => {
                         </div>
                       </div>
                       <div>
-                        {/* {MDS.util.getStateVariable(C, 5) !== "0x21" && (
-                          <KeyIcon />
-                        )} */}
                         {new Decimal(
                           MDS.util.getStateVariable(C, 4)
                         ).greaterThan(0) && (

@@ -265,6 +265,18 @@ const Details = () => {
                     <p>Contract id</p>
                     <p>{MDS.util.getStateVariable(viewingCoin, 199)}</p>
                   </li>
+                  {viewingCoin.tokenid !== "0x00" && (
+                    <li>
+                      <p>Token id</p>
+                      <p>{viewingCoin.tokenid}</p>
+                    </li>
+                  )}
+                  {viewingCoin.tokenid === "0x00" && (
+                    <li>
+                      <p>Token id</p>
+                      <p>0x00</p>
+                    </li>
+                  )}
                   <li>
                     <p>Created at</p>
                     <p>

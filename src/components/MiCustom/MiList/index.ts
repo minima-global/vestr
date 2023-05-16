@@ -38,6 +38,7 @@ export const MiList = styled("ul")`
     flex-direction: row;
     gap: 8px;
     text-align: left;
+    align-items: center;
   }
   > li div:first-of-type div *,
   li div:last-of-type * {
@@ -54,9 +55,6 @@ export const MiList = styled("ul")`
   }
 
   > li div:first-of-type img {
-    font-size: 0.5rem;
-    min-width: 32px;
-    width: 32px;
   }
   > li div:first-of-type div h6 {
     font-size: 0.975rem;
