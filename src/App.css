@@ -1,0 +1,39 @@
+.offline__wrapper {
+  display: grid;
+  grid-template-rows: 1fr;
+  grid-template-columns: 1fr minmax(0, 752px) 1fr;
+}
+
+.offline__wrapper div h6 {
+  font-family: Manrope-regular;
+  line-height: 1.5;
+  letter-spacing: 0.05em;
+  font-size: 1.5rem;
+  text-align: center;
+  color: #f4f4f5;
+  margin: 0;
+  padding: 0;
+}
+.offline__wrapper div p {
+  text-align: center;
+  padding: 0;
+  margin:0;
+  color: #f4f4f5;
+  font-size: 1rem;
+  line-height: 1.5;
+  letter-spacing: 0.05em;
+}
+.offline__wrapper div img {
+  align-self: center;
+}
+.offline__wrapper div svg {
+  align-self: center;
+}
+.offline__wrapper div:nth-of-type(2) {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  justify-content: center;
+  height: 100vh;
+}
