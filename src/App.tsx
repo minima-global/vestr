@@ -12,17 +12,20 @@ import { CircularProgress } from "@mui/material";
 function App() {
   const [_minimastatus, setStatus] = useState(false);
   const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    events.onInit(async () => {
-      MDS.cmd("balance", (r) => {
-        if (r.status) {
-          setLoading(false);
-          setStatus(true);
-        }
-      });
 
-      await RPC.setNewScript(vestingContract.script);
-    });
+  useEffect(() => {
+    if (loading) {
+      events.onInit(async () => {
+        MDS.cmd("balance", (r) => {
+          if (r.status) {
+            setLoading(false);
+            setStatus(true);
+          }
+        });
+
+        await RPC.setNewScript(vestingContract.script);
+      });
+    }
     if (loading && _minimastatus) {
       setTimeout(() => {
         setLoading(false);
