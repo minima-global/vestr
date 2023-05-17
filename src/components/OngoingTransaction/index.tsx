@@ -13,8 +13,13 @@ const OngoingTransaction = styled("div")`
   flex-direction: column;
   row-gap: 8px;
   position: relative;
-  max-height: 50vh;
   height: auto;
+  @media only screen and (max-width: 600px) {
+    max-height: 80vh;
+  }
+  @media only screen and (max-height: 600px) {
+    max-height: 80vh;
+  }
   * {
     font-family: Manrope-regular;
     font-size: 1rem;

@@ -112,10 +112,8 @@ const VestCreate = () => {
       setCalculateScheduleStatus("pending");
       const data = await RPC.calculateVestingSchedule(
         formik.values.amount.toString(),
-        "5"
+        formik.values.contractLength.toString()
       );
-      // console.log(data);
-
       setCalculatedSchedule(data);
       setCalculateScheduleStatus("complete");
     } catch (error) {
