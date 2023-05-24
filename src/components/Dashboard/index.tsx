@@ -1,8 +1,6 @@
-import { useState } from "react";
-import { Box } from "@mui/material";
 import Drawer from "../Drawer";
+import { useState } from "react";
 import styles from "./Dashboard.module.css";
-import Content from "../Content";
 import { Outlet, useOutletContext } from "react-router-dom";
 
 const Dashboard = () => {
@@ -13,12 +11,14 @@ const Dashboard = () => {
   };
 
   return (
-    <Box className={styles["app-wrapper"]}>
-      <Drawer closeDrawer={() => setOpen(false)} open={drawerOpen} />
-      <Content>
+    <div className={styles["app-wrapper"]}>
+      <nav>
+        <Drawer closeDrawer={() => setOpen(false)} open={drawerOpen} />
+      </nav>
+      <main>
         <Outlet context={drawerToggleHandler} />
-      </Content>
-    </Box>
+      </main>
+    </div>
   );
 };
 

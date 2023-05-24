@@ -5,7 +5,7 @@ import { useDrawer } from "../Dashboard";
 const Create = () => {
   const toggle = useDrawer();
   return (
-    <Stack mb={2} className={styles["create"]}>
+    <section className={styles["create"]}>
       <Toolbar className={styles["toolbar"]}>
         <img onClick={toggle} id="home" src="./assets/menu.svg" />
 
@@ -15,7 +15,7 @@ const Create = () => {
         <h5>Create A Vesting Contract</h5>
         <VestCreate />
       </Stack>
-    </Stack>
+    </section>
   );
 };
 

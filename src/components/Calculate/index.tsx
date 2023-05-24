@@ -7,7 +7,7 @@ const Calculate = () => {
   const toggle = useDrawer();
 
   return (
-    <Stack className={styles["calculate"]}>
+    <section className={styles["calculate"]}>
       <Toolbar className={styles["toolbar"]}>
         <img onClick={toggle} id="home" src="./assets/menu.svg" />
 
@@ -17,7 +17,7 @@ const Calculate = () => {
         <h5>Vesting Calculator</h5>
         <VestCalculateSchedules />
       </Stack>
-    </Stack>
+    </section>
   );
 };
 

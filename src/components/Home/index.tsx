@@ -8,7 +8,7 @@ const Home = () => {
   const toggle = useDrawer();
 
   return (
-    <Stack className={styles["home"]}>
+    <section className={styles["home"]}>
       <Toolbar className={styles["toolbar"]}>
         <img onClick={toggle} id="home" src="./assets/menu.svg" />
 
@@ -59,7 +59,7 @@ const Home = () => {
       <Box className={styles["contract"]}>
         <pre>{contracts.vestingContract.script}</pre>
       </Box>
-    </Stack>
+    </section>
   );
 };
 

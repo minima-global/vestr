@@ -1,8 +1,10 @@
 import { Txpow } from "../../@types";
-
-////////////// response interfaces //////////
+// MDS Response interfaces
 interface InitResponse {
   event: "inited";
+}
+interface MDSFail {
+  event: "MDSFAIL";
 }
 
 interface MiningResponse {
@@ -80,10 +82,13 @@ let whenNewBalance = (d: NewBalanceData) => {
 let whenInit = () => {
   console.log("INIT event ... please register custom callback");
 };
+let whenFail = () => {
+  console.log("MDS is down");
+};
+
 let whenMinimaLog = (d: MinimaLogData) => {
   // console.log("MINIMA LOG event ... please resgister custom callback", d);
 };
-
 let whenMDSTimer = (d: any) => {
   // console.log("MINIMA MDS TIMER event ... please register custom callback", d);
 };
@@ -91,10 +96,10 @@ let whenMDSTimer = (d: any) => {
 ///////////////////////////
 
 const initializeMinima = () => {
-  // MDS.DEBUG_HOST = "127.0.0.1";
-  // MDS.DEBUG_PORT = 9003;
-  // MDS.DEBUG_MINIDAPPID =
-  //   "0x6EA015CA6AD12F5E38AC2C8BD1F2BEBB322902E09791D326AEAC2363CE2A840ECB32218ECF4F9277FF11E0F5B461A89B1D287FF67824FD430B17A46224746EE338DBB1A647299497F6C1F77288282476DF4C5F5CC210508034D0D1982E1FB061647D7DDA67EEABC63694C896C9A75BEF38120B8E24D15CB6D1831D9E28D5F048";
+  MDS.DEBUG_HOST = "127.0.0.1";
+  MDS.DEBUG_PORT = 9003;
+  MDS.DEBUG_MINIDAPPID =
+    "0x5E88461CFD9E055813414EB1F35EAD4AE0B1A4BEE95D7728051E58BEABE7739B2F5EEE30C7FD5FC412725CF3E59ADAC55F28A6D688EC9761CE566B82D769A4F76CE9EE4F52521ABC6A1E24E44886052CDC54FA919D6DE88145430234D6EBC0577C0FE046ECD7C49FD8C76E7DC2C7190D1C273E124D9DD9FEC726EADC4741FD59";
 
   MDS.init(
     (
@@ -107,11 +112,14 @@ const initializeMinima = () => {
         | MaximaResponse
         | MDSTimerResponse
         | MaximaHosts
+        | MDSFail
     ) => {
       switch (nodeEvent.event) {
         case "inited":
-          // will have to dispatch from here..
           whenInit();
+          break;
+        case "MDSFAIL":
+          whenFail();
           break;
         case "NEWBLOCK":
           const newBlockData = nodeEvent.data;
@@ -141,19 +149,18 @@ const initializeMinima = () => {
         case "MAXIMAHOSTS":
           break;
         default:
-        // console.error("Unknown event type: ", nodeEvent);
       }
     }
   );
 };
 
-// Do registration
-// initializeMinima();
-
 ///////////////////////// application registers custom callbacks ///////////////////////
 
 function onNewBlock(callback: (data: NewBlockData) => void) {
   whenNewBlock = callback;
+}
+function onFail(callback: () => void) {
+  whenFail = callback;
 }
 
 function onMining(callback: (data: MiningData) => void) {
@@ -190,4 +197,5 @@ export const events = {
   onInit,
   onMinimaLog,
   onMDSTimer,
+  onFail,
 };

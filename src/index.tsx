@@ -9,15 +9,47 @@ import { CssBaseline, ThemeProvider } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 
+import {
+  Route,
+  createRoutesFromElements,
+  createHashRouter,
+  Navigate,
+  RouterProvider,
+} from "react-router-dom";
+import Home from "./components/Home";
+import Calculate from "./components/Calculate";
+import Create from "./components/Create";
+import Details from "./components/Details";
+import Dashboard from "./components/Dashboard";
+import NotFound from "./components/NotFound";
+import Track from "./components/Track";
+
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
+);
+
+export const router = createHashRouter(
+  createRoutesFromElements(
+    <Route path="/" element={<App />}>
+      <Route path="dashboard" element={<Dashboard />}>
+        <Route index element={<Home />} />
+        <Route path="calculate" element={<Calculate />} />
+        <Route path="createnew" element={<Create />} />
+        <Route path="track" element={<Track />}>
+          <Route path=":id" element={<Details />} />
+        </Route>
+        <Route path="*" element={<NotFound />} />
+      </Route>
+      <Route path="*" element={<Navigate replace to="dashboard" />} />
+    </Route>
+  )
 );
 root.render(
   <React.StrictMode>
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <App />
+        <RouterProvider router={router} />
       </ThemeProvider>
     </LocalizationProvider>
   </React.StrictMode>

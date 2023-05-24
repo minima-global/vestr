@@ -62,7 +62,7 @@ const Track = () => {
       {!!isViewingDetail && <Outlet />}
 
       {!isViewingDetail && (
-        <Stack className={styles["track"]}>
+        <section className={styles["track"]}>
           <Toolbar className={styles["toolbar"]}>
             <div className={styles["home"]}>
               <img onClick={toggle} id="home" src="./assets/menu.svg" />
@@ -182,7 +182,7 @@ const Track = () => {
               </>
             </CustomComponents.MiList>
           </Stack>
-        </Stack>
+        </section>
       )}
     </>
   );
