@@ -3,14 +3,12 @@
 }
 
 .details h5 {
-  font-family: Manrope-regular;
   font-size: 1.2rem;
   margin: 0;
   border-bottom: 1px solid #d3d3d3;
   padding-bottom: 8px;
 }
 .details h6 {
-  font-family: Manrope-regular;
   font-size: 1rem;
   margin: 0;
 
@@ -33,7 +31,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: Manrope-semibold;
   border: none;
   padding: 4px 8px;
   background-color: #16181c;
@@ -62,7 +59,6 @@
 .collect-btn {
   padding: 12px;
   border: none;
-  font-family: Manrope-regular;
   background-color: #16181c;
   color: #fff;
   border-radius: 8px;

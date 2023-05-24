@@ -22,7 +22,6 @@ export const MiContractSummary = styled("div")`
   }
 
   > div * {
-    font-family: Manrope-regular;
     text-align: center;
   }
   > div p {

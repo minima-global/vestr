@@ -14,7 +14,7 @@ const Select = styled("select")`
   font-weight: 500;
   padding-left: 8px;
   font-size: 1rem;
-  font-family: Manrope-regular;
+
   > option {
     color: #16181c;
   }

@@ -21,7 +21,6 @@ const OngoingTransaction = styled("div")`
     max-height: 80vh;
   }
   * {
-    font-family: Manrope-regular;
     font-size: 1rem;
   }
   > h5 {
@@ -78,7 +77,7 @@ const OngoingTransaction = styled("div")`
     border: none;
     background-color: #16181c;
     color: #fff;
-    font-family: Manrope-regular;
+
     font-size: 0.975rem;
   }
   button#cancel {
@@ -88,7 +87,7 @@ const OngoingTransaction = styled("div")`
     background-color: #fff;
     color: #16181c;
     border: 0.5px solid #16181c;
-    font-family: Manrope-regular;
+
     font-size: 0.975rem;
   }
   button:hover {
@@ -101,7 +100,7 @@ const OngoingTransaction = styled("div")`
   #withdraw h5 {
     padding: 0;
     margin: 0;
-    font-family: Manrope-regular;
+
     font-weight: 400;
   }
   #withdraw div:first-of-type {
@@ -117,12 +116,11 @@ const OngoingTransaction = styled("div")`
   #status {
     background-color: #ebfff0;
     padding: 4px;
-    font-family: Manrope-regular;
+
     font-size: 0.875rem;
     word-break: break-word;
   }
   #help {
-    font-family: Manrope-regular;
     font-size: 0.875rem;
     word-break: break-word;
   }

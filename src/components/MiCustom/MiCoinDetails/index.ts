@@ -5,7 +5,6 @@ export const MiCoinDetails = styled("div")`
   margin-top: 16px;
   padding: 4px;
   ul#iterator > li#list-subheader {
-    font-family: Manrope-regular;
     font-size: 1rem;
     color: #16181c;
     padding-bottom: 8px;
@@ -30,7 +29,7 @@ export const MiCoinDetails = styled("div")`
 
   h6 {
     margin: 0;
-    font-family: Manrope-regular;
+
     font-size: 1.25rem;
     color: #16181c;
     // border-bottom: 1px solid #d3d3d3;

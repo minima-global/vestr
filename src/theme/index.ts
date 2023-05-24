@@ -43,7 +43,7 @@ theme = createTheme(theme, {
       styleOverrides: {
         root: {
           height: "41px",
-          fontFamily: "Manrope-regular",
+
           lineHeight: "21px",
           "> MuiTypography-root": {
             fontSize: "0.875rem",
@@ -60,7 +60,7 @@ theme = createTheme(theme, {
           padding: 8,
           margin: 0,
           fontSize: "0.875rem",
-          fontFamily: "Manrope-regular",
+
           letterSpacing: "0.00938em",
           borderTopLeftRadius: 0,
           borderTopRightRadius: 0,
@@ -112,7 +112,7 @@ theme = createTheme(theme, {
           fontSize: "0.875rem",
           lineHeight: "21px",
           letterSpacing: "0.02em",
-          fontFamily: "Manrope-regular",
+
           fontWeight: 700,
           marginLeft: "8px",
           textAlign: "left",
@@ -131,7 +131,7 @@ theme = createTheme(theme, {
             color: "#000",
             border: "1px solid #585f63",
             fontWeight: "400",
-            fontFamily: "Manrope-regular",
+
             textOverflow: "ellipsis",
             "&::placeholder": {
               fontWeight: "400",
@@ -190,13 +190,6 @@ theme = createTheme(theme, {
           "&:focus": {
             backgroundColor: "rgba(255, 255, 255, 0.8)",
           },
-        },
-      },
-    },
-    MuiTableCell: {
-      styleOverrides: {
-        root: {
-          fontFamily: "Manrope-regular",
         },
       },
     },

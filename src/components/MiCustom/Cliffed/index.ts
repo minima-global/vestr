@@ -5,7 +5,6 @@ export const Cliffed = styled("div")`
   margin: 8px 0px;
 
   > h6 {
-    font-family: Manrope-regular;
     font-size: 0.975rem;
     margin: 0;
     padding: 8px;

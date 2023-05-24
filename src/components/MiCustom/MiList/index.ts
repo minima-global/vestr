@@ -14,7 +14,6 @@ export const MiList = styled("ul")`
   }
 
   > p {
-    font-family: Manrope-regular;
     font-size: 0.875rem;
     text-align: center;
     text-overflow: hidden;
@@ -69,7 +68,6 @@ export const MiList = styled("ul")`
   }
   > li div:last-of-type p {
     font-size: 0.775rem;
-    font-family: Manrope-regular;
   }
   > li div:last-of-type img {
     width: 16px;

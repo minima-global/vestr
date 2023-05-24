@@ -21,7 +21,7 @@
 .view div h6 {
   margin:0;
   padding:0;
-  font-family: Manrope-semibold;
+  
   font-size: 1.1rem;
   max-width: 220px;
   text-align: left;
@@ -50,7 +50,7 @@ ul * {
   color: #000;
   border: none;
   height: 48px;
-  font-family: Manrope-bold;
+  
   font-size: 1.1rem;
 }
 .view button:hover {
@@ -67,6 +67,5 @@ ul * {
 
 .block {
   color: #fff;
-  font-family: Manrope-semibold;
 }
 

@@ -24,12 +24,11 @@ const InputWrapperRadio = styled("div")`
     text-align: left;
     margin: 0px 16px;
     margin-top: 13px;
-    font-family: Manrope-regular;
+
     font-size: 0.975rem;
   }
 `;
 const InputLabel = styled("label")`
-  font-family: Manrope-regular;
   font-size: 0.875rem;
   font-weight: 700;
   line-height: 21px;
@@ -43,7 +42,6 @@ const InputHelper = styled("div")`
   text-align: left;
   margin: 0px 16px;
   margin-top: 13px;
-  font-family: Manrope-regular;
   font-size: 0.975rem;
   word-break: break-word;
 `;
@@ -60,7 +58,6 @@ const InputPercentage = styled("div")`
     margin: 0;
     text-align: center;
     font-weight: 700;
-    font-family: Manrope-regular;
   }
 `;
 export {
