@@ -1,4 +1,4 @@
-import { Box, Stack, Toolbar } from "@mui/material";
+import { Box, Toolbar } from "@mui/material";
 import styles from "./Home.module.css";
 import * as contracts from "../../minima/libs/contracts";
 import VestCalculateSchedules from "../VestCalculateSchedules";

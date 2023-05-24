@@ -1,5 +1,5 @@
 .drawer-persistent {
-  height: 100%;
+  height: 100vh;
   position: relative;
   left: 0;
   bottom: 0;
@@ -10,7 +10,7 @@
   display: block;
 }
 .drawer-temporary  {
-  height: 100%;
+  height: 100vh;
   top: 0;
   max-width: 350px;
   border-right: 1px solid #d3d3d3;
