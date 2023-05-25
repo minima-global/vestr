@@ -113,6 +113,6 @@
   }
 
   .grid > footer {
-    grid-area: 'subheader'
+    grid-area: 'subheader';
   }
 }
