@@ -26,13 +26,13 @@ import {
   InputLabel,
   InputWrapper,
   InputWrapperRadio,
-  InputHelper,
   InputPercentage,
 } from "../InputWrapper/InputWrapper";
 import OngoingTransaction from "../OngoingTransaction";
 
 import styles from "./VestCreate.module.css";
 import MiSelect from "../MiCustom/MiSelect/MiSelect";
+import { useLocation } from "react-router-dom";
 
 const formValidation = yup.object().shape({
   id: yup
@@ -82,8 +82,9 @@ const formValidation = yup.object().shape({
 });
 
 const VestCreate = () => {
+  const location = useLocation();
   const { balance: wallet, loadingBalance, error } = useWalletBalance();
-  const { walletAddress, walletPublicKey } = useWalletAddress();
+  const { walletAddress } = useWalletAddress();
   const [calculatedSchedule, setCalculatedSchedule] = useState<any>(undefined);
   const [loadingAddress, setLoadingAddress] = useState(false);
 
@@ -102,8 +103,16 @@ const VestCreate = () => {
 
   useEffect(() => {
     formik.setFieldValue("address", walletAddress);
-    formik.setFieldValue("root", walletPublicKey);
-  }, [walletAddress, walletPublicKey]);
+  }, [walletAddress]);
+
+  useEffect(() => {
+    formik.setFieldValue(
+      "token",
+      location.state && location.state.tokenid
+        ? wallet.find((t) => t.tokenid === location.state.tokenid)
+        : wallet[0]
+    );
+  }, [location]);
 
   const handleCalculation = async () => {
     setReviewModal(true);
@@ -144,12 +153,14 @@ const VestCreate = () => {
 
   const formik = useFormik({
     initialValues: {
-      token: wallet[0],
+      token:
+        location.state && location.state.tokenid
+          ? wallet.find((t) => t.tokenid === location.state.tokenid)
+          : wallet[0],
       address: "",
       amount: 0,
       contractLength: 0,
       cliff: 0,
-      root: "",
       minBlockWait: 0,
       preferred: false,
       rootPreferred: false,
@@ -163,15 +174,17 @@ const VestCreate = () => {
       setShowSuccessModal(true);
 
       try {
+        if (!formInput.token) {
+          throw new Error("No token selected!");
+        }
         await RPC.createVestingContract(
           formInput.amount.toString(),
           formInput.cliff,
           formInput.address,
           formInput.token,
-          formInput.root,
           formInput.contractLength,
           formInput.minBlockWait,
-          formInput.id.replace(`"`, `'`)
+          formInput.id
         )
           .then((resp) => {
             const contractPaymentPending = resp === 1;
@@ -185,7 +198,6 @@ const VestCreate = () => {
           .catch((err) => {
             setContractCreationStatus("failed");
             formik.setStatus("Contract creation failed, " + err);
-            // setShowSuccessModal(false);
           });
       } catch (error: any) {
         const formError =
@@ -213,7 +225,7 @@ const VestCreate = () => {
                   <CircularProgress size={8} />
                 )}
                 {contractCreationStatus === "complete" && <p>Completed!</p>}
-                {contractCreationStatus === "failed" && <p>formik.status</p>}
+                {contractCreationStatus === "failed" && <p>{formik.status}</p>}
                 {contractCreationStatus === "pending" && (
                   <>
                     <p>

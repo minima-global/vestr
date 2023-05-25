@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { events } from "./minima/libs/events";
 import Root from "./components/Root";
 import useMinima from "./hooks/useMinima";
-import Loading from "./components/Loading";
 import Unavailable from "./components/Unavailable";
+
+import Splash from "./pages/splash";
 
 const App = () => {
   const status = useMinima();
@@ -28,11 +29,11 @@ const App = () => {
 
   return (
     <>
-      {isReady && <Root />}
+      {!isNotAvailable && <Root />}
 
       {isNotAvailable && <Unavailable />}
 
-      {isLoading && <Loading />}
+      {!isNotAvailable && <Splash />}
     </>
   );
 };

@@ -19,11 +19,9 @@ export const createVestingContract = async (
   cliff: number,
   address: string,
   token: MinimaToken,
-  root: string,
   contractLength: number,
   minBlockWait: number,
-  id: string,
-  lumpSumAmount?: string
+  id: string
 ) => {
   try {
     const calculateDate = addMonths(new Date(), contractLength);
