@@ -2,15 +2,15 @@ import { Box, Toolbar } from "@mui/material";
 import styles from "./Home.module.css";
 import * as contracts from "../../minima/libs/contracts";
 import VestCalculateSchedules from "../VestCalculateSchedules";
-import { useDrawer } from "../Dashboard";
+// import { useDrawer } from "../Dashboard";
 
 const Home = () => {
-  const toggle = useDrawer();
+  // const toggle = useDrawer();
 
   return (
     <section className={styles["home"]}>
       <Toolbar className={styles["toolbar"]}>
-        <img onClick={toggle} id="home" src="./assets/menu.svg" />
+        {/* <img onClick={toggle} id="home" src="./assets/menu.svg" /> */}
 
         <div />
       </Toolbar>

@@ -10,11 +10,11 @@ import Decimal from "decimal.js";
 
 import { Outlet, useMatch, useNavigate } from "react-router-dom";
 import { events } from "../../minima/libs/events";
-import { useDrawer } from "../Dashboard";
+// import { useDrawer } from "../Dashboard";
 import useChainHeight from "../../hooks/useChainHeight";
 import { makeTokenImage } from "../../utils/utils";
 const Track = () => {
-  const toggle = useDrawer();
+  // const toggle = useDrawer();
   const tip = useChainHeight();
   const [contracts, setContracts] = useState<Map<string, Coin>>(new Map());
   const navigate = useNavigate();
@@ -65,7 +65,7 @@ const Track = () => {
         <section className={styles["track"]}>
           <Toolbar className={styles["toolbar"]}>
             <div className={styles["home"]}>
-              <img onClick={toggle} id="home" src="./assets/menu.svg" />
+              {/* <img onClick={toggle} id="home" src="./assets/menu.svg" /> */}
             </div>
             <Stack
               alignItems="flex-end"

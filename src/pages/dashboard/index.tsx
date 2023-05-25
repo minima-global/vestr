@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 import styles from "./Dashboard.module.css";
 import Dialog from "../../components/dialog";
+import Tooltip from "../../components/tooltip";
 const Dashboard = () => {
   return (
     <>
