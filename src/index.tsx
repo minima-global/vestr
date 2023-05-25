@@ -20,7 +20,7 @@ import Home from "./components/Home";
 import Calculate from "./components/Calculate";
 import Create from "./components/Create";
 import Details from "./components/Details";
-import Dashboard from "./components/Dashboard";
+import Dashboard from "./pages/dashboard";
 import NotFound from "./components/NotFound";
 import Track from "./components/Track";
 import SplashPage from "./pages/splash";

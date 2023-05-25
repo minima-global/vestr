@@ -1,10 +1,7 @@
 import { useEffect, useState } from "react";
 import { events } from "./minima/libs/events";
-import Root from "./components/Root";
 import useMinima from "./hooks/useMinima";
-import Unavailable from "./components/Unavailable";
-
-import Splash from "./pages/splash";
+import { Outlet } from "react-router-dom";
 
 const App = () => {
   const status = useMinima();
@@ -27,15 +24,7 @@ const App = () => {
   const isLoading = loading;
   const isNotAvailable = error || (!status && !loading);
 
-  return (
-    <>
-      {!isNotAvailable && <Root />}
-
-      {isNotAvailable && <Unavailable />}
-
-      {!isNotAvailable && <Splash />}
-    </>
-  );
+  return <Outlet />;
 };
 
 export default App;
