@@ -119,19 +119,22 @@
   font-size: 1rem;
 }
 
-@media only screen and (max-width: 700) {
-  .grid {
-    display: grid;
+@media screen and (min-width: 700px) {
   
-    grid-template-columns: auto 1fr auto;
+  
+  .grid {  
+    grid-template-rows: 56px 48px 1fr;
+    
     grid-template-areas: 
               'header'
               'subheader'
               'main';
-    grid-template-rows: 1fr;
   }
 
+
   .grid > footer {
-    grid-area: 'subheader';
+    grid-area: subheader;
   }
+  
 }
+
