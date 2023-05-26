@@ -11,28 +11,19 @@ const SplashPage = () => {
     setTimeout(() => setBrand(false), 2500);
   }, []);
   const handleClick = () => {
-    if (screen < 4) {
-      setScreen((s) => (s !== 4 ? s + 1 : 0));
-    }
-    if (screen === 4) {
+    // if (screen < 4) {
+    //   setScreen((s) => (s !== 4 ? s + 1 : 0));
+    // }
+    if (screen === 0) {
       navigate("/dashboard");
     }
   };
 
   const IntroductionText = [
     <h6>
-      Hello nice to <br /> meet you
+      Create and <br /> collect vesting <br /> contracts for any <br /> Minima
+      token
     </h6>,
-    <h6>
-      Easily manage all <br /> your digital assets <br /> in one place
-    </h6>,
-    <h6>
-      Send and receive <br /> tokens and NFTs
-    </h6>,
-    <h6>
-      Self custody allows <br /> you take full control <br /> of your assets
-    </h6>,
-    <h6>Let's get you setup</h6>,
   ];
 
   return (

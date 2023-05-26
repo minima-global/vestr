@@ -25,6 +25,7 @@ import NotFound from "./components/NotFound";
 import Track from "./components/Track";
 import SplashPage from "./pages/splash";
 import Info from "./pages/info";
+import Creator from "./pages/creator";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -35,8 +36,8 @@ export const router = createHashRouter(
     <Route path="/" element={<App />}>
       <Route index element={<SplashPage />} />
       <Route path="/dashboard" element={<Dashboard />}>
-        <Route index element={<Info />} />
-        <Route path="calculate" element={<Calculate />} />
+        <Route path="about" element={<Info />} />
+        <Route path="creator" element={<Creator />} />
         <Route path="createnew" element={<Create />} />
         <Route path="createnew/:id" element={<Create />} />
         <Route path="track" element={<Track />}>
