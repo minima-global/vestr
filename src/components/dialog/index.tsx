@@ -5,8 +5,17 @@ interface IProps {
   subtitle: any;
   buttonTitle: string;
   dismiss: boolean;
+  primaryButtonAction: () => any;
+  cancelAction?: () => void;
 }
-const Dialog = ({ title, subtitle, buttonTitle, dismiss }: IProps) => {
+const Dialog = ({
+  title,
+  subtitle,
+  buttonTitle,
+  dismiss,
+  cancelAction,
+  primaryButtonAction,
+}: IProps) => {
   return (
     <>
       <div className={styles["backdrop"]} />
@@ -20,8 +29,14 @@ const Dialog = ({ title, subtitle, buttonTitle, dismiss }: IProps) => {
                 {subtitle}
               </div>
               <div className={styles["button__wrapper"]}>
-                <button type="button">{buttonTitle}</button>
-                {dismiss && <button type="button">Cancel</button>}
+                <button type="button" onClick={primaryButtonAction}>
+                  {buttonTitle}
+                </button>
+                {dismiss && (
+                  <button type="button" onClick={cancelAction}>
+                    Cancel
+                  </button>
+                )}
               </div>
             </div>
           </section>

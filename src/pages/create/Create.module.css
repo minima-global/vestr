@@ -1,0 +1,49 @@
+.grid {
+  display: grid;
+
+  grid-template-rows: 1fr;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+
+.grid > section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.grid > section button {
+  border: none;
+  background: none;
+  text-align: left;
+
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.05em;
+  text-align: left;
+  padding: 0;
+  margin:0;
+}
+
+.grid > section:last-of-type {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.grid > section:last-of-type form div {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.changes {
+  font-size: 1rem!important;
+  font-weight: 500!important;
+  line-height: 19px!important;
+  letter-spacing: 0.02em!important;
+  text-align: center!important;
+  color: #08090B;
+
+}

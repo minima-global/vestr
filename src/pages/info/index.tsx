@@ -21,7 +21,7 @@ const Info = () => {
         <div className={styles["helper__wrapper"]}>
           <h6>Collector</h6>
           <p>I want to collect tokens from a vesting contract</p>
-          <button type="button" onClick={() => navigate("/collect")}>
+          <button type="button" onClick={() => navigate("collector")}>
             Collect tokens
           </button>
         </div>

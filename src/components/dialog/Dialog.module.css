@@ -43,6 +43,7 @@
 
   display: grid;
   margin: 0 16px;
+  background: none!important;
 }
 .grid main > section.full {
   grid-area: 1 / 1 / 1 / 4
