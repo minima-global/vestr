@@ -260,4 +260,8 @@
     max-height: 525px;
     overflow: hidden;
   }
+  .dd ul {
+    overflow-y: scroll;
+    padding-right: 16px;
+  }
 }

@@ -6,6 +6,7 @@ import useWalletBalance from "../../hooks/useWalletBalance";
 import WalletSelect from "../../components/walletSelect";
 import GraceSelect from "../../components/gracePeriod";
 import CliffSelect from "../../components/cliffPeriod";
+import AddressSelect from "../../components/addressSelect";
 const Create = () => {
   const navigate = useNavigate();
   const [exit, setExit] = useState(false);
@@ -39,8 +40,7 @@ const Create = () => {
           <form>
             <div>
               <label>Withdrawal address</label>
-              <input type="radio" />
-              <input type="radio" />
+              <AddressSelect />
             </div>
 
             <div>
