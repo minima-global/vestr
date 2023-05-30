@@ -1,19 +1,28 @@
 import { useEffect, useState } from "react";
 import styles from "./Splash.module.css";
 import { useNavigate } from "react-router-dom";
+import Vestr from "../../assets/vestr.json";
+import Lottie from "lottie-react";
+import { CSSTransition } from "react-transition-group";
 
 const SplashPage = () => {
   const navigate = useNavigate();
   const [displayBrand, setBrand] = useState(true);
   const [screen, setScreen] = useState(0);
 
+  const defaultOptions = {
+    loop: false,
+    autoplay: true,
+    animationData: Vestr,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+  };
+
   useEffect(() => {
     setTimeout(() => setBrand(false), 2500);
   }, []);
   const handleClick = () => {
-    // if (screen < 4) {
-    //   setScreen((s) => (s !== 4 ? s + 1 : 0));
-    // }
     if (screen === 0) {
       navigate("/dashboard/about");
     }
@@ -36,14 +45,41 @@ const SplashPage = () => {
         <div>
           {!!displayBrand && (
             <div className={styles["brand"]}>
-              <img alt="icon" src="./assets/brand.svg" />
+              <Lottie
+                style={{ width: 110, height: 110 }}
+                animationData={Vestr}
+              />
               <h6>Vestr</h6>
             </div>
           )}
-          {!displayBrand && IntroductionText[screen]}
+          <CSSTransition
+            unmountOnExit
+            in={!displayBrand}
+            timeout={500}
+            classNames={{
+              enter: styles.backdropEnter,
+              enterDone: styles.backdropEnterActive,
+              exit: styles.backdropExit,
+              exitActive: styles.backdropExitActive,
+            }}
+          >
+            {IntroductionText[screen]}
+          </CSSTransition>
         </div>
         {!!displayBrand && <p></p>}
-        {!displayBrand && <p>Tap to continue</p>}
+        <CSSTransition
+          unmountOnExit
+          in={!displayBrand}
+          timeout={500}
+          classNames={{
+            enter: styles.backdropEnter,
+            enterDone: styles.backdropEnterActive,
+            exit: styles.backdropExit,
+            exitActive: styles.backdropExitActive,
+          }}
+        >
+          <p>Tap to continue</p>
+        </CSSTransition>
       </div>
     </div>
   );

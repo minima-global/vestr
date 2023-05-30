@@ -75,8 +75,12 @@
   grid-template-rows: repeat(7, max-content);
   grid-template-columns: 1fr;
   gap: 8px;
-  padding: 0px 16px 8px 0px;
-  overflow-y: scroll;
+  padding: 0px 16px 0px 0px;
+  overflow-y: auto;
+}
+.dd ul:has(::-webkit-scrollbar) {
+  padding-right: 16px;
+
 }
 .dd ul li {
   padding: 16px!important;
