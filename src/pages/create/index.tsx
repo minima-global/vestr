@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./Create.module.css";
 import Dialog from "../../components/dialog";
+import useWalletBalance from "../../hooks/useWalletBalance";
+import WalletSelect from "../../components/walletSelect";
 const Create = () => {
   const navigate = useNavigate();
   const [exit, setExit] = useState(false);
@@ -27,7 +29,8 @@ const Create = () => {
           <button type="button" onClick={() => setExit(true)}>
             Cancel
           </button>
-          <input type="select" />
+
+          <WalletSelect />
         </section>
 
         <section>

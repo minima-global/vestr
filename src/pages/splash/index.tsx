@@ -15,7 +15,7 @@ const SplashPage = () => {
     //   setScreen((s) => (s !== 4 ? s + 1 : 0));
     // }
     if (screen === 0) {
-      navigate("/dashboard");
+      navigate("/dashboard/about");
     }
   };
 

@@ -14,7 +14,10 @@ const Info = () => {
         <div className={styles["helper__wrapper"]}>
           <h6>Creator</h6>
           <p>I want to create a vesting contract</p>
-          <button type="button" onClick={() => navigate("/create")}>
+          <button
+            type="button"
+            onClick={() => navigate("/dashboard/creator/create")}
+          >
             Create a contract
           </button>
         </div>
