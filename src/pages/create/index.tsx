@@ -5,6 +5,7 @@ import Dialog from "../../components/dialog";
 import useWalletBalance from "../../hooks/useWalletBalance";
 import WalletSelect from "../../components/walletSelect";
 import GraceSelect from "../../components/gracePeriod";
+import CliffSelect from "../../components/cliffPeriod";
 const Create = () => {
   const navigate = useNavigate();
   const [exit, setExit] = useState(false);
@@ -59,7 +60,7 @@ const Create = () => {
 
             <div>
               <label>Cliff period</label>
-              <input type="select" />
+              <CliffSelect />
             </div>
 
             <div>

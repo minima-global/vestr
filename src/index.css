@@ -27,3 +27,20 @@ p {
   margin: 0;
   padding: 0;
 }
+
+*::-webkit-scrollbar {
+  width: 16px;
+  border-radius: 4px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #FFFFFF;
+  border-radius: 16px;
+  border: 2px solid #D3D3D8;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #D3D3D8;
+  border-radius: 16px;
+  padding: 4px;
+}
