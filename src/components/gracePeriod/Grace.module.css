@@ -1,0 +1,153 @@
+.select {
+  display: grid!important;
+  grid-template-columns: 1fr auto!important;
+  grid-template-rows: 1fr!important;
+  gap: 16px!important;
+
+  border-radius: 4px;
+
+  padding: 12px 16px 12px 16px;
+  overflow: hidden;
+  background-color: #FFFFFF;
+}
+
+.select img:last-of-type {
+  margin: auto!important;
+}
+
+.active {
+  transform: rotate(180deg);
+  transition: transform 0.1s ease-in;
+}
+
+.select div {
+  margin: auto 0;
+  overflow: hidden;
+}
+
+.select div * {
+  margin: 0;
+  padding: 0;
+  text-overflow: ellipsis;
+  white-space: normal;
+  overflow: hidden;
+}
+.select div h6 {
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 23px;
+  letter-spacing: 0.02em;
+  color: #464C4F;
+}
+
+
+.backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+  position: absolute;
+  z-index: 43;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.dd {
+  z-index: 44;
+  background-color: #E9E9EB;
+
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  border-radius: 4px;
+  padding: 24px;
+
+  display: grid;
+  gap: 24px;
+}
+.dd ul {
+  display: flex;
+  flex-direction: column;
+  overflow-y: overlay;
+  gap: 8px;
+  padding: 0px 0px 8px 0px;
+}
+.dd ul:first-of-type li {
+  padding: 16px!important;
+  background-color: #FFFFFF;
+  border-radius: 4px;
+  overflow: hidden;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #08090B;
+}
+.dd > div h6 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  position: relative;
+  letter-spacing: 0.05em;
+  margin: 0;
+  padding: 0;
+}
+
+.dd > div img {
+  width: 16px;
+  height: 16px;
+}
+.dd > div {
+  display: flex!important;
+  justify-content: space-between!important;
+  align-items: center!important;
+  flex-direction: row!important;
+}
+
+
+
+
+
+.ddMenuEnter {
+  position: absolute;
+  transform: translateY(+110%);
+}
+.ddMenuEnterActive {
+  position: absolute;
+  transform: translateY(0%);
+  transition: all 0.5s ease;
+
+}
+.ddMenuExit {
+  position: absolute;
+  transform: translateY(0%);
+}
+.ddMenuExitActive {
+  transform: translateY(+110%);
+  transition: all 0.5s ease;
+}
+
+
+.backdropEnter {
+  opacity: 0;
+}
+.backdropEnterActive {
+  opacity: 1;
+  transition: opacity 200ms;
+}
+
+.backdropExit {
+  opacity: 1;
+}
+.backdropExitActive {
+  opacity: 0;
+  transition: opacity 200ms;
+}
+
+@media screen and (min-width: 560px) {
+  .dd {
+    position: relative;
+    align-self: center;
+
+    padding: 24px 32px 24px 32px;
+    overflow: hidden;
+  }
+}

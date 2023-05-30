@@ -87,7 +87,7 @@
   line-height: 1.5;
   letter-spacing: 0.05em;
   font-weight: 400;
-  font-size: 1.5rem;
+  font-size: 1rem;
   text-align: center;
 }
 .dialog div:last-of-type button:first-of-type {
@@ -101,6 +101,7 @@
   border: none;
   width: 100%;
   font-size: 1rem;
+  text-align: center;
 }
 .dialog div:last-of-type button:first-of-type:disabled {
   background-color: #D3D3D8;

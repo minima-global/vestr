@@ -17,7 +17,7 @@ const Dialog = ({
   primaryButtonAction,
 }: IProps) => {
   return (
-    <>
+    <div>
       <div className={styles["backdrop"]} />
       <div className={styles["grid"]}>
         <header />
@@ -43,7 +43,7 @@ const Dialog = ({
         </main>
         <footer />
       </div>
-    </>
+    </div>
   );
 };
 

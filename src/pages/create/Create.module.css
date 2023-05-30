@@ -26,18 +26,6 @@
   margin:0;
 }
 
-.grid > section:last-of-type {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.grid > section:last-of-type form div {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
 .changes {
   font-size: 1rem!important;
   font-weight: 500!important;

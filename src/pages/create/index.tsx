@@ -4,6 +4,7 @@ import styles from "./Create.module.css";
 import Dialog from "../../components/dialog";
 import useWalletBalance from "../../hooks/useWalletBalance";
 import WalletSelect from "../../components/walletSelect";
+import GraceSelect from "../../components/gracePeriod";
 const Create = () => {
   const navigate = useNavigate();
   const [exit, setExit] = useState(false);
@@ -63,7 +64,7 @@ const Create = () => {
 
             <div>
               <label>Grace period</label>
-              <input type="select" />
+              <GraceSelect />
             </div>
 
             <button type="submit">Review</button>
