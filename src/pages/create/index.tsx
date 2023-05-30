@@ -37,36 +37,53 @@ const Create = () => {
         </section>
 
         <section>
-          <form>
+          <form className={styles["form"]}>
             <div>
-              <label>Withdrawal address</label>
-              <AddressSelect />
+              <label htmlFor="radio" className={styles["form-group-custom"]}>
+                Withdrawal address
+                <AddressSelect />
+              </label>
             </div>
 
-            <div>
-              <label>Contract ID</label>
-              <input type="text" />
-            </div>
+            <label htmlFor="contract-id" className={styles["form-group"]}>
+              Contract ID
+              <input
+                placeholder="Contract name"
+                type="text"
+                id="contract-id"
+                name="contract-id"
+              />
+            </label>
 
-            <div>
-              <label>Token amount</label>
-              <input type="number" />
-            </div>
+            <label htmlFor="amount" className={styles["form-group"]}>
+              Token amount
+              <input
+                placeholder="Token amount"
+                type="number"
+                id="amount"
+                name="amount"
+              />
+            </label>
 
-            <div>
-              <label>Contract length</label>
-              <input type="select" />
-            </div>
+            <label htmlFor="contract-length" className={styles["form-group"]}>
+              Contract length
+              <input
+                placeholder="Contract length"
+                type="amount"
+                id="contract-length"
+                name="contract-length"
+              />
+            </label>
 
-            <div>
-              <label>Cliff period</label>
+            <label htmlFor="Cliff period" className={styles["form-group"]}>
+              Cliff period
               <CliffSelect />
-            </div>
+            </label>
 
-            <div>
-              <label>Grace period</label>
+            <label className={styles["form-group"]}>
+              Grace period
               <GraceSelect />
-            </div>
+            </label>
 
             <button type="submit">Review</button>
           </form>

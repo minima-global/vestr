@@ -21,6 +21,10 @@
   letter-spacing: 0.02em;
   text-align: left;
 }
+.radio-wrapper label:has(input[type="radio"]:disabled) {
+  background-color: #E9E9EB;
+  color: #91919D;
+}
 
 input[type="radio"] {
   /* Add if not using autoprefixer */
@@ -38,6 +42,9 @@ input[type="radio"] {
   border-radius: 50%;
   transform: translateY(-0.01em);
 }
+input[type="radio"]:disabled {
+  background-color: #E9E9EB;
+}
 input[type="radio"] {
   /* ...existing styles */
 
@@ -51,7 +58,7 @@ input[type="radio"]::before {
   border-radius: 50%;
   transform: scale(0);
   transition: 120ms transform ease-in-out;
-  box-shadow: inset 1em 1em #FFCD1E;
+  box-shadow: inset 1em 1em #08090B;
 }
 input[type="radio"]:checked::before {
   transform: scale(1);
@@ -65,6 +72,6 @@ input[type="radio"]::before {
 }
 
 input[type="radio"]:focus {
-  outline: max(2px, 0.15em) solid #FFCD1E;
+  outline: max(2px, 0.15em) solid #08090B;
   outline-offset: max(2px, 0.15em);
 }
