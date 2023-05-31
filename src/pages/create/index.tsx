@@ -1,18 +1,70 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import styles from "./Create.module.css";
 import Dialog from "../../components/dialog";
-import useWalletBalance from "../../hooks/useWalletBalance";
 import WalletSelect from "../../components/walletSelect";
 import GraceSelect from "../../components/gracePeriod";
 import CliffSelect from "../../components/cliffPeriod";
 import AddressSelect from "../../components/addressSelect";
+import { useFormik } from "formik";
+import useWalletBalance from "../../hooks/useWalletBalance";
+import useWalletAddress from "../../hooks/useWalletAddress";
+
+import * as RPC from "../../minima/libs/RPC";
 const Create = () => {
+  const { balance: wallet } = useWalletBalance();
+  const { walletAddress } = useWalletAddress();
+  const location = useLocation();
   const navigate = useNavigate();
   const [exit, setExit] = useState(false);
   const handleCancel = () => {
-    navigate(-1);
+    navigate("/dashboard/creator");
   };
+
+  useEffect(() => {
+    console.log(location.state);
+    formik.setFieldValue(
+      "token",
+      location.state && location.state.tokenid
+        ? wallet.find((t) => t.tokenid === location.state.tokenid)
+        : wallet[0]
+    );
+    if (location.state && location.state.cliff) {
+      formik.setFieldValue("cliff", location.state.cliff);
+    }
+    if (location.state && location.state.grace) {
+      formik.setFieldValue("grace", location.state.grace);
+    }
+    if (location.state && location.state.addressPreference) {
+      const own = location.state.addressPreference === "0";
+      if (own) {
+        formik.setFieldValue("address", walletAddress);
+      }
+    }
+  }, [location, wallet]);
+
+  const formik = useFormik({
+    initialValues: {
+      token:
+        location.state && location.state.tokenid
+          ? wallet.find((t) => t.tokenid === location.state.tokenid)
+          : wallet[0],
+      cliff: 0,
+      grace: 0,
+      amount: 0,
+      length: 0,
+      name: "",
+      address: "",
+    },
+    onSubmit: async (form) => {
+      console.log("token", form);
+
+      try {
+        // await RPC.createVestingContract();
+      } catch (error) {}
+    },
+  });
+
   return (
     <>
       {exit && (
@@ -37,13 +89,24 @@ const Create = () => {
         </section>
 
         <section>
-          <form className={styles["form"]}>
-            <div>
-              <label htmlFor="radio" className={styles["form-group-custom"]}>
+          <form onSubmit={formik.handleSubmit} className={styles["form"]}>
+            <label htmlFor="radio" className={styles["form-group-custom"]}>
+              Withdrawal address
+              <AddressSelect />
+            </label>
+            {location.state && location.state.addressPreference && (
+              <label htmlFor="wallet" className={styles["form-group"]}>
                 Withdrawal address
-                <AddressSelect />
+                <input
+                  id="wallet"
+                  name="wallet"
+                  placeholder="Wallet address"
+                  value={formik.values.address}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                />
               </label>
-            </div>
+            )}
 
             <label htmlFor="contract-id" className={styles["form-group"]}>
               Contract ID
@@ -52,6 +115,9 @@ const Create = () => {
                 type="text"
                 id="contract-id"
                 name="contract-id"
+                value={formik.values.name}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
               />
             </label>
 
@@ -62,6 +128,9 @@ const Create = () => {
                 type="number"
                 id="amount"
                 name="amount"
+                value={formik.values.amount}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
               />
             </label>
 
@@ -72,6 +141,9 @@ const Create = () => {
                 type="amount"
                 id="contract-length"
                 name="contract-length"
+                value={formik.values.length}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
               />
             </label>
 

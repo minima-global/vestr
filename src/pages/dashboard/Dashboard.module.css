@@ -87,6 +87,11 @@
   gap: 4px;
   text-decoration: none;
 }
+.grid > footer > section > nav a:hover p, .grid > footer > section > nav a:hover svg path  {
+  fill: #FFCD1E; 
+  color: #FFCD1E;
+  cursor: pointer; 
+}
 .grid > footer > section > nav a p {
   color: #E9E9EB;
   font-weight: 500;

@@ -14,20 +14,20 @@ const WalletSelect = () => {
   const location = useLocation();
   const { balance } = useWalletBalance();
   const [searchText, setSearchText] = useState("");
-  const [current, setCurrent] = useState<MinimaToken | null>(null);
+  const [current, setCurrent] = useState<MinimaToken | undefined>(undefined);
   const [active, setActive] = useState(false);
-  console.log(balance);
-  useEffect(() => {
-    setCurrent(balance[0]);
-  }, [balance]);
 
   useEffect(() => {
-    console.log(location.state);
-  }, [location]);
+    setCurrent(
+      location.state && location.state.tokenid
+        ? balance.find((t) => t.tokenid === location.state.tokenid)
+        : balance[0]
+    );
+  }, [balance, location]);
 
   const handleSelection = (token: MinimaToken) => {
     navigate("/dashboard/creator/create", {
-      state: { tokenid: token.tokenid },
+      state: { ...location.state, tokenid: token.tokenid },
     });
     setCurrent(token);
     setActive(false);

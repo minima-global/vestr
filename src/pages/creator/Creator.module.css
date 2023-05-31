@@ -30,8 +30,16 @@
 .grid > section:first-of-type button:first-of-type {
   background-color: #D3D3D8;
 }
+.grid > section:first-of-type button:first-of-type:hover {
+  background-color: #E9E9EB;
+  cursor: pointer;
+}
 .grid > section:first-of-type button:last-of-type {
   background-color: #FFCD1E;
+}
+.grid > section:first-of-type button:last-of-type:hover {
+  background-color: #FFE792;
+  cursor: pointer;
 }
 .grid > section:last-of-type {
   display: grid;

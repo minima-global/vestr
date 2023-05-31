@@ -92,7 +92,6 @@
 
 .form button[type="submit"] {
   background-color: #FFCD1E;
-  font-family: Manrope;
   font-size: 1rem;
   font-weight: 600;
   line-height: 19px;
@@ -107,5 +106,9 @@
   cursor: not-allowed;
   background-color: #D3D3D8;
   color: #FFFFFF;
+}
+.form button[type="submit"]:hover {
+  cursor: pointer;
+  background-color: #FFE792;
 }
 

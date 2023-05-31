@@ -1,19 +1,31 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import styles from "./Cliff.module.css";
 import AppGrid from "../app-grid";
 
 import { CSSTransition } from "react-transition-group";
-import Dialog from "../dialog";
+
+import { useLocation, useNavigate } from "react-router-dom";
 
 const CliffSelect = () => {
   const [current, setCurrent] = useState<null | string>(null);
   const [active, setActive] = useState(false);
-  const [warning, setWarning] = useState(false);
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.state && location.state.cliff) {
+      setCurrent(location.state.cliff);
+    }
+  }, [location]);
 
   const handleSelection = (cliff: number) => {
     setCurrent(cliff === 1 ? cliff + " month" : cliff + " months");
     setActive(false);
+    navigate("/dashboard/creator/create", {
+      state: { ...location.state, cliff: cliff },
+    });
   };
 
   return (

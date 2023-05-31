@@ -29,7 +29,7 @@ const Dialog = ({
                 {subtitle}
               </div>
               <div className={styles["button__wrapper"]}>
-                <button type="button" onClick={primaryButtonAction}>
+                <button type="button" onClick={() => primaryButtonAction()}>
                   {buttonTitle}
                 </button>
                 {dismiss && (

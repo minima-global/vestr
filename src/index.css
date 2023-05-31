@@ -6,6 +6,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow: hidden;
+
   font-family: "Manrope"!important;
 }
 
@@ -43,4 +44,8 @@ p {
   background-color: #D3D3D8;
   border-radius: 16px;
   padding: 4px;
+}
+
+button {
+  font-family: "Manrope";
 }

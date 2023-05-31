@@ -1,15 +1,24 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import styles from "./Grace.module.css";
 import AppGrid from "../app-grid";
 
 import { CSSTransition } from "react-transition-group";
 import Dialog from "../dialog";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const GraceSelect = () => {
   const [current, setCurrent] = useState<null | string>(null);
   const [active, setActive] = useState(false);
   const [warning, setWarning] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.state && location.state.grace) {
+      setCurrent(Object.keys(location.state.grace)[0].replaceAll("_", " "));
+    }
+  }, [location]);
 
   const gracePeriods = [
     {
@@ -32,10 +41,15 @@ const GraceSelect = () => {
     },
   ];
 
-  const handleSelection = (grace: string) => {
-    if (warning) {
-      setWarning(false);
-    }
+  const handleSelection = (grace: string, index: number) => {
+    navigate("/dashboard/creator/create", {
+      state: {
+        ...location.state,
+        grace: gracePeriods[index],
+      },
+    });
+
+    //  Object.values(gracePeriods[index])[0]
 
     setCurrent(grace);
     setActive(false);
@@ -49,7 +63,7 @@ const GraceSelect = () => {
   return (
     <>
       <CSSTransition
-        in={!!warning}
+        in={warning}
         unmountOnExit
         timeout={200}
         classNames={{
@@ -69,7 +83,10 @@ const GraceSelect = () => {
           }
           buttonTitle="Confirm"
           dismiss={true}
-          primaryButtonAction={() => handleSelection("None")}
+          primaryButtonAction={() => {
+            setWarning(false);
+            handleSelection("None", 0);
+          }}
           cancelAction={() => setWarning(false)}
         />
       </CSSTransition>
@@ -86,7 +103,7 @@ const GraceSelect = () => {
       </div>
 
       <CSSTransition
-        in={!!active}
+        in={active}
         unmountOnExit
         timeout={200}
         classNames={{
@@ -99,7 +116,7 @@ const GraceSelect = () => {
         <div className={styles["backdrop"]} />
       </CSSTransition>
       <CSSTransition
-        in={!!active}
+        in={active}
         unmountOnExit
         timeout={100}
         classNames={{
@@ -124,13 +141,17 @@ const GraceSelect = () => {
               <ul>
                 {gracePeriods.map((g, i) => (
                   <li
-                    onClick={() =>
-                      i !== 0
-                        ? handleSelection(
-                            Object.keys(g).toString().replaceAll("_", " ")
-                          )
-                        : handleWarning()
-                    }
+                    onClick={() => {
+                      if (i === 0) {
+                        handleWarning();
+                      }
+                      if (i !== 0) {
+                        handleSelection(
+                          Object.keys(g).toString().replaceAll("_", " "),
+                          i
+                        );
+                      }
+                    }}
                   >
                     {Object.keys(g).toString().replaceAll("_", " ")}
                   </li>

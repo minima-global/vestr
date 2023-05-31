@@ -50,11 +50,14 @@
   background-color: #FFCD1E;
   border-radius: 4px;
   padding: 12px;
-  font-family: Manrope;
   font-size: 1rem;
   font-weight: 600;
   line-height: 1.5;
   letter-spacing: 0.05em;
   text-align: center;
   border: none;
+}
+.helper__wrapper button:hover {
+  background-color: #FFE792;
+  cursor: pointer;
 }
