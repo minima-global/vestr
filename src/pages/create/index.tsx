@@ -21,6 +21,7 @@ const Create = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [exit, setExit] = useState(false);
+  const [review, setReview] = useState(false);
 
   const [tooltips, setTooltips] = useState({
     walletAddress: false,
@@ -42,6 +43,23 @@ const Create = () => {
   );
   const handleCancel = () => {
     navigate("/dashboard/creator");
+  };
+  const handleReviewClick = async () => {
+    setReview(true);
+    const uniqueIdentityForContract = await RPC.hash(
+      encodeURIComponent(formik.values.name) + Math.random() * 1000000
+    );
+
+    setReview(false);
+
+    navigate("review/" + uniqueIdentityForContract, {
+      state: {
+        contract: {
+          ...formik.values,
+          id: uniqueIdentityForContract,
+        },
+      },
+    });
   };
 
   useEffect(() => {
@@ -84,21 +102,6 @@ const Create = () => {
       ? location.state.addressPreference
       : "",
   ]);
-
-  const handleReviewClick = async () => {
-    const uniqueIdentityForContract = await RPC.hash(
-      encodeURIComponent(formik.values.name) + Math.random() * 1000000
-    );
-
-    navigate("review/" + uniqueIdentityForContract, {
-      state: {
-        contract: {
-          ...formik.values,
-          id: uniqueIdentityForContract,
-        },
-      },
-    });
-  };
 
   const formik = useFormik({
     initialValues: {
@@ -582,7 +585,7 @@ const Create = () => {
               </label>
 
               <button
-                disabled={!formik.isValid}
+                disabled={!formik.isValid || review}
                 type="button"
                 onClick={handleReviewClick}
               >
