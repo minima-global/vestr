@@ -31,9 +31,7 @@ const CliffSelect = () => {
   return (
     <>
       <div onClick={() => setActive(true)} className={styles["select"]}>
-        <div>
-          <h6>{current ? current : "Select cliff period"}</h6>
-        </div>
+        <div>{current ? current : "Select cliff period"}</div>
 
         <img
           className={active ? styles.active : ""}

@@ -89,9 +89,7 @@ const GraceSelect = () => {
         />
       </CSSTransition>
       <div onClick={() => setActive(true)} className={styles["select"]}>
-        <div>
-          <h6>{current ? current : "Select grace period"}</h6>
-        </div>
+        <div>{current ? current : "Select grace period"}</div>
 
         <img
           className={active ? styles.active : ""}

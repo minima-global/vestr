@@ -23,6 +23,11 @@
 .select div {
   margin: auto 0;
   overflow: hidden;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 23px;
+  letter-spacing: 0.05em;
+  color: #464C4F;
 }
 
 .select div * {
@@ -32,14 +37,6 @@
   white-space: normal;
   overflow: hidden;
 }
-.select div h6 {
-  font-size: 1rem;
-  font-weight: 500;
-  line-height: 23px;
-  letter-spacing: 0.02em;
-  color: #464C4F;
-}
-
 
 .backdrop {
   background-color: rgba(0, 0, 0, 0.5);
