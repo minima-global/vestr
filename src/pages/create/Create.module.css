@@ -116,6 +116,11 @@
   cursor: pointer;
   background-color: #FFE792;
 }
+.form button[type="submit"]:disabled:hover {
+  cursor: not-allowed;
+  background-color: #D3D3D8;
+
+}
 
 .formError {
   background-color: #FFE2E9;

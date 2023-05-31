@@ -29,7 +29,7 @@ const Create = () => {
       console.log("Setting field Value For Cliff");
       formik.setFieldValue("cliff", location.state.cliff);
     }
-  }, [location.state.cliff]);
+  }, [location.state && location.state.cliff ? location.state.cliff : ""]);
 
   useEffect(() => {
     formik.setFieldValue(
@@ -38,7 +38,10 @@ const Create = () => {
         ? wallet.find((t) => t.tokenid === location.state.tokenid)
         : wallet[0]
     );
-  }, [location.state.tokenid, wallet]);
+  }, [
+    location.state && location.state.tokenid ? location.state.tokenid : "",
+    wallet,
+  ]);
 
   useEffect(() => {
     if (location.state && location.state.grace) {
@@ -47,7 +50,7 @@ const Create = () => {
         location.state.grace[Object.keys(location.state.grace)[0]]
       );
     }
-  }, [location.state.grace]);
+  }, [location.state && location.state.grace ? location.state.grace : ""]);
 
   useEffect(() => {
     if (location.state && location.state.addressPreference) {
@@ -56,7 +59,11 @@ const Create = () => {
         formik.setFieldValue("address", walletAddress);
       }
     }
-  }, [location.state.addressPreference]);
+  }, [
+    location.state && location.state.addressPreference
+      ? location.state.addressPreference
+      : "",
+  ]);
 
   const formik = useFormik({
     initialValues: {
@@ -102,6 +109,19 @@ const Create = () => {
           </button>
 
           <WalletSelect />
+          <CSSTransition
+            in={formik.errors.token && formik.touched.token ? true : false}
+            unmountOnExit
+            timeout={200}
+            classNames={{
+              enter: styles.backdropEnter,
+              enterDone: styles.backdropEnterActive,
+              exit: styles.backdropExit,
+              exitActive: styles.backdropExitActive,
+            }}
+          >
+            <div className={styles["formError"]}>{formik.errors.token}</div>
+          </CSSTransition>
         </section>
 
         <section>
@@ -111,16 +131,35 @@ const Create = () => {
               <AddressSelect />
             </label>
             {location.state && location.state.addressPreference && (
-              <label htmlFor="wallet" className={styles["form-group"]}>
+              <label htmlFor="address" className={styles["form-group"]}>
                 Withdrawal address
                 <input
-                  id="wallet"
-                  name="wallet"
+                  id="address"
+                  name="address"
                   placeholder="Wallet address"
                   value={formik.values.address}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                 />
+                <CSSTransition
+                  in={
+                    formik.errors.address && formik.touched.address
+                      ? true
+                      : false
+                  }
+                  unmountOnExit
+                  timeout={200}
+                  classNames={{
+                    enter: styles.backdropEnter,
+                    enterDone: styles.backdropEnterActive,
+                    exit: styles.backdropExit,
+                    exitActive: styles.backdropExitActive,
+                  }}
+                >
+                  <div className={styles["formError"]}>
+                    {formik.errors.address}
+                  </div>
+                </CSSTransition>
               </label>
             )}
 
@@ -135,6 +174,19 @@ const Create = () => {
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
               />
+              <CSSTransition
+                in={formik.errors.name && formik.touched.name ? true : false}
+                unmountOnExit
+                timeout={200}
+                classNames={{
+                  enter: styles.backdropEnter,
+                  enterDone: styles.backdropEnterActive,
+                  exit: styles.backdropExit,
+                  exitActive: styles.backdropExitActive,
+                }}
+              >
+                <div className={styles["formError"]}>{formik.errors.name}</div>
+              </CSSTransition>
             </label>
 
             <label htmlFor="amount" className={styles["form-group"]}>
@@ -144,10 +196,27 @@ const Create = () => {
                 type="number"
                 id="amount"
                 name="amount"
-                value={formik.values.amount}
+                value={formik.values.amount > 0 ? formik.values.amount : ""}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
               />
+              <CSSTransition
+                in={
+                  formik.errors.amount && formik.touched.amount ? true : false
+                }
+                unmountOnExit
+                timeout={200}
+                classNames={{
+                  enter: styles.backdropEnter,
+                  enterDone: styles.backdropEnterActive,
+                  exit: styles.backdropExit,
+                  exitActive: styles.backdropExitActive,
+                }}
+              >
+                <div className={styles["formError"]}>
+                  {formik.errors.amount}
+                </div>
+              </CSSTransition>
             </label>
 
             <label htmlFor="length" className={styles["form-group"]}>
@@ -157,17 +226,34 @@ const Create = () => {
                 type="number"
                 id="length"
                 name="length"
-                value={formik.values.length}
+                value={formik.values.length > 0 ? formik.values.length : ""}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
               />
+              <CSSTransition
+                in={
+                  formik.errors.length && formik.touched.length ? true : false
+                }
+                unmountOnExit
+                timeout={200}
+                classNames={{
+                  enter: styles.backdropEnter,
+                  enterDone: styles.backdropEnterActive,
+                  exit: styles.backdropExit,
+                  exitActive: styles.backdropExitActive,
+                }}
+              >
+                <div className={styles["formError"]}>
+                  {formik.errors.length}
+                </div>
+              </CSSTransition>
             </label>
 
             <label htmlFor="Cliff period" className={styles["form-group"]}>
               Cliff period
               <CliffSelect />
               <CSSTransition
-                in={formik.errors.cliff ? true : false}
+                in={formik.errors.cliff && formik.touched.cliff ? true : false}
                 unmountOnExit
                 timeout={200}
                 classNames={{
@@ -199,7 +285,9 @@ const Create = () => {
               </CSSTransition>
             </label>
 
-            <button type="submit">Review</button>
+            <button disabled={!formik.isValid} type="submit">
+              Review
+            </button>
           </form>
         </section>
       </section>
@@ -211,12 +299,14 @@ export default Create;
 
 const formValidation = yup.object().shape({
   token: yup.object().required("Field is required"),
+  amount: yup.number().required("Field is required"),
   cliff: yup.number().test("cliff", "Invalid cliff period", function (val) {
     const { path, createError, parent } = this;
     if (val === undefined) return true;
     console.log(parent);
     const contractLength = parent.length;
-    if (typeof contractLength !== "number") return true;
+
+    if (typeof contractLength !== "number" || contractLength === 0) return true;
     console.log("Comparing cliff with val", val);
 
     const invalidCliffAmount = val >= contractLength;
@@ -235,7 +325,7 @@ const formValidation = yup.object().shape({
 
     const contractLength = parent.length;
 
-    if (typeof contractLength !== "number") return true;
+    if (typeof contractLength !== "number" || contractLength === 0) return true;
     console.log("Comparing grace with val", val);
     const invalidGracePeriod = val >= contractLength * 168 * 4;
     if (invalidGracePeriod) {
@@ -255,6 +345,7 @@ const formValidation = yup.object().shape({
       if (val === undefined) {
         return false;
       }
+
       if (val < 1) {
         return createError({
           path,
