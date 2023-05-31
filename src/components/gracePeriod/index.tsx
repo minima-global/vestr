@@ -7,6 +7,27 @@ import { CSSTransition } from "react-transition-group";
 import Dialog from "../dialog";
 import { useLocation, useNavigate } from "react-router-dom";
 
+export const gracePeriods = [
+  {
+    None: 0,
+  },
+  {
+    Daily: 24,
+  },
+  {
+    Weekly: 168,
+  },
+  {
+    Monthly: 720,
+  },
+  {
+    Every_6_Months: 4320,
+  },
+  {
+    Yearly: 8640,
+  },
+];
+
 const GraceSelect = () => {
   const [current, setCurrent] = useState<null | string>(null);
   const [active, setActive] = useState(false);
@@ -20,27 +41,6 @@ const GraceSelect = () => {
     }
   }, [location]);
 
-  const gracePeriods = [
-    {
-      None: 0,
-    },
-    {
-      Daily: 24,
-    },
-    {
-      Weekly: 168,
-    },
-    {
-      Monthly: 720,
-    },
-    {
-      Every_6_Months: 4320,
-    },
-    {
-      Yearly: 8640,
-    },
-  ];
-
   const handleSelection = (grace: string, index: number) => {
     navigate("/dashboard/creator/create", {
       state: {
@@ -48,8 +48,6 @@ const GraceSelect = () => {
         grace: gracePeriods[index],
       },
     });
-
-    //  Object.values(gracePeriods[index])[0]
 
     setCurrent(grace);
     setActive(false);

@@ -24,7 +24,7 @@ const CliffSelect = () => {
     setCurrent(cliff === 1 ? cliff + " month" : cliff + " months");
     setActive(false);
     navigate("/dashboard/creator/create", {
-      state: { ...location.state, cliff: cliff },
+      state: { ...location.state, cliff },
     });
   };
 

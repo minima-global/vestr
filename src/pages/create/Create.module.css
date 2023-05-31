@@ -117,3 +117,31 @@
   background-color: #FFE792;
 }
 
+.formError {
+  background-color: #FFE2E9;
+  border-radius: 4px;
+  padding: 12px;
+
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 28px;
+  letter-spacing: 0.02em;
+  color: #08090B;
+}
+
+
+.backdropEnter {
+  opacity: 0;
+}
+.backdropEnterActive {
+  opacity: 1;
+  transition: opacity 200ms;
+}
+
+.backdropExit {
+  opacity: 1;
+}
+.backdropExitActive {
+  opacity: 0;
+  transition: opacity 200ms;
+}
