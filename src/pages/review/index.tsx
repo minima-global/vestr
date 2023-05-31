@@ -1,11 +1,31 @@
+import { useState } from "react";
 import { CSSTransition } from "react-transition-group";
 import styles from "./Review.module.css";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import * as RPC from "../../minima/libs/RPC";
 
 interface IProps {}
 export const Review = ({}: IProps) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [schedule, setSchedule] = useState<any>();
+  const scheduleCalculate = async () => {
+    const s = await RPC.calculateVestingSchedule(
+      location.state.contract.amount,
+      location.state.contract.length
+    );
+    console.log("sched", s);
+    setSchedule(s);
+  };
+
+  useEffect(() => {
+    if (location.state && !location.state.contract) {
+      navigate("/dashboard/creator/create");
+    }
+
+    scheduleCalculate();
+  }, [location.state]);
 
   return (
     <CSSTransition
@@ -21,7 +41,11 @@ export const Review = ({}: IProps) => {
     >
       <section className={styles["grid"]}>
         <section>
-          <button type="button" onClick={() => navigate(-1)}>
+          <button
+            className={styles["back-btn"]}
+            type="button"
+            onClick={() => navigate(-1)}
+          >
             <img alt="left-arrow" src="./assets/arrow_back.svg" /> Back
           </button>
           <section>
@@ -33,7 +57,7 @@ export const Review = ({}: IProps) => {
               </li>
               <li>
                 <h6>Contract length</h6>
-                <p>{location.state.contract.length}</p>
+                <p>{location.state.contract.length + " month(s)"}</p>
               </li>
               <li>
                 <h6>Collection address</h6>
@@ -57,17 +81,27 @@ export const Review = ({}: IProps) => {
               </li>
               <li>
                 <h6>Payment per block</h6>
-                <p>1234</p>
+                <p>
+                  {schedule && schedule.paymentPerBlock
+                    ? schedule.paymentPerBlock
+                    : "N/A"}
+                </p>
               </li>
               <li>
                 <h6>Payment per month</h6>
-                <p>1234</p>
+                <p>
+                  {schedule && schedule.paymentPerMonth
+                    ? schedule.paymentPerMonth
+                    : "N/A"}
+                </p>
               </li>
             </ul>
           </section>
-          <div>
+          <div className={styles["button-wrapper"]}>
             <button type="submit">Create</button>
-            <button type="button">Cancel</button>
+            <button type="button" onClick={() => navigate(-1)}>
+              Cancel
+            </button>
           </div>
         </section>
       </section>

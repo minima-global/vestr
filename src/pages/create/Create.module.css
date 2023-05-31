@@ -119,7 +119,6 @@
 .form button[type="button"]:disabled:hover {
   cursor: not-allowed;
   background-color: #D3D3D8;
-
 }
 
 .formError {
