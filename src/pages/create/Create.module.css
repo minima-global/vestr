@@ -24,6 +24,7 @@
   text-align: left;
   padding: 0;
   margin:0;
+  colro: #08090B;
 }
 .grid > section button:hover {
   color: #91919D;
