@@ -103,6 +103,10 @@
   font-size: 1rem;
   text-align: center;
 }
+.dialog div:last-of-type button:first-of-type:hover {
+  background-color: #464C4F;
+  cursor: pointer;
+}
 .dialog div:last-of-type button:first-of-type:disabled {
   background-color: #D3D3D8;
   cursor: not-allowed;
@@ -119,6 +123,11 @@
   max-width: fit-content;
   padding: 0;
   font-size: 1rem;
+}
+.dialog div:last-of-type button:last-of-type:hover {
+  cursor: pointer;
+  color: #91919D;
+  border-color: #91919D;
 }
 
 @media screen and (min-width: 700px) {

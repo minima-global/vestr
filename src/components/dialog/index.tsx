@@ -34,7 +34,7 @@ const Dialog = ({
                 </button>
                 {dismiss && (
                   <button type="button" onClick={cancelAction}>
-                    Cancel
+                    Go back
                   </button>
                 )}
               </div>

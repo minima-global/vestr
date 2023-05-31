@@ -25,6 +25,10 @@
   padding: 0;
   margin:0;
 }
+.grid > section button:hover {
+  color: #91919D;
+  cursor: pointer;
+}
 
 .changes {
   font-size: 1rem!important;
