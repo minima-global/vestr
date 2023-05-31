@@ -14,12 +14,22 @@ import { CSSTransition } from "react-transition-group";
 
 import * as RPC from "../../minima/libs/RPC";
 import * as yup from "yup";
+import Tooltip from "../../components/tooltip";
 const Create = () => {
   const { balance: wallet } = useWalletBalance();
   const { walletAddress } = useWalletAddress();
   const location = useLocation();
   const navigate = useNavigate();
   const [exit, setExit] = useState(false);
+
+  const [tooltips, setTooltips] = useState({
+    walletAddress: false,
+    contractID: false,
+    tokenAmount: false,
+    contractLength: false,
+    cliffPeriod: false,
+    gracePeriod: false,
+  });
 
   const reviewPath = matchPath(
     { path: "/dashboard/creator/create/review/:id" },
@@ -191,7 +201,45 @@ const Create = () => {
               </label>
               {location.state && location.state.addressPreference && (
                 <label htmlFor="address" className={styles["form-group"]}>
-                  Withdrawal address
+                  <span>
+                    Wallet address
+                    {!tooltips.walletAddress && (
+                      <img
+                        onClick={() =>
+                          setTooltips({ ...tooltips, walletAddress: true })
+                        }
+                        alt="question"
+                        src="./assets/help_filled.svg"
+                      />
+                    )}
+                    {!!tooltips.walletAddress && (
+                      <img
+                        onClick={() =>
+                          setTooltips({ ...tooltips, walletAddress: false })
+                        }
+                        alt="question"
+                        src="./assets/cancel_filled.svg"
+                      />
+                    )}
+                  </span>
+
+                  <CSSTransition
+                    in={tooltips.walletAddress}
+                    unmountOnExit
+                    timeout={200}
+                    classNames={{
+                      enter: styles.backdropEnter,
+                      enterDone: styles.backdropEnterActive,
+                      exit: styles.backdropExit,
+                      exitActive: styles.backdropExitActive,
+                    }}
+                  >
+                    <Tooltip
+                      content="The wallet address tokens will be sent to."
+                      position={126}
+                    />
+                  </CSSTransition>
+
                   <input
                     id="address"
                     name="address"
@@ -223,7 +271,43 @@ const Create = () => {
               )}
 
               <label htmlFor="name" className={styles["form-group"]}>
-                Contract ID
+                <span>
+                  Contract ID
+                  {!tooltips.contractID && (
+                    <img
+                      onClick={() =>
+                        setTooltips({ ...tooltips, contractID: true })
+                      }
+                      alt="question"
+                      src="./assets/help_filled.svg"
+                    />
+                  )}
+                  {!!tooltips.contractID && (
+                    <img
+                      onClick={() =>
+                        setTooltips({ ...tooltips, contractID: false })
+                      }
+                      alt="question"
+                      src="./assets/cancel_filled.svg"
+                    />
+                  )}
+                </span>
+                <CSSTransition
+                  in={tooltips.contractID}
+                  unmountOnExit
+                  timeout={200}
+                  classNames={{
+                    enter: styles.backdropEnter,
+                    enterDone: styles.backdropEnterActive,
+                    exit: styles.backdropExit,
+                    exitActive: styles.backdropExitActive,
+                  }}
+                >
+                  <Tooltip
+                    content="A name for your contract so you can easily identify it."
+                    position={98}
+                  />
+                </CSSTransition>
                 <input
                   placeholder="Contract name"
                   type="text"
@@ -251,7 +335,43 @@ const Create = () => {
               </label>
 
               <label htmlFor="amount" className={styles["form-group"]}>
-                Token amount
+                <span>
+                  Token amount
+                  {!tooltips.tokenAmount && (
+                    <img
+                      onClick={() =>
+                        setTooltips({ ...tooltips, tokenAmount: true })
+                      }
+                      alt="question"
+                      src="./assets/help_filled.svg"
+                    />
+                  )}
+                  {!!tooltips.tokenAmount && (
+                    <img
+                      onClick={() =>
+                        setTooltips({ ...tooltips, tokenAmount: false })
+                      }
+                      alt="question"
+                      src="./assets/cancel_filled.svg"
+                    />
+                  )}
+                </span>
+                <CSSTransition
+                  in={tooltips.tokenAmount}
+                  unmountOnExit
+                  timeout={200}
+                  classNames={{
+                    enter: styles.backdropEnter,
+                    enterDone: styles.backdropEnterActive,
+                    exit: styles.backdropExit,
+                    exitActive: styles.backdropExitActive,
+                  }}
+                >
+                  <Tooltip
+                    content="The total number of tokens to be vested."
+                    position={119}
+                  />
+                </CSSTransition>
                 <input
                   placeholder="Token amount"
                   type="number"
@@ -281,7 +401,44 @@ const Create = () => {
               </label>
 
               <label htmlFor="length" className={styles["form-group"]}>
-                Contract length
+                <span>
+                  Contract length
+                  {!tooltips.contractLength && (
+                    <img
+                      onClick={() =>
+                        setTooltips({ ...tooltips, contractLength: true })
+                      }
+                      alt="question"
+                      src="./assets/help_filled.svg"
+                    />
+                  )}
+                  {!!tooltips.contractLength && (
+                    <img
+                      onClick={() =>
+                        setTooltips({ ...tooltips, contractLength: false })
+                      }
+                      alt="question"
+                      src="./assets/cancel_filled.svg"
+                    />
+                  )}
+                </span>
+                <CSSTransition
+                  in={tooltips.contractLength}
+                  unmountOnExit
+                  timeout={200}
+                  classNames={{
+                    enter: styles.backdropEnter,
+                    enterDone: styles.backdropEnterActive,
+                    exit: styles.backdropExit,
+                    exitActive: styles.backdropExitActive,
+                  }}
+                >
+                  <Tooltip
+                    content="The number of months the contract lasts."
+                    position={136}
+                  />
+                </CSSTransition>
+
                 <input
                   placeholder="Contract length"
                   type="number"
@@ -311,7 +468,43 @@ const Create = () => {
               </label>
 
               <label htmlFor="Cliff period" className={styles["form-group"]}>
-                Cliff period
+                <span>
+                  Cliff period
+                  {!tooltips.cliffPeriod && (
+                    <img
+                      onClick={() =>
+                        setTooltips({ ...tooltips, cliffPeriod: true })
+                      }
+                      alt="question"
+                      src="./assets/help_filled.svg"
+                    />
+                  )}
+                  {!!tooltips.cliffPeriod && (
+                    <img
+                      onClick={() =>
+                        setTooltips({ ...tooltips, cliffPeriod: false })
+                      }
+                      alt="question"
+                      src="./assets/cancel_filled.svg"
+                    />
+                  )}
+                </span>
+                <CSSTransition
+                  in={tooltips.cliffPeriod}
+                  unmountOnExit
+                  timeout={200}
+                  classNames={{
+                    enter: styles.backdropEnter,
+                    enterDone: styles.backdropEnterActive,
+                    exit: styles.backdropExit,
+                    exitActive: styles.backdropExitActive,
+                  }}
+                >
+                  <Tooltip
+                    content="The number of months the contract lasts."
+                    position={96}
+                  />
+                </CSSTransition>
                 <CliffSelect />
                 <CSSTransition
                   in={
@@ -333,7 +526,43 @@ const Create = () => {
               </label>
 
               <label className={styles["form-group"]}>
-                Grace period
+                <span>
+                  Grace period
+                  {!tooltips.gracePeriod && (
+                    <img
+                      onClick={() =>
+                        setTooltips({ ...tooltips, gracePeriod: true })
+                      }
+                      alt="question"
+                      src="./assets/help_filled.svg"
+                    />
+                  )}
+                  {!!tooltips.gracePeriod && (
+                    <img
+                      onClick={() =>
+                        setTooltips({ ...tooltips, gracePeriod: false })
+                      }
+                      alt="question"
+                      src="./assets/cancel_filled.svg"
+                    />
+                  )}
+                </span>
+                <CSSTransition
+                  in={tooltips.gracePeriod}
+                  unmountOnExit
+                  timeout={200}
+                  classNames={{
+                    enter: styles.backdropEnter,
+                    enterDone: styles.backdropEnterActive,
+                    exit: styles.backdropExit,
+                    exitActive: styles.backdropExitActive,
+                  }}
+                >
+                  <Tooltip
+                    content="The amount of time between each collection. Please note, if you do not set a grace period, the recipient will be able to collect tokens after every block."
+                    position={110}
+                  />
+                </CSSTransition>
                 <GraceSelect />
                 <CSSTransition
                   in={formik.errors.grace ? true : false}

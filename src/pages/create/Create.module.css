@@ -43,7 +43,7 @@
 .form-group {
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: auto 48px;
+  grid-template-rows: auto;
   gap: 17px;
 
   font-size: 1rem;
@@ -63,6 +63,15 @@
   line-height: 19px;
   letter-spacing: 0.05em;
 
+}
+
+.form-group span {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.form-group span img {
+  z-index: 42;
 }
 
 .form-group input {

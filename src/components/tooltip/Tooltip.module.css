@@ -9,6 +9,7 @@
 
   font-size: 0.875rem;
   font-weight: 500;
+  height: max-content;
 }
 
 .tooltip-hook {
