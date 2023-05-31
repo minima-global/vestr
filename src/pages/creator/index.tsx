@@ -1,16 +1,48 @@
 import { useState } from "react";
 import styles from "./Creator.module.css";
-import { Outlet, useMatch, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, matchPath, useNavigate } from "react-router-dom";
+import { CSSTransition } from "react-transition-group";
 const Creator = () => {
   const navigate = useNavigate();
-  const isMatch = useMatch("/dashboard/creator/create");
+  const location = useLocation();
+  const reviewPath = matchPath(
+    { path: "/dashboard/creator/create/review/:id" },
+    location.pathname
+  );
+  const createPath = matchPath(
+    { path: "/dashboard/creator/create" },
+    location.pathname
+  );
+
   const [contracts, setContracts] = useState([]);
   const [filterText, setFilteredText] = useState("");
 
   return (
     <>
-      {!!isMatch && <Outlet />}
-      {!isMatch && (
+      <CSSTransition
+        in={Boolean(createPath) || Boolean(reviewPath)}
+        unmountOnExit
+        timeout={200}
+        classNames={{
+          enter: styles.backdropEnter,
+          enterDone: styles.backdropEnterActive,
+          exit: styles.backdropExit,
+          exitActive: styles.backdropExitActive,
+        }}
+      >
+        <Outlet />
+      </CSSTransition>
+      <CSSTransition
+        in={!Boolean(createPath) && !Boolean(reviewPath)}
+        unmountOnExit
+        timeout={200}
+        classNames={{
+          enter: styles.backdropEnter,
+          enterDone: styles.backdropEnterActive,
+          exit: styles.backdropExit,
+          exitActive: styles.backdropExitActive,
+        }}
+      >
         <section className={styles["grid"]}>
           <section>
             <button type="button">
@@ -54,7 +86,7 @@ const Creator = () => {
             </section>
           </section>
         </section>
-      )}
+      </CSSTransition>
     </>
   );
 };

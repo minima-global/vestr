@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, matchPath, useNavigate } from "react-router-dom";
 import styles from "./Create.module.css";
 import Dialog from "../../components/dialog";
 import WalletSelect from "../../components/walletSelect";
@@ -20,6 +20,16 @@ const Create = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [exit, setExit] = useState(false);
+
+  const reviewPath = matchPath(
+    { path: "/dashboard/creator/create/review/:id" },
+    location.pathname
+  );
+
+  const createPath = matchPath(
+    { path: "/dashboard/creator/create" },
+    location.pathname
+  );
   const handleCancel = () => {
     navigate("/dashboard/creator");
   };
@@ -65,6 +75,21 @@ const Create = () => {
       : "",
   ]);
 
+  const handleReviewClick = async () => {
+    const uniqueIdentityForContract = await RPC.hash(
+      encodeURIComponent(formik.values.name) + Math.random() * 1000000
+    );
+
+    navigate("review/" + uniqueIdentityForContract, {
+      state: {
+        contract: {
+          ...formik.values,
+          id: uniqueIdentityForContract,
+        },
+      },
+    });
+  };
+
   const formik = useFormik({
     initialValues: {
       token:
@@ -90,7 +115,30 @@ const Create = () => {
 
   return (
     <>
-      {exit && (
+      <CSSTransition
+        in={!Boolean(createPath) && Boolean(reviewPath)}
+        unmountOnExit
+        timeout={200}
+        classNames={{
+          enter: styles.backdropEnter,
+          enterDone: styles.backdropEnterActive,
+          exit: styles.backdropExit,
+          exitActive: styles.backdropExitActive,
+        }}
+      >
+        <Outlet />
+      </CSSTransition>
+      <CSSTransition
+        in={exit}
+        unmountOnExit
+        timeout={200}
+        classNames={{
+          enter: styles.backdropEnter,
+          enterDone: styles.backdropEnterActive,
+          exit: styles.backdropExit,
+          exitActive: styles.backdropExitActive,
+        }}
+      >
         <Dialog
           title="Exit this contract?"
           subtitle={
@@ -101,51 +149,121 @@ const Create = () => {
           primaryButtonAction={handleCancel}
           cancelAction={() => setExit(false)}
         />
-      )}
-      <section className={styles["grid"]}>
-        <section>
-          <button type="button" onClick={() => setExit(true)}>
-            Cancel
-          </button>
+      </CSSTransition>
+      <CSSTransition
+        in={Boolean(createPath) && !Boolean(reviewPath)}
+        unmountOnExit
+        timeout={200}
+        classNames={{
+          enter: styles.backdropEnter,
+          enterDone: styles.backdropEnterActive,
+          exit: styles.backdropExit,
+          exitActive: styles.backdropExitActive,
+        }}
+      >
+        <section className={styles["grid"]}>
+          <section>
+            <button type="button" onClick={() => setExit(true)}>
+              Cancel
+            </button>
 
-          <WalletSelect />
-          <CSSTransition
-            in={formik.errors.token && formik.touched.token ? true : false}
-            unmountOnExit
-            timeout={200}
-            classNames={{
-              enter: styles.backdropEnter,
-              enterDone: styles.backdropEnterActive,
-              exit: styles.backdropExit,
-              exitActive: styles.backdropExitActive,
-            }}
-          >
-            <div className={styles["formError"]}>{formik.errors.token}</div>
-          </CSSTransition>
-        </section>
+            <WalletSelect />
+            <CSSTransition
+              in={formik.errors.token && formik.touched.token ? true : false}
+              unmountOnExit
+              timeout={200}
+              classNames={{
+                enter: styles.backdropEnter,
+                enterDone: styles.backdropEnterActive,
+                exit: styles.backdropExit,
+                exitActive: styles.backdropExitActive,
+              }}
+            >
+              <div className={styles["formError"]}>{formik.errors.token}</div>
+            </CSSTransition>
+          </section>
 
-        <section>
-          <form onSubmit={formik.handleSubmit} className={styles["form"]}>
-            <label htmlFor="radio" className={styles["form-group-custom"]}>
-              Withdrawal address
-              <AddressSelect />
-            </label>
-            {location.state && location.state.addressPreference && (
-              <label htmlFor="address" className={styles["form-group"]}>
+          <section>
+            <form onSubmit={formik.handleSubmit} className={styles["form"]}>
+              <label htmlFor="radio" className={styles["form-group-custom"]}>
                 Withdrawal address
+                <AddressSelect />
+              </label>
+              {location.state && location.state.addressPreference && (
+                <label htmlFor="address" className={styles["form-group"]}>
+                  Withdrawal address
+                  <input
+                    id="address"
+                    name="address"
+                    placeholder="Wallet address"
+                    value={formik.values.address}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                  />
+                  <CSSTransition
+                    in={
+                      formik.errors.address && formik.touched.address
+                        ? true
+                        : false
+                    }
+                    unmountOnExit
+                    timeout={200}
+                    classNames={{
+                      enter: styles.backdropEnter,
+                      enterDone: styles.backdropEnterActive,
+                      exit: styles.backdropExit,
+                      exitActive: styles.backdropExitActive,
+                    }}
+                  >
+                    <div className={styles["formError"]}>
+                      {formik.errors.address}
+                    </div>
+                  </CSSTransition>
+                </label>
+              )}
+
+              <label htmlFor="name" className={styles["form-group"]}>
+                Contract ID
                 <input
-                  id="address"
-                  name="address"
-                  placeholder="Wallet address"
-                  value={formik.values.address}
+                  placeholder="Contract name"
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formik.values.name}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                />
+                <CSSTransition
+                  in={formik.errors.name && formik.touched.name ? true : false}
+                  unmountOnExit
+                  timeout={200}
+                  classNames={{
+                    enter: styles.backdropEnter,
+                    enterDone: styles.backdropEnterActive,
+                    exit: styles.backdropExit,
+                    exitActive: styles.backdropExitActive,
+                  }}
+                >
+                  <div className={styles["formError"]}>
+                    {formik.errors.name}
+                  </div>
+                </CSSTransition>
+              </label>
+
+              <label htmlFor="amount" className={styles["form-group"]}>
+                Token amount
+                <input
+                  placeholder="Token amount"
+                  type="number"
+                  id="amount"
+                  name="amount"
+                  value={formik.values.amount > 0 ? formik.values.amount : ""}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                 />
                 <CSSTransition
                   in={
-                    formik.errors.address && formik.touched.address
-                      ? true
-                      : false
+                    formik.errors.amount && formik.touched.amount ? true : false
                   }
                   unmountOnExit
                   timeout={200}
@@ -157,140 +275,94 @@ const Create = () => {
                   }}
                 >
                   <div className={styles["formError"]}>
-                    {formik.errors.address}
+                    {formik.errors.amount}
                   </div>
                 </CSSTransition>
               </label>
-            )}
 
-            <label htmlFor="name" className={styles["form-group"]}>
-              Contract ID
-              <input
-                placeholder="Contract name"
-                type="text"
-                id="name"
-                name="name"
-                value={formik.values.name}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-              />
-              <CSSTransition
-                in={formik.errors.name && formik.touched.name ? true : false}
-                unmountOnExit
-                timeout={200}
-                classNames={{
-                  enter: styles.backdropEnter,
-                  enterDone: styles.backdropEnterActive,
-                  exit: styles.backdropExit,
-                  exitActive: styles.backdropExitActive,
-                }}
+              <label htmlFor="length" className={styles["form-group"]}>
+                Contract length
+                <input
+                  placeholder="Contract length"
+                  type="number"
+                  id="length"
+                  name="length"
+                  value={formik.values.length > 0 ? formik.values.length : ""}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                />
+                <CSSTransition
+                  in={
+                    formik.errors.length && formik.touched.length ? true : false
+                  }
+                  unmountOnExit
+                  timeout={200}
+                  classNames={{
+                    enter: styles.backdropEnter,
+                    enterDone: styles.backdropEnterActive,
+                    exit: styles.backdropExit,
+                    exitActive: styles.backdropExitActive,
+                  }}
+                >
+                  <div className={styles["formError"]}>
+                    {formik.errors.length}
+                  </div>
+                </CSSTransition>
+              </label>
+
+              <label htmlFor="Cliff period" className={styles["form-group"]}>
+                Cliff period
+                <CliffSelect />
+                <CSSTransition
+                  in={
+                    formik.errors.cliff && formik.touched.cliff ? true : false
+                  }
+                  unmountOnExit
+                  timeout={200}
+                  classNames={{
+                    enter: styles.backdropEnter,
+                    enterDone: styles.backdropEnterActive,
+                    exit: styles.backdropExit,
+                    exitActive: styles.backdropExitActive,
+                  }}
+                >
+                  <div className={styles["formError"]}>
+                    {formik.errors.cliff}
+                  </div>
+                </CSSTransition>
+              </label>
+
+              <label className={styles["form-group"]}>
+                Grace period
+                <GraceSelect />
+                <CSSTransition
+                  in={formik.errors.grace ? true : false}
+                  unmountOnExit
+                  timeout={200}
+                  classNames={{
+                    enter: styles.backdropEnter,
+                    enterDone: styles.backdropEnterActive,
+                    exit: styles.backdropExit,
+                    exitActive: styles.backdropExitActive,
+                  }}
+                >
+                  <div className={styles["formError"]}>
+                    {formik.errors.grace}
+                  </div>
+                </CSSTransition>
+              </label>
+
+              <button
+                disabled={!formik.isValid}
+                type="button"
+                onClick={handleReviewClick}
               >
-                <div className={styles["formError"]}>{formik.errors.name}</div>
-              </CSSTransition>
-            </label>
-
-            <label htmlFor="amount" className={styles["form-group"]}>
-              Token amount
-              <input
-                placeholder="Token amount"
-                type="number"
-                id="amount"
-                name="amount"
-                value={formik.values.amount > 0 ? formik.values.amount : ""}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-              />
-              <CSSTransition
-                in={
-                  formik.errors.amount && formik.touched.amount ? true : false
-                }
-                unmountOnExit
-                timeout={200}
-                classNames={{
-                  enter: styles.backdropEnter,
-                  enterDone: styles.backdropEnterActive,
-                  exit: styles.backdropExit,
-                  exitActive: styles.backdropExitActive,
-                }}
-              >
-                <div className={styles["formError"]}>
-                  {formik.errors.amount}
-                </div>
-              </CSSTransition>
-            </label>
-
-            <label htmlFor="length" className={styles["form-group"]}>
-              Contract length
-              <input
-                placeholder="Contract length"
-                type="number"
-                id="length"
-                name="length"
-                value={formik.values.length > 0 ? formik.values.length : ""}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-              />
-              <CSSTransition
-                in={
-                  formik.errors.length && formik.touched.length ? true : false
-                }
-                unmountOnExit
-                timeout={200}
-                classNames={{
-                  enter: styles.backdropEnter,
-                  enterDone: styles.backdropEnterActive,
-                  exit: styles.backdropExit,
-                  exitActive: styles.backdropExitActive,
-                }}
-              >
-                <div className={styles["formError"]}>
-                  {formik.errors.length}
-                </div>
-              </CSSTransition>
-            </label>
-
-            <label htmlFor="Cliff period" className={styles["form-group"]}>
-              Cliff period
-              <CliffSelect />
-              <CSSTransition
-                in={formik.errors.cliff && formik.touched.cliff ? true : false}
-                unmountOnExit
-                timeout={200}
-                classNames={{
-                  enter: styles.backdropEnter,
-                  enterDone: styles.backdropEnterActive,
-                  exit: styles.backdropExit,
-                  exitActive: styles.backdropExitActive,
-                }}
-              >
-                <div className={styles["formError"]}>{formik.errors.cliff}</div>
-              </CSSTransition>
-            </label>
-
-            <label className={styles["form-group"]}>
-              Grace period
-              <GraceSelect />
-              <CSSTransition
-                in={formik.errors.grace ? true : false}
-                unmountOnExit
-                timeout={200}
-                classNames={{
-                  enter: styles.backdropEnter,
-                  enterDone: styles.backdropEnterActive,
-                  exit: styles.backdropExit,
-                  exitActive: styles.backdropExitActive,
-                }}
-              >
-                <div className={styles["formError"]}>{formik.errors.grace}</div>
-              </CSSTransition>
-            </label>
-
-            <button disabled={!formik.isValid} type="submit">
-              Review
-            </button>
-          </form>
+                Review
+              </button>
+            </form>
+          </section>
         </section>
-      </section>
+      </CSSTransition>
     </>
   );
 };

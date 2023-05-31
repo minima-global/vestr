@@ -177,28 +177,28 @@ const VestCreate = () => {
         if (!formInput.token) {
           throw new Error("No token selected!");
         }
-        await RPC.createVestingContract(
-          formInput.amount.toString(),
-          formInput.cliff,
-          formInput.address,
-          formInput.token,
-          formInput.contractLength,
-          formInput.minBlockWait,
-          formInput.id
-        )
-          .then((resp) => {
-            const contractPaymentPending = resp === 1;
-            const contractPaymentCompleted = resp === 0;
+        // await RPC.createVestingContract(
+        //   formInput.amount.toString(),
+        //   formInput.cliff,
+        //   formInput.address,
+        //   formInput.token,
+        //   formInput.contractLength,
+        //   formInput.minBlockWait,
+        //   formInput.id
+        // )
+        //   .then((resp) => {
+        //     const contractPaymentPending = resp === 1;
+        //     const contractPaymentCompleted = resp === 0;
 
-            if (contractPaymentPending) setContractCreationStatus("pending");
-            if (contractPaymentCompleted) setContractCreationStatus("complete");
+        //     if (contractPaymentPending) setContractCreationStatus("pending");
+        //     if (contractPaymentCompleted) setContractCreationStatus("complete");
 
-            formik.resetForm();
-          })
-          .catch((err) => {
-            setContractCreationStatus("failed");
-            formik.setStatus("Contract creation failed, " + err);
-          });
+        //     formik.resetForm();
+        //   })
+        //   .catch((err) => {
+        //     setContractCreationStatus("failed");
+        //     formik.setStatus("Contract creation failed, " + err);
+        //   });
       } catch (error: any) {
         const formError =
           error && error.message

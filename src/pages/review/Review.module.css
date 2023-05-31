@@ -1,0 +1,87 @@
+.grid {
+  display: grid;
+
+  grid-template-rows: 1fr;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+
+.grid > section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.grid > section button {
+  border: none;
+  background: none;
+  text-align: left;
+
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.05em;
+  text-align: left;
+  padding: 0;
+  margin:0;
+  color: #08090B;
+
+  align-items: center;
+  display: flex;
+}
+.grid > section button:hover {
+  color: #91919D;
+  cursor: pointer;
+}
+.grid > section button:hover svg {
+  fill: #91919D;
+}
+
+.grid > section > section h6 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 36px;
+  letter-spacing: 0.02em;
+  color: #08090B;
+  margin: 0; padding:0;
+}
+
+.grid > section > section {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.grid > section > section ul {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(8, 74px);
+  gap: 8px;
+}
+.grid > section > section li {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto;
+  gap: 4px;
+  padding: 16px;
+
+  background: #FFFFFF;
+  border-radius: 4px;
+}
+.grid > section > section li h6, .grid > section > section li p {
+  padding: 0;
+  margin: 0;
+}
+.grid > section > section li h6 {
+  color: #08090B;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 19px;
+  letter-spacing: 0.02em;
+}
+.grid > section > section li p {
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 19px;
+  letter-spacing: 0.02em;
+}

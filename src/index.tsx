@@ -16,16 +16,14 @@ import {
   Navigate,
   RouterProvider,
 } from "react-router-dom";
-import Home from "./components/Home";
-import Calculate from "./components/Calculate";
-import Details from "./components/Details";
+
 import Dashboard from "./pages/dashboard";
 import NotFound from "./components/NotFound";
-import Track from "./components/Track";
 import SplashPage from "./pages/splash";
 import Info from "./pages/info";
 import Creator from "./pages/creator";
 import Create from "./pages/create";
+import Review from "./pages/review";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -38,12 +36,11 @@ export const router = createHashRouter(
       <Route path="/dashboard" element={<Dashboard />}>
         <Route path="about" element={<Info />} />
         <Route path="creator" element={<Creator />}>
-          <Route path="create" element={<Create />} />
+          <Route path="create" element={<Create />}>
+            <Route path="review/:id" element={<Review />} />
+          </Route>
         </Route>
-        <Route path="createnew/:id" element={<Create />} />
-        <Route path="track" element={<Track />}>
-          <Route path=":id" element={<Details />} />
-        </Route>
+
         <Route path="*" element={<NotFound />} />
       </Route>
       <Route path="*" element={<Navigate replace to="dashboard" />} />

@@ -24,7 +24,7 @@
   text-align: left;
   padding: 0;
   margin:0;
-  colro: #08090B;
+  color: #08090B;
 }
 .grid > section button:hover {
   color: #91919D;
@@ -95,7 +95,7 @@
   gap: 24px;
 }
 
-.form button[type="submit"] {
+.form button[type="button"] {
   background-color: #FFCD1E;
   font-size: 1rem;
   font-weight: 600;
@@ -107,16 +107,16 @@
   text-align: center;
   margin-top: calc(32px - 24px);
 }
-.form button[type="submit"]:disabled {
+.form button[type="button"]:disabled {
   cursor: not-allowed;
   background-color: #D3D3D8;
   color: #FFFFFF;
 }
-.form button[type="submit"]:hover {
+.form button[type="button"]:hover {
   cursor: pointer;
   background-color: #FFE792;
 }
-.form button[type="submit"]:disabled:hover {
+.form button[type="button"]:disabled:hover {
   cursor: not-allowed;
   background-color: #D3D3D8;
 
