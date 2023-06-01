@@ -20,6 +20,10 @@ const Creator = () => {
     { path: "/dashboard/creator/contract/:id" },
     location.pathname
   );
+  const calculatePath = matchPath(
+    { path: "/dashboard/creator/calculate" },
+    location.pathname
+  );
 
   const [filterText, setFilteredText] = useState("");
 
@@ -29,7 +33,8 @@ const Creator = () => {
         in={
           Boolean(createPath) ||
           Boolean(reviewPath) ||
-          Boolean(contractDetailPath)
+          Boolean(contractDetailPath) ||
+          Boolean(calculatePath)
         }
         unmountOnExit
         timeout={200}
@@ -46,7 +51,8 @@ const Creator = () => {
         in={
           !Boolean(createPath) &&
           !Boolean(reviewPath) &&
-          !Boolean(contractDetailPath)
+          !Boolean(contractDetailPath) &&
+          !Boolean(calculatePath)
         }
         unmountOnExit
         timeout={200}
@@ -59,7 +65,7 @@ const Creator = () => {
       >
         <section className={styles["grid"]}>
           <section>
-            <button type="button">
+            <button onClick={() => navigate("calculate")} type="button">
               <img alt="calculate-icon" src="./assets/calculate.svg" />
               Calculate a contract
             </button>
