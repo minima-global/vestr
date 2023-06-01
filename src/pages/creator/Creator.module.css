@@ -6,7 +6,7 @@
   gap: 24px;
 }
 .grid > section:first-of-type {
-  display: grid;
+  display: flex;
   flex-direction: column;
   gap: 16px;
 }

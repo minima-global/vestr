@@ -25,6 +25,7 @@ import Creator from "./pages/creator";
 import Create from "./pages/create";
 import Review from "./pages/review";
 import ContractDetails from "./pages/contractDetails";
+import Collector from "./pages/collector";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -36,6 +37,9 @@ export const router = createHashRouter(
       <Route index element={<SplashPage />} />
       <Route path="/dashboard" element={<Dashboard />}>
         <Route path="about" element={<Info />} />
+        <Route path="collector" element={<Collector />}>
+          <Route path="contract/:id" element={<ContractDetails />} />
+        </Route>
         <Route path="creator" element={<Creator />}>
           <Route path="create" element={<Create />}>
             <Route path="review/:id" element={<Review />} />

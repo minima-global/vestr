@@ -52,7 +52,7 @@ const Dashboard = () => {
                 <p>Creator</p>
               </NavLink>
               <NavLink
-                to="calculate"
+                to="collector"
                 className={({ isActive }) => (isActive ? styles.isActive : "")}
               >
                 <svg
