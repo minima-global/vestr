@@ -23,7 +23,7 @@ const Create = () => {
   const navigate = useNavigate();
   const [exit, setExit] = useState(false);
   const [review, setReview] = useState(false);
-
+  console.log(wallet);
   const [tooltips, setTooltips] = useState({
     walletAddress: false,
     contractID: false,
@@ -66,30 +66,26 @@ const Create = () => {
 
   useEffect(() => {
     if (location.state && location.state.cliff) {
-      console.log("Setting field Value For Cliff");
-      formik.setFieldValue("cliff", location.state.cliff);
+      formik.setFieldValue("cliff", location.state.cliff, true);
     }
   }, [location.state && location.state.cliff ? location.state.cliff : ""]);
 
   useEffect(() => {
-    if (location.state && location.state.tokenid) {
-      formik.setFieldValue(
-        "token",
-        location.state && location.state.tokenid
-          ? wallet.find((t) => t.tokenid === location.state.tokenid)
-          : wallet[0]
-      );
-    }
-  }, [
-    location.state && location.state.tokenid ? location.state.tokenid : "",
-    wallet,
-  ]);
+    formik.setFieldValue(
+      "token",
+      location.state && location.state.tokenid
+        ? wallet.find((t) => t.tokenid === location.state.tokenid)
+        : wallet[0],
+      true
+    );
+  }, [wallet]);
 
   useEffect(() => {
     if (location.state && location.state.grace) {
       formik.setFieldValue(
         "grace",
-        gracePeriods[location.state.grace.replaceAll(" ", "_")]
+        gracePeriods[location.state.grace.replaceAll(" ", "_")],
+        true
       );
     }
   }, [location.state && location.state.grace ? location.state.grace : ""]);
@@ -98,7 +94,7 @@ const Create = () => {
     if (location.state && location.state.addressPreference) {
       const own = location.state.addressPreference === "0";
       if (own) {
-        formik.setFieldValue("address", walletAddress);
+        formik.setFieldValue("address", walletAddress, true);
       }
     }
   }, [
@@ -109,10 +105,7 @@ const Create = () => {
 
   const formik = useFormik({
     initialValues: {
-      token:
-        location.state && location.state.tokenid
-          ? wallet.find((t) => t.tokenid === location.state.tokenid)
-          : wallet[0],
+      token: wallet[0],
       cliff: 0,
       grace: 0,
       amount: 0,
@@ -154,6 +147,9 @@ const Create = () => {
     },
     validationSchema: formValidation,
   });
+
+  console.log("formik errors", formik.errors);
+  console.log("token ", formik.values.token);
 
   return (
     <>
@@ -256,7 +252,7 @@ const Create = () => {
 
             <WalletSelect />
             <CSSTransition
-              in={formik.errors.token && formik.touched.token ? true : false}
+              in={Boolean(formik.errors.token) && Boolean(formik.touched.token)}
               unmountOnExit
               timeout={200}
               classNames={{
@@ -266,7 +262,9 @@ const Create = () => {
                 exitActive: styles.backdropExitActive,
               }}
             >
-              <div className={styles["formError"]}>{formik.errors.token}</div>
+              <div className={styles["formError"]}>
+                {formik.errors.token as string}
+              </div>
             </CSSTransition>
           </section>
 
@@ -323,7 +321,6 @@ const Create = () => {
                     placeholder="Wallet address"
                     value={formik.values.address}
                     onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
                   />
                   <CSSTransition
                     in={
@@ -392,7 +389,6 @@ const Create = () => {
                   name="name"
                   value={formik.values.name}
                   onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
                 />
                 <CSSTransition
                   in={formik.errors.name && formik.touched.name ? true : false}
@@ -456,7 +452,6 @@ const Create = () => {
                   name="amount"
                   value={formik.values.amount > 0 ? formik.values.amount : ""}
                   onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
                 />
                 <CSSTransition
                   in={
@@ -659,7 +654,7 @@ const Create = () => {
               </label>
 
               <button
-                disabled={!formik.isValid || review}
+                disabled={!(formik.isValid && formik.dirty)}
                 type="button"
                 onClick={handleReviewClick}
               >
@@ -678,17 +673,16 @@ export default Create;
 const formValidation = yup.object().shape({
   token: yup.object().required("Field is required"),
   amount: yup.number().required("Field is required"),
-  cliff: yup.number().test("cliff", "Invalid cliff period", function (val) {
+  cliff: yup.number().test("cliff", function (val) {
     const { path, createError, parent } = this;
     if (val === undefined) return true;
-    console.log(parent);
+
     const contractLength = parent.length;
 
-    if (typeof contractLength !== "number" || contractLength === 0) return true;
-    console.log("Comparing cliff with val", val);
+    // if (typeof contractLength !== "number" || contractLength === 0) return true;
 
     const invalidCliffAmount = val >= contractLength;
-    if (invalidCliffAmount) {
+    if (invalidCliffAmount && Number(contractLength)) {
       return createError({
         path,
         message: "Cliff period must be less than the contract length",
@@ -697,16 +691,14 @@ const formValidation = yup.object().shape({
 
     return true;
   }),
-  grace: yup.number().test("grace", "Invalid grace period", function (val) {
+  grace: yup.number().test("grace", function (val) {
     const { path, createError, parent } = this;
     if (val === undefined) return true;
 
     const contractLength = parent.length;
 
-    if (typeof contractLength !== "number" || contractLength === 0) return true;
-    console.log("Comparing grace with val", val);
     const invalidGracePeriod = val >= contractLength * 168 * 4;
-    if (invalidGracePeriod) {
+    if (invalidGracePeriod && Number(contractLength)) {
       return createError({
         path,
         message: "Grace period must be less than the contract length",
@@ -718,19 +710,15 @@ const formValidation = yup.object().shape({
   length: yup
     .number()
     .required("Field is required")
-    .test("check-month", "Invalid month", function (val) {
-      const { path, createError, parent } = this;
+    .test("contract-length", function (val) {
+      const { path, createError } = this;
+
       if (val === undefined) {
-        return false;
+        return createError({ path, message: "Please select a month" });
       }
-
       if (val < 1) {
-        return createError({
-          path,
-          message: "Please select a valid amount of month(s)",
-        });
+        return createError({ path, message: "Please select a valid month" });
       }
-
       return true;
     }),
   name: yup
