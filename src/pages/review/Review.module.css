@@ -148,3 +148,15 @@
   color: #91919D;
   border-color: #91919D;
 }
+
+.formError {
+  background-color: #FFE2E9;
+  border-radius: 4px;
+  padding: 12px;
+
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 28px;
+  letter-spacing: 0.02em;
+  color: #08090B;
+}

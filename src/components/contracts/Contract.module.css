@@ -1,0 +1,80 @@
+.contracts {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto;
+  gap: 8px;
+  overflow-x: hidden;
+
+}
+.contracts li {
+  padding: 12px;
+  background-color: #FFFFFF;
+  border-radius: 4px;
+
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-rows: auto;
+  gap: 16px;
+
+}
+.contracts li > img {
+  width: 64px;
+  height: 64px;
+}
+.contracts li > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+
+  overflow: hidden;
+}
+.contracts li > div * {
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.contracts li > div h6 {
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 19.2px;
+  letter-spacing: 0.02em;
+  color: #08090B;
+}
+.contracts li > div p {
+  font-style: normal;
+  font-weight: 500;
+  font-size: 1rem;
+  line-height: 19px;
+  letter-spacing: 0.02em;
+  
+  color: #91919D;
+}
+.contracts li > button {
+  background-color: #FFCD1E;
+  border-radius: 4px;
+  border: none;
+  padding: 8px 12px;
+  
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 19px;
+  letter-spacing: 0.02em;
+  margin: auto;
+}
+.contracts li > button:hover {
+  background-color: #FFE792;
+  cursor: pointer;
+}
+
+.no-contracts {
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 28px;
+  letter-spacing: 0.02em;
+  text-align: center;
+  color: #A7A7B0;
+  padding: 0;
+  margin: 0;
+}

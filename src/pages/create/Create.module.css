@@ -158,3 +158,65 @@
   opacity: 0;
   transition: opacity 200ms;
 }
+
+.transaction-status {
+  position: absolute;
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
+  z-index: 44;
+  background-color: #FFCD1E;
+
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto;
+  padding: 24px;
+  padding-bottom: 48px;
+}
+
+.transaction-status > img {
+  justify-self: flex-end;
+}
+.transaction-status > img:hover {
+  cursor: pointer;
+  opacity: 0.8;
+}
+.transaction-status div {
+  align-self: center;
+  justify-self: center;
+  text-align: center;
+}
+.transaction-status div h6 {
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+}
+.transaction-status div p {
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+}
+.transaction-status button {
+  align-self: flex-end;
+  /* justify-self: center; */
+
+  background-color: #08090B;
+  border: none;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+  padding: 16px 44px;
+  border-radius: 4px;
+}
+.transaction-status button:hover {
+  background-color: #464C4F;
+  cursor: pointer;
+}
+
+
+

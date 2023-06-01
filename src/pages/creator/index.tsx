@@ -2,9 +2,12 @@ import { useState } from "react";
 import styles from "./Creator.module.css";
 import { Outlet, useLocation, matchPath, useNavigate } from "react-router-dom";
 import { CSSTransition } from "react-transition-group";
+import useVestingContracts from "../../hooks/useVestingContract";
+import Contracts from "../../components/contracts";
 const Creator = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const contracts = useVestingContracts();
   const reviewPath = matchPath(
     { path: "/dashboard/creator/create/review/:id" },
     location.pathname
@@ -14,7 +17,6 @@ const Creator = () => {
     location.pathname
   );
 
-  const [contracts, setContracts] = useState([]);
   const [filterText, setFilteredText] = useState("");
 
   return (
@@ -57,10 +59,14 @@ const Creator = () => {
           <section>
             <section>
               <h6>My contracts</h6>
-              <input type="search" placeholder="Search contract" />
+              <input
+                type="search"
+                placeholder="Search contract"
+                onChange={(e: any) => setFilteredText(e.target.value)}
+              />
             </section>
             <section>
-              {!contracts.length && !filterText.length && (
+              {!contracts.size && !filterText.length && (
                 <div>
                   <p className={styles["no-contracts"]}>
                     You currently have no vesting contracts
@@ -68,20 +74,11 @@ const Creator = () => {
                 </div>
               )}
 
-              {!!contracts.length && !filterText.length && (
-                <ul>
-                  {contracts.map((c) => (
-                    <li></li>
-                  ))}
-                </ul>
-              )}
-
-              {!!contracts.length && filterText.length && (
-                <ul>
-                  {contracts.map((c) => (
-                    <li></li>
-                  ))}
-                </ul>
+              {!!contracts.size && (
+                <Contracts
+                  filterText={filterText}
+                  coins={Array.from(contracts.values())}
+                />
               )}
             </section>
           </section>

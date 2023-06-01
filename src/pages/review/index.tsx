@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { CSSTransition } from "react-transition-group";
 import styles from "./Review.module.css";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useOutletContext } from "react-router-dom";
 import { useEffect } from "react";
 import * as RPC from "../../minima/libs/RPC";
 
@@ -10,12 +10,14 @@ export const Review = ({}: IProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [schedule, setSchedule] = useState<any>();
+  const { submitForm, formStatus }: any = useOutletContext();
+
   const scheduleCalculate = async () => {
     const s = await RPC.calculateVestingSchedule(
       location.state.contract.amount,
       location.state.contract.length
     );
-    console.log("sched", s);
+
     setSchedule(s);
   };
 
@@ -97,8 +99,13 @@ export const Review = ({}: IProps) => {
               </li>
             </ul>
           </section>
+          {!!formStatus && typeof formStatus === "string" && (
+            <div className={styles["formError"]}>{formStatus}</div>
+          )}
           <div className={styles["button-wrapper"]}>
-            <button type="submit">Create</button>
+            <button type="button" onClick={() => submitForm()}>
+              Create
+            </button>
             <button type="button" onClick={() => navigate(-1)}>
               Cancel
             </button>

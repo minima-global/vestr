@@ -49,6 +49,7 @@ const Create = () => {
     const uniqueIdentityForContract = await RPC.hash(
       encodeURIComponent(formik.values.name) + Math.random() * 1000000
     );
+    formik.setFieldValue("uid", uniqueIdentityForContract);
 
     setReview(false);
 
@@ -70,12 +71,14 @@ const Create = () => {
   }, [location.state && location.state.cliff ? location.state.cliff : ""]);
 
   useEffect(() => {
-    formik.setFieldValue(
-      "token",
-      location.state && location.state.tokenid
-        ? wallet.find((t) => t.tokenid === location.state.tokenid)
-        : wallet[0]
-    );
+    if (location.state && location.state.tokenid) {
+      formik.setFieldValue(
+        "token",
+        location.state && location.state.tokenid
+          ? wallet.find((t) => t.tokenid === location.state.tokenid)
+          : wallet[0]
+      );
+    }
   }, [
     location.state && location.state.tokenid ? location.state.tokenid : "",
     wallet,
@@ -115,19 +118,84 @@ const Create = () => {
       length: 0,
       name: "",
       address: "",
+      uid: "",
     },
     onSubmit: async (form) => {
-      console.log("token", form);
-
+      if (!form.token) throw new Error("You must select a token first");
       try {
-        // await RPC.createVestingContract();
-      } catch (error) {}
+        const transactionStatus: 0 | 1 = await RPC.createVestingContract(
+          form.amount.toString(),
+          form.cliff,
+          form.address,
+          form.token,
+          form.length,
+          form.grace,
+          form.name,
+          form.uid
+        ).catch((err) => {
+          throw new Error(err);
+        });
+
+        formik.setStatus(transactionStatus);
+      } catch (error: any) {
+        console.log("Error transaction creation", error.message);
+
+        const noCoinsAvailable = error.message.includes("No Coins of tokenid");
+        const insufficientFunds = error.message.includes("Insufficient funds");
+        formik.setStatus(
+          noCoinsAvailable
+            ? "Not enough coins available."
+            : insufficientFunds
+            ? "Insufficient funds, you require more tokens."
+            : error.message
+        );
+      }
     },
     validationSchema: formValidation,
   });
 
   return (
     <>
+      <CSSTransition
+        in={
+          typeof formik.status !== "undefined" &&
+          (formik.status === 0 || formik.status === 1)
+        }
+        timeout={200}
+        unmountOnExit
+        classNames={{
+          enter: styles.backdropEnter,
+          enterDone: styles.backdropEnterActive,
+          exit: styles.backdropExit,
+          exitActive: styles.backdropExitActive,
+        }}
+      >
+        <div className={styles["transaction-status"]}>
+          <div>
+            <h6>Confirm</h6>
+            {formik.status === 1 && (
+              <p>
+                To complete the transaction, go to the Minima app <br /> Home
+                screen, press <img alt="pending" src="./assets/pace.svg" /> ,
+                then <br /> long press the Vestr command and <br /> select
+                'Accept'.
+              </p>
+            )}
+            {formik.status === 0 && (
+              <p>Transaction was completed and should arrive shortly.</p>
+            )}
+          </div>
+          <button
+            onClick={() => {
+              navigate("/dashboard/creator/create");
+              formik.resetForm();
+            }}
+            type="button"
+          >
+            Continue
+          </button>
+        </div>
+      </CSSTransition>
       <CSSTransition
         in={!Boolean(createPath) && Boolean(reviewPath)}
         unmountOnExit
@@ -139,7 +207,12 @@ const Create = () => {
           exitActive: styles.backdropExitActive,
         }}
       >
-        <Outlet />
+        <Outlet
+          context={{
+            submitForm: formik.handleSubmit,
+            formStatus: formik.status,
+          }}
+        />
       </CSSTransition>
       <CSSTransition
         in={exit}
