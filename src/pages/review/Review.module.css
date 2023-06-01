@@ -1,0 +1,179 @@
+.grid {
+  display: grid;
+
+  grid-template-rows: 1fr;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+
+.grid > section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow: hidden;
+}
+
+.back-btn {
+  border: none;
+  background: none;
+  text-align: left;
+
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.05em;
+  text-align: left;
+  padding: 0;
+  margin:0;
+  color: #08090B;
+
+  align-items: center;
+  display: flex;
+}
+.grid > section button:hover {
+  color: #91919D;
+  cursor: pointer;
+}
+.grid > section button:hover svg path {
+  fill: #91919D;
+}
+
+.grid > section > section h6 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 36px;
+  letter-spacing: 0.02em;
+  color: #08090B;
+  margin: 0; padding:0;
+  text-overflow: ellipsis;
+}
+
+.grid > section > section {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.grid > section > section ul {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(9, max-content);
+  gap: 8px;
+}
+.grid > section > section li {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto;
+  gap: 4px;
+  padding: 16px;
+
+  background: #FFFFFF;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.grid > section > section li h6, .grid > section > section li p {
+  padding: 0;
+  margin: 0;
+}
+.grid > section > section li h6 {
+  color: #08090B;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 19px;
+  letter-spacing: 0.02em;
+  text-overflow: ellipsis;
+  overflow: hidden;
+
+}
+.grid > section > section li p {
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 19px;
+  letter-spacing: 0.02em;
+  white-space: pre-wrap;
+  word-break: break-all;
+
+}
+.button-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.button-wrapper button:first-of-type {
+  border: none;
+
+  background-color: #FFCD1E;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 19px;
+  letter-spacing: 0.05em;
+  color: #08090B;
+  border-radius: 4px;
+  padding: 16px;
+  text-align: center;
+  margin-top: calc(32px - 24px);
+}
+.button-wrapper button:first-of-type:disabled {
+  cursor: not-allowed;
+  background-color: #D3D3D8;
+  color: #FFFFFF;
+}
+.button-wrapper button:first-of-type:hover {
+  cursor: pointer;
+  background-color: #FFE792;
+}
+.button-wrapper button:first-of-type:disabled:hover {
+  cursor: not-allowed;
+  background-color: #D3D3D8;
+}
+
+.button-wrapper button:last-of-type {
+  align-self: center;
+  background-color: transparent;
+  text-align: center;
+  border: none;
+  border-bottom: 1px solid #17191C;
+  padding-bottom: 4px;
+  color: #17191C;
+  letter-spacing: 0.05em;
+  line-height: 1.5;
+  font-weight: 600;
+  max-width: fit-content;
+  padding: 0;
+  font-size: 1rem;
+}
+.button-wrapper button:last-of-type:hover {
+  cursor: pointer;
+  color: #91919D;
+  border-color: #91919D;
+}
+
+.formError {
+  background-color: #FFE2E9;
+  border-radius: 4px;
+  padding: 12px;
+
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 28px;
+  letter-spacing: 0.02em;
+  color: #08090B;
+}
+
+
+.backdropEnter {
+  opacity: 0;
+}
+.backdropEnterActive {
+  opacity: 1;
+  transition: opacity 200ms;
+}
+
+.backdropExit {
+  opacity: 1;
+}
+.backdropExitActive {
+  opacity: 0;
+  transition: opacity 200ms;
+}

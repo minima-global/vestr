@@ -1,0 +1,147 @@
+.grid {
+  height: 100vh;
+  display: grid;
+
+  grid-template-columns: 1fr;
+  grid-template-rows: 56px 1fr 85px;
+  grid-template-areas: 
+            'header'
+            'main'
+            'footer';
+
+}
+
+
+.grid main > section {
+  grid-area: 1 / 2 / 1 / 3;
+  
+  padding: 0 16px;
+  padding-top: 24px;
+  padding-bottom: 24px;
+  background-color: #F4F4F5;
+}
+
+.grid main > section.full {
+  grid-area: 1 / 1 / 1 / 4
+}
+
+.grid > main {
+  grid-area: main;
+  background-color: #E9E9EB;
+
+  overflow-x: hidden;
+  overflow-y: overlay;
+  display: grid;
+  grid-template-rows: 1fr;
+  grid-template-columns: 1fr minmax(0, 560px) 1fr;
+}
+
+.grid > header {
+  grid-area: header;
+  background-color: #FFCD1E;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+}
+.grid > header div:first-of-type {
+  display: flex;
+  gap: 8px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+}
+.grid > header div:first-of-type img {
+  width: 34px;
+  height: 34px;  
+}
+.grid > header div:first-of-type h6 {
+  font-size:  0.937rem;
+  letter-spacing: 0.05em;
+  line-height: 1.5;
+  color: #08090B;
+}
+
+.grid > footer {
+  grid-area: footer;
+  background-color: #08090B;
+  
+  display: grid;
+  grid-template-rows: 1fr;
+  grid-template-columns: 1fr minmax(0, 560px) 1fr;
+}
+.grid footer > section {
+  grid-area: 1 / 2 / 1 / 3;
+}
+.grid footer > section > nav {
+  display: grid;
+  grid-template-rows: 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
+  height: 100%;
+}
+.grid > footer > section > nav a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 4px;
+  text-decoration: none;
+}
+.grid > footer > section > nav a:hover p, .grid > footer > section > nav a:hover svg path  {
+  fill: #FFCD1E; 
+  color: #FFCD1E;
+  cursor: pointer; 
+}
+.grid > footer > section > nav a p {
+  color: #E9E9EB;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  line-height: 1.5;
+  font-size: 0.875rem;
+  padding: 0;
+  margin: 0;
+}
+
+.grid > footer > section > nav a svg {
+  width: 32px;
+  height: 32px;
+}
+
+.isActive p {
+  color: #FFCD1E!important;
+}
+.isActive svg path {
+  fill: #FFCD1E;
+}
+
+@media screen and (min-width: 560px) {
+  
+  
+  .grid {  
+    grid-template-rows: 56px 48px 1fr;
+    
+    grid-template-areas: 
+              'header'
+              'subheader'
+              'main';
+  }
+
+  .grid > footer > section nav a {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    gap: 4px;
+    text-decoration: none;
+  }
+
+  .grid > footer > section > nav a svg {
+    width: 24px;
+    height: 24px;
+  }
+  
+
+  .grid > footer {
+    grid-area: subheader;
+  }
+  
+}

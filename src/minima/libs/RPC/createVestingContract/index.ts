@@ -19,12 +19,11 @@ export const createVestingContract = async (
   cliff: number,
   address: string,
   token: MinimaToken,
-  root: string,
   contractLength: number,
   minBlockWait: number,
   id: string,
-  lumpSumAmount?: string
-) => {
+  uid: string
+): Promise<0 | 1> => {
   try {
     const calculateDate = addMonths(new Date(), contractLength);
     // console.log(calculateDate);
@@ -32,12 +31,9 @@ export const createVestingContract = async (
     const endContractBlockHeight = await RPC.calculateBlockHeightFromDate(
       calculateDate
     );
+    // console.log("EndContractBlockHeight", endContractBlockHeight);
     // get currentBlockHeight
     const currentBlockHeight = await RPC.getCurrentBlockHeight();
-    // unique identifier for contract
-    const uniqueIdentityForContract = await RPC.hash(
-      encodeURIComponent(id) + Math.random() * 1000000
-    );
 
     /**
      * Calculate the Cliff period, when can the user start collecting this contract
@@ -46,10 +42,19 @@ export const createVestingContract = async (
     const now = new Decimal(new Date().getTime()).dividedBy(1000); // time now in seconds
     const difference = new Decimal(then.getTime()).dividedBy(1000).minus(now);
     const estimateCliffPeriod = difference.dividedBy(50);
+    // console.log(
+    //   "Eestiamted cliff period in blocks",
+    //   estimateCliffPeriod.toNumber()
+    // );
     const startingBlockHeightOfContract = new Decimal(currentBlockHeight)
       .plus(estimateCliffPeriod)
       .round()
       .toNumber();
+
+    const finalEndContractBlockHeight = new Decimal(endContractBlockHeight)
+      .plus(estimateCliffPeriod)
+      .toNumber();
+    // console.log("Final Block Height + cliff", finalEndContractBlockHeight);
 
     /**
      * Calculate the minimum block wait the user must wait before he collects again
@@ -64,17 +69,16 @@ export const createVestingContract = async (
           vestingContract.scriptaddress
         } tokenid:${
           token.tokenid
-        } state:{"0":"${address}","1":"${amount}","2":"${startingBlockHeightOfContract}", "3":"${endContractBlockHeight}","4":"${minimumTimeUserMustWaitToCollectAgain}","5":"${new Date().getTime()}", "199":"${uniqueIdentityForContract}"}`,
+        } state:{"0":"${address}","1":"${amount}","2":"${startingBlockHeightOfContract}", "3":"${endContractBlockHeight}","4":"${minimumTimeUserMustWaitToCollectAgain}","5":"${new Date().getTime()}","6":"${cliff}","7":"${minBlockWait}", "199":"${uid}"}`,
         (res) => {
+          // console.log(res);
           if (!res.status && !res.pending)
-            reject(res.error ? res.error : "RPC Failed");
-          if (!res.status && !res.pending)
-            resolve(
+            reject(
               res.error ? res.error : res.message ? res.message : "RPC Failed"
             );
+
           if (!res.status && res.pending) resolve(1);
 
-          // console.log(res);
           resolve(0);
         }
       );

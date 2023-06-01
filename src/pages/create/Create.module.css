@@ -1,0 +1,222 @@
+.grid {
+  display: grid;
+
+  grid-template-rows: 1fr;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+
+.grid > section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.grid > section button {
+  border: none;
+  background: none;
+  text-align: left;
+
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.05em;
+  text-align: left;
+  padding: 0;
+  margin:0;
+  color: #08090B;
+}
+.grid > section button:hover {
+  color: #91919D;
+  cursor: pointer;
+}
+
+.changes {
+  font-size: 1rem!important;
+  font-weight: 500!important;
+  line-height: 19px!important;
+  letter-spacing: 0.02em!important;
+  text-align: center!important;
+  color: #08090B;
+}
+
+.form-group {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto;
+  gap: 17px;
+
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 19px;
+  letter-spacing: 0.05em;
+
+}
+.form-group-custom {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+  gap: 17px;
+
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 19px;
+  letter-spacing: 0.05em;
+
+}
+
+.form-group span {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.form-group span img {
+  z-index: 42;
+}
+
+.form-group input {
+  background-color: #FFFFFF;
+  border-radius: 4px;
+  padding: 16px 16px;
+  border: none;
+
+  color: #08090B;
+  font-size: 1rem;
+  letter-spacing: 0.05em;
+  font-weight: 500;
+}
+.form-group input:focus {
+  border-color: #08090B;
+  outline-color: #08090B;
+}
+
+.form-group input::placeholder {
+  color: #BDBDC4;
+  font-weight: 500;
+  font-size: 1rem;
+  line-height: 23px;
+  letter-spacing: 0.05em;
+}
+
+.form {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+.form button[type="button"] {
+  background-color: #FFCD1E;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 19px;
+  letter-spacing: 0.05em;
+  color: #08090B;
+  border-radius: 4px;
+  padding: 16px;
+  text-align: center;
+  margin-top: calc(32px - 24px);
+}
+.form button[type="button"]:disabled {
+  cursor: not-allowed;
+  background-color: #D3D3D8;
+  color: #FFFFFF;
+}
+.form button[type="button"]:hover {
+  cursor: pointer;
+  background-color: #FFE792;
+}
+.form button[type="button"]:disabled:hover {
+  cursor: not-allowed;
+  background-color: #D3D3D8;
+}
+
+.formError {
+  background-color: #FFE2E9;
+  border-radius: 4px;
+  padding: 12px;
+
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 28px;
+  letter-spacing: 0.02em;
+  color: #08090B;
+}
+
+
+.backdropEnter {
+  opacity: 0;
+}
+.backdropEnterActive {
+  opacity: 1;
+  transition: opacity 200ms;
+}
+
+.backdropExit {
+  opacity: 1;
+}
+.backdropExitActive {
+  opacity: 0;
+  transition: opacity 200ms;
+}
+
+.transaction-status {
+  position: absolute;
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
+  z-index: 44;
+  background-color: #FFCD1E;
+
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto;
+  padding: 24px;
+  padding-bottom: 48px;
+}
+
+.transaction-status > img {
+  justify-self: flex-end;
+}
+.transaction-status > img:hover {
+  cursor: pointer;
+  opacity: 0.8;
+}
+.transaction-status div {
+  align-self: center;
+  justify-self: center;
+  text-align: center;
+}
+.transaction-status div h6 {
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+}
+.transaction-status div p {
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+}
+.transaction-status button {
+  align-self: flex-end;
+  /* justify-self: center; */
+
+  background-color: #08090B;
+  border: none;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+  padding: 16px 44px;
+  border-radius: 4px;
+}
+.transaction-status button:hover {
+  background-color: #464C4F;
+  cursor: pointer;
+}
+
+
+

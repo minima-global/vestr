@@ -1,0 +1,285 @@
+.grid {
+  display: grid;
+
+  grid-template-rows: 1fr;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+.grid > section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow: hidden;
+}
+
+.back-btn {
+  border: none;
+  background: none;
+  text-align: left;
+
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.05em;
+  text-align: left;
+  padding: 0;
+  margin:0;
+  color: #08090B;
+
+  align-items: center;
+  display: flex;
+}
+.grid > section button:hover {
+  color: #91919D;
+  cursor: pointer;
+}
+.grid > section button:hover svg path {
+  fill: #91919D;
+}
+
+.grid > section > section h6 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 36px;
+  letter-spacing: 0.02em;
+  color: #08090B;
+  margin: 0; padding:0;
+  text-overflow: ellipsis;
+}
+
+.show-details {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 36px;
+  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 16px!important;
+}
+
+.grid > section > section {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.grid > section > section ul {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(4, max-content);
+  gap: 8px;
+}
+.hidden-details {
+  grid-template-rows: repeat(10, max-content)!important;
+}
+.grid > section > section li {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto;
+  gap: 4px;
+  padding: 16px;
+
+  background: #FFFFFF;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.grid > section > section li h6, .grid > section > section li p {
+  padding: 0;
+  margin: 0;
+}
+.grid > section > section li h6 {
+  color: #08090B;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 19px;
+  letter-spacing: 0.02em;
+  text-overflow: ellipsis;
+  overflow: hidden;
+
+}
+.grid > section > section li p {
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 19px;
+  letter-spacing: 0.02em;
+  white-space: pre-wrap;
+  word-break: break-all;
+
+}
+.button-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.button-wrapper button:first-of-type {
+  border: none;
+
+  background-color: #FFCD1E;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 19px;
+  letter-spacing: 0.05em;
+  color: #08090B;
+  border-radius: 4px;
+  padding: 16px;
+  text-align: center;
+  margin-top: calc(32px - 24px);
+}
+.button-wrapper button:first-of-type:disabled {
+  cursor: not-allowed;
+  background-color: #D3D3D8;
+  color: #FFFFFF;
+}
+.button-wrapper button:first-of-type:hover {
+  cursor: pointer;
+  background-color: #FFE792;
+}
+.button-wrapper button:first-of-type:disabled:hover {
+  cursor: not-allowed;
+  background-color: #D3D3D8;
+}
+
+.button-wrapper button:last-of-type {
+  align-self: center;
+  background-color: transparent;
+  text-align: center;
+  border: none;
+  border-bottom: 1px solid #17191C;
+  padding-bottom: 4px;
+  color: #17191C;
+  letter-spacing: 0.05em;
+  line-height: 1.5;
+  font-weight: 600;
+  max-width: fit-content;
+  padding: 0;
+  font-size: 1rem;
+}
+.button-wrapper button:last-of-type:hover {
+  cursor: pointer;
+  color: #91919D;
+  border-color: #91919D;
+}
+
+.formError {
+  background-color: #FFE2E9;
+  border-radius: 4px;
+  padding: 12px;
+
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 28px;
+  letter-spacing: 0.02em;
+  color: #08090B;
+}
+
+.no-contracts {
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 28px;
+  letter-spacing: 0.02em;
+  text-align: center;
+  color: #A7A7B0;
+  padding: 0;
+  margin: 0;
+}
+
+.can-collect {
+  font-size: 1.5rem!important;
+  font-weight: 400;
+  line-height: 29px;
+  letter-spacing: 0.02em;
+  color: #08090B
+}
+
+
+.active {
+  transform: rotate(180deg);
+  transition: transform 0.2s ease-in;
+}
+.passive {
+  transform: rotate(0deg);
+  transition: transform 0.2s ease-in;
+}
+
+.copy-label {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.copy-label button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  background: none;
+  border: none;
+
+  font-family: Manrope;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 24px;
+  letter-spacing: 0.02em;
+  color:#91919D;
+  padding: 0;
+
+}
+.copy-label button:hover {
+  color:#08090B!important;
+  cursor: pointer;
+}
+.copy-label button:hover svg path {
+  fill: #08090B; 
+}
+.copy-label button.activeCopy {
+  color: #00CBB6!important;
+}
+.copy-label button.activeCopy svg path {
+  fill: #00CBB6!important;
+}
+
+
+
+ .collect-btn {
+  background-color: #FFCD1E;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 19px;
+  letter-spacing: 0.05em;
+  color: #08090B;
+  border-radius: 4px;
+  padding: 16px;
+  text-align: center;
+  border: none;
+}
+.collect-btn:disabled {
+  cursor: not-allowed;
+  background-color: #D3D3D8;
+  color: #FFFFFF;
+}
+.collect-btn:hover {
+  cursor: pointer;
+  background-color: #FFE792;
+}
+.collect-btn:disabled:hover {
+  cursor: not-allowed;
+  background-color: #D3D3D8;
+}
+
+.backdropEnter {
+  opacity: 0;
+}
+.backdropEnterActive {
+  opacity: 1;
+  transition: opacity 200ms;
+}
+
+.backdropExit {
+  opacity: 1;
+}
+.backdropExitActive {
+  opacity: 0;
+  transition: opacity 200ms;
+}

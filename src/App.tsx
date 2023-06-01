@@ -1,63 +1,39 @@
 import { useEffect, useState } from "react";
-
-import { RouterProvider } from "react-router-dom";
-import "./App.css";
-import { vestingContract } from "./minima/libs/contracts";
 import { events } from "./minima/libs/events";
-import router from "./router";
+import useMinima from "./hooks/useMinima";
+import { Outlet } from "react-router-dom";
 
 import * as RPC from "./minima/libs/RPC";
-import { CircularProgress } from "@mui/material";
+import { vestingContract } from "./minima/libs/contracts";
 
-function App() {
-  const [_minimastatus, setStatus] = useState(false);
+const App = () => {
+  const status = useMinima();
   const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    events.onInit(async () => {
-      MDS.cmd("balance", (r) => {
-        if (r.status) {
-          setLoading(false);
-          setStatus(true);
-        }
-      });
+  const [error, setError] = useState(false);
 
-      await RPC.setNewScript(vestingContract.script);
+  const addScript = async () => {
+    await RPC.setNewScript(vestingContract.cleanScript);
+  };
+  useEffect(() => {
+    events.onFail(() => {
+      console.error("MDS Unavailable!");
+      setError(true);
     });
-    if (loading && _minimastatus) {
+
+    addScript();
+
+    return () => {
       setTimeout(() => {
         setLoading(false);
-      }, 5000);
-    }
-  }, [loading, _minimastatus]);
+      }, 1500);
+    };
+  }, [status]);
 
-  return (
-    <>
-      {!!_minimastatus && !loading && <RouterProvider router={router} />}
-      {!_minimastatus && !loading && (
-        <div className="offline__wrapper">
-          <div />
-          <div>
-            <img alt="offline" src="./assets/failed.svg" />
-            <h6>Minima is offline</h6>
-            <p>Check the status of your node and refresh this page.</p>
-          </div>
-          <div />
-        </div>
-      )}
-      {!_minimastatus && loading && (
-        <div className="offline__wrapper">
-          <div />
-          <div>
-            <CircularProgress
-              sx={{ color: "white", alignSelf: "center" }}
-              size={32}
-            />
-          </div>
-          <div />
-        </div>
-      )}
-    </>
-  );
-}
+  const isReady = !error && status && !loading;
+  const isLoading = loading;
+  const isNotAvailable = error || (!status && !loading);
+
+  return <Outlet />;
+};
 
 export default App;

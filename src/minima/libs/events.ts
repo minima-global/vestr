@@ -1,8 +1,10 @@
 import { Txpow } from "../../@types";
-
-////////////// response interfaces //////////
+// MDS Response interfaces
 interface InitResponse {
   event: "inited";
+}
+interface MDSFail {
+  event: "MDSFAIL";
 }
 
 interface MiningResponse {
@@ -80,10 +82,13 @@ let whenNewBalance = (d: NewBalanceData) => {
 let whenInit = () => {
   console.log("INIT event ... please register custom callback");
 };
+let whenFail = () => {
+  // console.log("MDS is down");
+};
+
 let whenMinimaLog = (d: MinimaLogData) => {
   // console.log("MINIMA LOG event ... please resgister custom callback", d);
 };
-
 let whenMDSTimer = (d: any) => {
   // console.log("MINIMA MDS TIMER event ... please register custom callback", d);
 };
@@ -94,7 +99,7 @@ const initializeMinima = () => {
   // MDS.DEBUG_HOST = "127.0.0.1";
   // MDS.DEBUG_PORT = 9003;
   // MDS.DEBUG_MINIDAPPID =
-  //   "0x6EA015CA6AD12F5E38AC2C8BD1F2BEBB322902E09791D326AEAC2363CE2A840ECB32218ECF4F9277FF11E0F5B461A89B1D287FF67824FD430B17A46224746EE338DBB1A647299497F6C1F77288282476DF4C5F5CC210508034D0D1982E1FB061647D7DDA67EEABC63694C896C9A75BEF38120B8E24D15CB6D1831D9E28D5F048";
+  //   "0x1F4FFCA9B76FF21E444CB5F2FEBC468EDE52E8ADE17569DC57AB89FE1539F4E1346B27FAF8E58C1707ED7A6301425D5EB6791A456642067F2C99DFB1AE098C79DCD9FEDE83CCF42801FC04B528CD2D3021A1C0C54503924BC205A161A640A169E1F5B7A4CACD6D0056FD74FA15663D6990FE3E5BF5FDA793AC64C9F16CC7700A";
 
   MDS.init(
     (
@@ -107,11 +112,14 @@ const initializeMinima = () => {
         | MaximaResponse
         | MDSTimerResponse
         | MaximaHosts
+        | MDSFail
     ) => {
       switch (nodeEvent.event) {
         case "inited":
-          // will have to dispatch from here..
           whenInit();
+          break;
+        case "MDSFAIL":
+          whenFail();
           break;
         case "NEWBLOCK":
           const newBlockData = nodeEvent.data;
@@ -141,19 +149,18 @@ const initializeMinima = () => {
         case "MAXIMAHOSTS":
           break;
         default:
-        // console.error("Unknown event type: ", nodeEvent);
       }
     }
   );
 };
 
-// Do registration
-// initializeMinima();
-
 ///////////////////////// application registers custom callbacks ///////////////////////
 
 function onNewBlock(callback: (data: NewBlockData) => void) {
   whenNewBlock = callback;
+}
+function onFail(callback: () => void) {
+  whenFail = callback;
 }
 
 function onMining(callback: (data: MiningData) => void) {
@@ -190,4 +197,5 @@ export const events = {
   onInit,
   onMinimaLog,
   onMDSTimer,
+  onFail,
 };

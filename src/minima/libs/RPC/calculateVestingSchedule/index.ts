@@ -2,9 +2,8 @@ import Decimal from "decimal.js";
 
 Decimal.set({ precision: 64 });
 export const calculateVestingSchedule = async (
-  amount: string,
-  // launchPercentage: number,
-  contractLength: string
+  amount: number,
+  contractLength: number
 ) => {
   // are they receiving a lump sum token payment
   // const initialPayment = new Decimal(amount).times(launchPercentage);

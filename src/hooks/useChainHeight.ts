@@ -8,16 +8,16 @@ interface Block {
   timemilli: string;
   date: string;
 }
-const useChainHeight = (): Block | undefined => {
-  const [tip, setTip] = useState<Block | undefined>(undefined);
-
-  events.onNewBlock(() => {
-    MDS.cmd("block", (res) => {
-      setTip(res.response);
-    });
-  });
+const useChainHeight = (): Block | null => {
+  const [tip, setTip] = useState<Block | null>(null);
 
   useEffect(() => {
+    events.onNewBlock(() => {
+      MDS.cmd("block", (res) => {
+        setTip(res.response);
+      });
+    });
+
     MDS.cmd("block", (res) => {
       setTip(res.response);
     });
