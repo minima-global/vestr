@@ -7,8 +7,8 @@ const Info = () => {
   return (
     <section className={styles["grid"]}>
       <h6>
-        Vestr enables you to calculate, create and track vesting schedules for
-        any token that you issue on the Minima blockchain.
+        Vestr enables you to create and collect vesting schedules for any token
+        issued on the Minima blockchain.
       </h6>
       <Stack rowGap={2}>
         <div className={styles["helper__wrapper"]}>
