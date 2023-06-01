@@ -10,7 +10,7 @@ export const Review = ({}: IProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [schedule, setSchedule] = useState<any>();
-  const { submitForm, formStatus }: any = useOutletContext();
+  const { submitForm, formStatus, isSubmitting }: any = useOutletContext();
 
   const scheduleCalculate = async () => {
     const s = await RPC.calculateVestingSchedule(
@@ -103,10 +103,18 @@ export const Review = ({}: IProps) => {
             <div className={styles["formError"]}>{formStatus}</div>
           )}
           <div className={styles["button-wrapper"]}>
-            <button type="button" onClick={() => submitForm()}>
+            <button
+              disabled={isSubmitting}
+              type="button"
+              onClick={() => submitForm()}
+            >
               Create
             </button>
-            <button type="button" onClick={() => navigate(-1)}>
+            <button
+              disabled={isSubmitting}
+              type="button"
+              onClick={() => navigate(-1)}
+            >
               Cancel
             </button>
           </div>

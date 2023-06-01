@@ -186,6 +186,14 @@
   margin: 0;
 }
 
+.can-collect {
+  font-size: 1.5rem!important;
+  font-weight: 400;
+  line-height: 29px;
+  letter-spacing: 0.02em;
+  color: #08090B
+}
+
 
 .active {
   transform: rotate(180deg);
@@ -258,4 +266,20 @@
 .collect-btn:disabled:hover {
   cursor: not-allowed;
   background-color: #D3D3D8;
+}
+
+.backdropEnter {
+  opacity: 0;
+}
+.backdropEnterActive {
+  opacity: 1;
+  transition: opacity 200ms;
+}
+
+.backdropExit {
+  opacity: 1;
+}
+.backdropExitActive {
+  opacity: 0;
+  transition: opacity 200ms;
 }

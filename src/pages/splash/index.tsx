@@ -10,15 +10,6 @@ const SplashPage = () => {
   const [displayBrand, setBrand] = useState(true);
   const [screen, setScreen] = useState(0);
 
-  const defaultOptions = {
-    loop: false,
-    autoplay: true,
-    animationData: Vestr,
-    rendererSettings: {
-      preserveAspectRatio: "xMidYMid slice",
-    },
-  };
-
   useEffect(() => {
     setTimeout(() => setBrand(false), 2500);
   }, []);

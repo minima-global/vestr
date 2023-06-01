@@ -7,6 +7,7 @@ interface IProps {
   dismiss: boolean;
   primaryButtonAction: () => any;
   cancelAction?: () => void;
+  primaryButtonDisable?: boolean;
 }
 const Dialog = ({
   title,
@@ -15,6 +16,7 @@ const Dialog = ({
   dismiss,
   cancelAction,
   primaryButtonAction,
+  primaryButtonDisable = false,
 }: IProps) => {
   return (
     <div>
@@ -29,11 +31,20 @@ const Dialog = ({
                 {subtitle}
               </div>
               <div className={styles["button__wrapper"]}>
-                <button type="button" onClick={() => primaryButtonAction()}>
+                <button
+                  disabled={primaryButtonDisable}
+                  className={styles["primary"]}
+                  type="button"
+                  onClick={() => primaryButtonAction()}
+                >
                   {buttonTitle}
                 </button>
                 {dismiss && (
-                  <button type="button" onClick={cancelAction}>
+                  <button
+                    className={styles["secondary"]}
+                    type="button"
+                    onClick={cancelAction}
+                  >
                     Go back
                   </button>
                 )}

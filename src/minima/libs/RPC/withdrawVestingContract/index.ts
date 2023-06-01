@@ -4,13 +4,11 @@ import Decimal from "decimal.js";
 export const withdrawVestingContract = (
   coin: any,
   cancollect: string,
-  change: string,
-  root: boolean
+  change: string
 ) => {
   const coinid = coin.coinid;
   const tokenid = coin.tokenid;
   const withdrawalAddress = MDS.util.getStateVariable(coin, 0);
-  const rootKey = MDS.util.getStateVariable(coin, 5);
 
   return new Promise((resolve, reject) => {
     // reject("Failed purposefully");
@@ -50,22 +48,24 @@ export const withdrawVestingContract = (
       coin,
       5
     )};         
+            txnstate id:${id} port:5 value:${MDS.util.getStateVariable(
+      coin,
+      6
+    )};         
+            txnstate id:${id} port:5 value:${MDS.util.getStateVariable(
+      coin,
+      7
+    )};         
             txnstate id:${id} port:199 value:${MDS.util.getStateVariable(
       coin,
       199
-    )};      
-            
-            ${
-              root
-                ? `txnsign id:${id} publickey:${rootKey} txnpostauto:false;`
-                : ""
-            }
-            ${!root ? `txnpost id:${id};` : ""}
+    )};          
             txndelete id:${id}
-        `;
+    
+    `;
 
     MDS.cmd(command, (res) => {
-      // console.log(res);
+      console.log(res);
       const multiResponse = res.length > 1;
       if (!multiResponse && !res.status)
         reject(res.error ? res.error : "RPC Failed");

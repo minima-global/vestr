@@ -65,6 +65,7 @@
 .dialog div:first-of-type, .button__wrapper {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 16px;
 }
 .button__wrapper {
@@ -89,6 +90,7 @@
   font-weight: 400;
   font-size: 1rem;
   text-align: center;
+  word-break: break-all;
 }
 .dialog div:last-of-type button:first-of-type {
   background-color: #08090B;
@@ -103,15 +105,15 @@
   font-size: 1rem;
   text-align: center;
 }
-.dialog div:last-of-type button:first-of-type:hover {
+.dialog div:last-of-type .primary:hover {
   background-color: #464C4F;
   cursor: pointer;
 }
-.dialog div:last-of-type button:first-of-type:disabled {
+.dialog div:last-of-type .primary:disabled {
   background-color: #D3D3D8;
   cursor: not-allowed;
 }
-.dialog div:last-of-type button:last-of-type {
+.dialog div:last-of-type .secondary {
   background-color: transparent;
   border: none;
   border-bottom: 1px solid #17191C;
@@ -124,7 +126,7 @@
   padding: 0;
   font-size: 1rem;
 }
-.dialog div:last-of-type button:last-of-type:hover {
+.dialog div:last-of-type .secondary:hover {
   cursor: pointer;
   color: #91919D;
   border-color: #91919D;
