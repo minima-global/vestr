@@ -3,7 +3,7 @@
 
   grid-template-rows: 1fr;
   grid-template-columns: 1fr;
-  gap: 32px;
+  gap: 24px;
 }
 
 .grid > section {
@@ -232,3 +232,30 @@
   fill: #00CBB6!important;
 }
 
+
+
+ .collect-btn {
+  background-color: #FFCD1E;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 19px;
+  letter-spacing: 0.05em;
+  color: #08090B;
+  border-radius: 4px;
+  padding: 16px;
+  text-align: center;
+  border: none;
+}
+.collect-btn:disabled {
+  cursor: not-allowed;
+  background-color: #D3D3D8;
+  color: #FFFFFF;
+}
+.collect-btn:hover {
+  cursor: pointer;
+  background-color: #FFE792;
+}
+.collect-btn:disabled:hover {
+  cursor: not-allowed;
+  background-color: #D3D3D8;
+}

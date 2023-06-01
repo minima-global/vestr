@@ -320,6 +320,9 @@ const ContractDetails = () => {
               </div>
             )}
           </section>
+          <button className={styles["collect-btn"]} type="button">
+            Collect
+          </button>
         </section>
       )}
       {!contract && (

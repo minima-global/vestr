@@ -11,7 +11,7 @@ import {
   ListItem,
   ListItemText,
 } from "@mui/material";
-import MiError from "../MiCustom/MiError/MiError";
+// import MiError from "../MiCustom/MiError/MiError";
 import styles from "./VestCalculateSchedules.module.css";
 
 import * as RPC from "../../minima/libs/RPC";
@@ -87,11 +87,11 @@ const VestCalculateSchedules = ({
           <form className={styles["form"]} onSubmit={formik.handleSubmit}>
             <Stack spacing={5}>
               <Stack spacing={1}>
-                {formik.status ? (
+                {/* {formik.status ? (
                   <MiError>
                     <label>{formik.status}</label>
                   </MiError>
-                ) : null}
+                ) : null} */}
 
                 <FormGroup>
                   <FormLabel htmlFor="amount">Contract Amount</FormLabel>
