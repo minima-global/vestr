@@ -574,7 +574,7 @@ const Create = () => {
                   }}
                 >
                   <Tooltip
-                    content="The number of months the contract lasts."
+                    content="The amount of time before a contract starts."
                     position={96}
                   />
                 </CSSTransition>
