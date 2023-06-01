@@ -7,26 +7,18 @@ import { CSSTransition } from "react-transition-group";
 import Dialog from "../dialog";
 import { useLocation, useNavigate } from "react-router-dom";
 
-export const gracePeriods = [
-  {
-    None: 0,
-  },
-  {
-    Daily: 24,
-  },
-  {
-    Weekly: 168,
-  },
-  {
-    Monthly: 720,
-  },
-  {
-    Every_6_Months: 4320,
-  },
-  {
-    Yearly: 8640,
-  },
-];
+export const gracePeriods: any = {
+  None: 0,
+  Daily: 24,
+  Weekly: 168,
+  Monthly: 720,
+  Every_6_Months: 4320,
+  Yearly: 8640,
+};
+
+export function getObjectKey(obj: any, value: any) {
+  return Object.keys(obj).find((key) => obj[key] === value);
+}
 
 const GraceSelect = () => {
   const [current, setCurrent] = useState<null | string>(null);
@@ -37,15 +29,16 @@ const GraceSelect = () => {
 
   useEffect(() => {
     if (location.state && location.state.grace) {
-      setCurrent(Object.keys(location.state.grace)[0].replaceAll("_", " "));
+      setCurrent(location.state.grace);
     }
   }, [location]);
 
-  const handleSelection = (grace: string, index: number) => {
+  const handleSelection = (grace: string) => {
+    console.log("grace", grace.replaceAll(" ", "_"));
     navigate("/dashboard/creator/create", {
       state: {
         ...location.state,
-        grace: gracePeriods[index],
+        grace: grace,
       },
     });
 
@@ -83,7 +76,7 @@ const GraceSelect = () => {
           dismiss={true}
           primaryButtonAction={() => {
             setWarning(false);
-            handleSelection("None", 0);
+            handleSelection("None");
           }}
           cancelAction={() => setWarning(false)}
         />
@@ -135,21 +128,18 @@ const GraceSelect = () => {
               </div>
 
               <ul>
-                {gracePeriods.map((g, i) => (
+                {Object.keys(gracePeriods).map((g, i) => (
                   <li
                     onClick={() => {
                       if (i === 0) {
                         handleWarning();
                       }
                       if (i !== 0) {
-                        handleSelection(
-                          Object.keys(g).toString().replaceAll("_", " "),
-                          i
-                        );
+                        handleSelection(g.replaceAll("_", " "));
                       }
                     }}
                   >
-                    {Object.keys(g).toString().replaceAll("_", " ")}
+                    {g.replaceAll("_", " ")}
                   </li>
                 ))}
               </ul>

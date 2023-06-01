@@ -24,6 +24,7 @@ import Info from "./pages/info";
 import Creator from "./pages/creator";
 import Create from "./pages/create";
 import Review from "./pages/review";
+import ContractDetails from "./pages/contractDetails";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -39,6 +40,7 @@ export const router = createHashRouter(
           <Route path="create" element={<Create />}>
             <Route path="review/:id" element={<Review />} />
           </Route>
+          <Route path="contract/:id" element={<ContractDetails />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />

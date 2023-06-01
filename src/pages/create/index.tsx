@@ -3,7 +3,7 @@ import { Outlet, useLocation, matchPath, useNavigate } from "react-router-dom";
 import styles from "./Create.module.css";
 import Dialog from "../../components/dialog";
 import WalletSelect from "../../components/walletSelect";
-import GraceSelect from "../../components/gracePeriod";
+import GraceSelect, { gracePeriods } from "../../components/gracePeriod";
 import CliffSelect from "../../components/cliffPeriod";
 import AddressSelect from "../../components/addressSelect";
 import { useFormik } from "formik";
@@ -15,6 +15,7 @@ import { CSSTransition } from "react-transition-group";
 import * as RPC from "../../minima/libs/RPC";
 import * as yup from "yup";
 import Tooltip from "../../components/tooltip";
+
 const Create = () => {
   const { balance: wallet } = useWalletBalance();
   const { walletAddress } = useWalletAddress();
@@ -88,7 +89,7 @@ const Create = () => {
     if (location.state && location.state.grace) {
       formik.setFieldValue(
         "grace",
-        location.state.grace[Object.keys(location.state.grace)[0]]
+        gracePeriods[location.state.grace.replaceAll(" ", "_")]
       );
     }
   }, [location.state && location.state.grace ? location.state.grace : ""]);

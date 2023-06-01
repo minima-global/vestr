@@ -16,13 +16,21 @@ const Creator = () => {
     { path: "/dashboard/creator/create" },
     location.pathname
   );
+  const contractDetailPath = matchPath(
+    { path: "/dashboard/creator/contract/:id" },
+    location.pathname
+  );
 
   const [filterText, setFilteredText] = useState("");
 
   return (
     <>
       <CSSTransition
-        in={Boolean(createPath) || Boolean(reviewPath)}
+        in={
+          Boolean(createPath) ||
+          Boolean(reviewPath) ||
+          Boolean(contractDetailPath)
+        }
         unmountOnExit
         timeout={200}
         classNames={{
@@ -35,7 +43,11 @@ const Creator = () => {
         <Outlet />
       </CSSTransition>
       <CSSTransition
-        in={!Boolean(createPath) && !Boolean(reviewPath)}
+        in={
+          !Boolean(createPath) &&
+          !Boolean(reviewPath) &&
+          !Boolean(contractDetailPath)
+        }
         unmountOnExit
         timeout={200}
         classNames={{

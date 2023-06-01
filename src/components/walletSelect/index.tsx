@@ -109,7 +109,7 @@ const WalletSelect = () => {
               <input type="search" placeholder="Search token" />
               <ul>
                 {balance.map((t) => (
-                  <li onClick={() => handleSelection(t)}>
+                  <li key={t.tokenid} onClick={() => handleSelection(t)}>
                     {t.tokenid === "0x00" && (
                       <img alt="token-icon" src="./assets/minimaToken.svg" />
                     )}
