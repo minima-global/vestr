@@ -5,8 +5,7 @@ export const withdrawVestingContract = (
   coin: any,
   cancollect: string,
   change: string,
-  root: boolean,
-  state: any[]
+  root: boolean
 ) => {
   const coinid = coin.coinid;
   const tokenid = coin.tokenid;

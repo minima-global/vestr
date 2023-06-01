@@ -130,6 +130,7 @@ const GraceSelect = () => {
               <ul>
                 {Object.keys(gracePeriods).map((g, i) => (
                   <li
+                    key={g}
                     onClick={() => {
                       if (i === 0) {
                         handleWarning();

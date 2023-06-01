@@ -27,6 +27,9 @@ const ContractDetails = () => {
     coinid: false,
     address: false,
   });
+
+  const [status, setStatus] = useState();
+  const [error, setError] = useState();
   const tip = useChainHeight();
 
   const calculatedData: any = useContractCalculation(location.state.contract);
@@ -46,6 +49,7 @@ const ContractDetails = () => {
       if (button === "address") setCopy({ ...copyButton, address: false });
     }, 2000);
   };
+  const handleCollect = (coin: Coin) => {};
   useEffect(() => {
     if (location.state && location.state.contract) {
       setContract(location.state.contract);
@@ -320,7 +324,11 @@ const ContractDetails = () => {
               </div>
             )}
           </section>
-          <button className={styles["collect-btn"]} type="button">
+          <button
+            onClick={() => handleCollect(contract)}
+            className={styles["collect-btn"]}
+            type="button"
+          >
             Collect
           </button>
         </section>

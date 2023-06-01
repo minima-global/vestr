@@ -78,7 +78,7 @@ const CliffSelect = () => {
 
               <ul>
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((c) => (
-                  <li onClick={() => handleSelection(c)}>
+                  <li key={c} onClick={() => handleSelection(c)}>
                     {c === 1 ? "1 month" : c + " months"}
                   </li>
                 ))}
