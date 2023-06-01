@@ -579,9 +579,7 @@ const Create = () => {
                 </CSSTransition>
                 <CliffSelect />
                 <CSSTransition
-                  in={
-                    formik.errors.cliff && formik.touched.cliff ? true : false
-                  }
+                  in={Boolean(formik.errors.cliff)}
                   unmountOnExit
                   timeout={200}
                   classNames={{
@@ -592,7 +590,7 @@ const Create = () => {
                   }}
                 >
                   <div className={styles["formError"]}>
-                    {formik.errors.cliff}
+                    {formik.errors.cliff as string}
                   </div>
                 </CSSTransition>
               </label>
@@ -637,7 +635,7 @@ const Create = () => {
                 </CSSTransition>
                 <GraceSelect />
                 <CSSTransition
-                  in={formik.errors.grace ? true : false}
+                  in={Boolean(formik.errors.grace)}
                   unmountOnExit
                   timeout={200}
                   classNames={{
