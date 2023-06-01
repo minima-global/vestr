@@ -23,7 +23,7 @@ const Create = () => {
   const navigate = useNavigate();
   const [exit, setExit] = useState(false);
   const [review, setReview] = useState(false);
-  console.log(wallet);
+  // console.log(wallet);
   const [tooltips, setTooltips] = useState({
     walletAddress: false,
     contractID: false,
@@ -132,7 +132,7 @@ const Create = () => {
 
         formik.setStatus(transactionStatus);
       } catch (error: any) {
-        console.log("Error transaction creation", error.message);
+        // console.log("Error transaction creation", error.message);
 
         const noCoinsAvailable = error.message.includes("No Coins of tokenid");
         const insufficientFunds = error.message.includes("Insufficient funds");
@@ -148,8 +148,8 @@ const Create = () => {
     validationSchema: formValidation,
   });
 
-  console.log("formik errors", formik.errors);
-  console.log("token ", formik.values.token);
+  // console.log("formik errors", formik.errors);
+  // console.log("token ", formik.values.token);
 
   return (
     <>

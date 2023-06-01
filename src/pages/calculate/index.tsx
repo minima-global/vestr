@@ -1,12 +1,30 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./Calculate.module.css";
 import { CSSTransition } from "react-transition-group";
 import Tooltip from "../../components/tooltip";
+import * as RPC from "../../minima/libs/RPC";
 
 const Calculate = () => {
   const navigate = useNavigate();
+  const [amount, setAmount] = useState<number>(0);
+  const [contractLength, setContractLength] = useState<number>(0);
+
+  const [schedule, setSchedule] = useState<any>();
   const [tooltips, setTooltips] = useState({ amount: false, length: false });
+
+  const calculateSchedule = async () => {
+    const schedule = await RPC.calculateVestingSchedule(
+      amount || 0,
+      contractLength || 0
+    );
+    setSchedule(schedule);
+  };
+
+  useEffect(() => {
+    calculateSchedule();
+  }, [amount, contractLength]);
+
   return (
     <CSSTransition
       in={true}
@@ -95,16 +113,17 @@ const Calculate = () => {
               </CSSTransition>
               <input
                 placeholder="Token amount"
-                type="text"
+                type="number"
+                min={0}
                 id="amount"
                 name="amount"
-                // value={formik.values.name}
-                // onChange={formik.handleChange}
+                value={amount === 0 ? "" : amount}
+                onChange={(e: any) => setAmount(e.target.value)}
               />
             </label>
             <label htmlFor="length" className={styles["form-group"]}>
               <span>
-                Token amount
+                Contract length
                 {!tooltips.length && (
                   <img
                     onClick={() => setTooltips({ ...tooltips, length: true })}
@@ -138,11 +157,12 @@ const Calculate = () => {
               </CSSTransition>
               <input
                 placeholder="Contract length"
-                type="text"
+                type="number"
+                min={0}
                 id="length"
                 name="length"
-                // value={formik.values.name}
-                // onChange={formik.handleChange}
+                value={contractLength === 0 ? "" : contractLength}
+                onChange={(e: any) => setContractLength(e.target.value)}
               />
             </label>
           </section>
@@ -153,11 +173,19 @@ const Calculate = () => {
                 <ul>
                   <li>
                     <h6>Payment per block</h6>
-                    <p>-</p>
+                    <p>
+                      {!schedule || !Number(schedule.paymentPerBlock)
+                        ? "-"
+                        : schedule.paymentPerBlock}
+                    </p>
                   </li>
                   <li>
                     <h6>Payment per month</h6>
-                    <p>-</p>
+                    <p>
+                      {!schedule || !Number(schedule.paymentPerMonth)
+                        ? "-"
+                        : schedule.paymentPerMonth}
+                    </p>
                   </li>
                 </ul>
               </div>

@@ -83,7 +83,7 @@ let whenInit = () => {
   console.log("INIT event ... please register custom callback");
 };
 let whenFail = () => {
-  console.log("MDS is down");
+  // console.log("MDS is down");
 };
 
 let whenMinimaLog = (d: MinimaLogData) => {

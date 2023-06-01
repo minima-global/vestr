@@ -31,7 +31,7 @@ export const createVestingContract = async (
     const endContractBlockHeight = await RPC.calculateBlockHeightFromDate(
       calculateDate
     );
-    console.log("EndContractBlockHeight", endContractBlockHeight);
+    // console.log("EndContractBlockHeight", endContractBlockHeight);
     // get currentBlockHeight
     const currentBlockHeight = await RPC.getCurrentBlockHeight();
 
@@ -42,10 +42,10 @@ export const createVestingContract = async (
     const now = new Decimal(new Date().getTime()).dividedBy(1000); // time now in seconds
     const difference = new Decimal(then.getTime()).dividedBy(1000).minus(now);
     const estimateCliffPeriod = difference.dividedBy(50);
-    console.log(
-      "Eestiamted cliff period in blocks",
-      estimateCliffPeriod.toNumber()
-    );
+    // console.log(
+    //   "Eestiamted cliff period in blocks",
+    //   estimateCliffPeriod.toNumber()
+    // );
     const startingBlockHeightOfContract = new Decimal(currentBlockHeight)
       .plus(estimateCliffPeriod)
       .round()
@@ -54,7 +54,7 @@ export const createVestingContract = async (
     const finalEndContractBlockHeight = new Decimal(endContractBlockHeight)
       .plus(estimateCliffPeriod)
       .toNumber();
-    console.log("Final Block Height + cliff", finalEndContractBlockHeight);
+    // console.log("Final Block Height + cliff", finalEndContractBlockHeight);
 
     /**
      * Calculate the minimum block wait the user must wait before he collects again
@@ -71,7 +71,7 @@ export const createVestingContract = async (
           token.tokenid
         } state:{"0":"${address}","1":"${amount}","2":"${startingBlockHeightOfContract}", "3":"${endContractBlockHeight}","4":"${minimumTimeUserMustWaitToCollectAgain}","5":"${new Date().getTime()}","6":"${cliff}","7":"${minBlockWait}", "199":"${uid}"}`,
         (res) => {
-          console.log(res);
+          // console.log(res);
           if (!res.status && !res.pending)
             reject(
               res.error ? res.error : res.message ? res.message : "RPC Failed"

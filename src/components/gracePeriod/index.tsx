@@ -34,7 +34,7 @@ const GraceSelect = () => {
   }, [location]);
 
   const handleSelection = (grace: string) => {
-    console.log("grace", grace.replaceAll(" ", "_"));
+    // console.log("grace", grace.replaceAll(" ", "_"));
     navigate("/dashboard/creator/create", {
       state: {
         ...location.state,

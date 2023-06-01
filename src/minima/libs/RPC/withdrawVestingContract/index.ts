@@ -65,7 +65,7 @@ export const withdrawVestingContract = (
     `;
 
     MDS.cmd(command, (res) => {
-      console.log(res);
+      // console.log(res);
       const multiResponse = res.length > 1;
       if (!multiResponse && !res.status)
         reject(res.error ? res.error : "RPC Failed");

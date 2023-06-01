@@ -42,7 +42,7 @@ const ContractDetails = () => {
 
   const calculatedData: any = useContractCalculation(location.state.contract);
 
-  console.log("CalculatedData", calculatedData);
+  // console.log("CalculatedData", calculatedData);
 
   const handleCopy = (text: string, button: string) => {
     if (button === "tokenid") setCopy({ ...copyButton, tokenid: true });
