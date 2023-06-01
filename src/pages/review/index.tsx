@@ -48,7 +48,31 @@ export const Review = ({}: IProps) => {
             type="button"
             onClick={() => navigate(-1)}
           >
-            <img alt="left-arrow" src="./assets/arrow_back.svg" /> Back
+            <svg
+              width="16"
+              height="17"
+              viewBox="0 0 16 17"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <mask
+                id="mask0_33_7292"
+                maskUnits="userSpaceOnUse"
+                x="0"
+                y="0"
+                width="16"
+                height="17"
+              >
+                <rect y="0.5" width="16" height="16" fill="#D9D9D9" />
+              </mask>
+              <g mask="url(#mask0_33_7292)">
+                <path
+                  d="M6.39969 14.6695L0.230469 8.50027L6.39969 2.33105L7.29582 3.22719L2.02275 8.50027L7.29582 13.7734L6.39969 14.6695Z"
+                  fill="#08090B"
+                />
+              </g>
+            </svg>
+            Back
           </button>
           <section>
             <h6>Review contract details</h6>

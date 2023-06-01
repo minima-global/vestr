@@ -34,7 +34,7 @@
   color: #91919D;
   cursor: pointer;
 }
-.grid > section button:hover svg {
+.grid > section button:hover svg path {
   fill: #91919D;
 }
 
