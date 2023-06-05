@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Outlet, useLocation, matchPath, useNavigate } from "react-router-dom";
 import styles from "./Create.module.css";
 import Dialog from "../../components/dialog";
@@ -7,7 +7,6 @@ import GraceSelect, { gracePeriods } from "../../components/gracePeriod";
 import CliffSelect from "../../components/cliffPeriod";
 import AddressSelect from "../../components/addressSelect";
 import { useFormik } from "formik";
-import useWalletBalance from "../../hooks/useWalletBalance";
 import useWalletAddress from "../../hooks/useWalletAddress";
 
 import { CSSTransition } from "react-transition-group";
@@ -15,9 +14,11 @@ import { CSSTransition } from "react-transition-group";
 import * as RPC from "../../minima/libs/RPC";
 import * as yup from "yup";
 import Tooltip from "../../components/tooltip";
+import { appContext } from "../../AppContext";
+import { MinimaToken } from "../../@types";
 
 const Create = () => {
-  const { balance: wallet } = useWalletBalance();
+  const { walletBalance: wallet, scriptAddress } = useContext(appContext);
   const { walletAddress } = useWalletAddress();
   const location = useLocation();
   const navigate = useNavigate();
@@ -74,7 +75,7 @@ const Create = () => {
     formik.setFieldValue(
       "token",
       location.state && location.state.tokenid
-        ? wallet.find((t) => t.tokenid === location.state.tokenid)
+        ? wallet.find((t: MinimaToken) => t.tokenid === location.state.tokenid)
         : wallet[0],
       true
     );
@@ -125,7 +126,8 @@ const Create = () => {
           form.length,
           form.grace,
           form.name,
-          form.uid
+          form.uid,
+          scriptAddress
         ).catch((err) => {
           throw new Error(err);
         });

@@ -1,7 +1,7 @@
 import { format } from "date-fns";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import styles from "./ContractDetails.module.css";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { CSSTransition } from "react-transition-group";
 import { Coin } from "../../@types";
 
@@ -18,6 +18,7 @@ import Dialog from "../../components/dialog";
 
 import Loading from "../../assets/loading.json";
 import Lottie from "lottie-react";
+import { appContext } from "../../AppContext";
 
 export function getKeyByValue(object: any, value: any) {
   return Object.keys(object).find((key) => object[key] === value);
@@ -26,8 +27,10 @@ export function getKeyByValue(object: any, value: any) {
 const ContractDetails = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { scriptAddress } = useContext(appContext);
   const [seeDetails, setDetails] = useState(false);
   const [contract, setContract] = useState<Coin | null>(null);
+  const { contracts } = useContext(appContext);
   const [copyButton, setCopy] = useState({
     tokenid: false,
     coinid: false,
@@ -40,9 +43,14 @@ const ContractDetails = () => {
   const [error, setError] = useState<false | string>(false);
   const tip = useChainHeight();
 
-  const calculatedData: any = useContractCalculation(location.state.contract);
+  const params = useParams();
 
-  // console.log("CalculatedData", calculatedData);
+  const calculatedData: any = useContractCalculation(contract);
+  useEffect(() => {
+    console.log(params);
+    console.log(contracts);
+    setContract(contracts.get(params.id));
+  }, [contracts]);
 
   const handleCopy = (text: string, button: string) => {
     if (button === "tokenid") setCopy({ ...copyButton, tokenid: true });
@@ -69,7 +77,8 @@ const ContractDetails = () => {
       await RPC.withdrawVestingContract(
         coin,
         calculatedData.cancollect,
-        calculatedData.change
+        calculatedData.change,
+        scriptAddress
       ).catch((err) => {
         throw new Error(err);
       });
@@ -80,12 +89,6 @@ const ContractDetails = () => {
       setError(error.message);
     }
   };
-
-  useEffect(() => {
-    if (location.state && location.state.contract) {
-      setContract(location.state.contract);
-    }
-  }, [location.state]);
 
   return (
     <>

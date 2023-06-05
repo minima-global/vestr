@@ -1,18 +1,18 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 
 import styles from "./WalletSelect.module.css";
 import { MinimaToken } from "../../@types";
 import { useLocation, useNavigate } from "react-router-dom";
-import useWalletBalance from "../../hooks/useWalletBalance";
 import AppGrid from "../app-grid";
 
 import { CSSTransition } from "react-transition-group";
+import { appContext } from "../../AppContext";
 
 interface IProps {}
 const WalletSelect = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { balance } = useWalletBalance();
+  const { walletBalance: balance } = useContext(appContext);
   const [searchText, setSearchText] = useState("");
   const [current, setCurrent] = useState<MinimaToken | undefined>(undefined);
   const [active, setActive] = useState(false);
@@ -20,7 +20,7 @@ const WalletSelect = () => {
   useEffect(() => {
     setCurrent(
       location.state && location.state.tokenid
-        ? balance.find((t) => t.tokenid === location.state.tokenid)
+        ? balance.find((t: MinimaToken) => t.tokenid === location.state.tokenid)
         : balance[0]
     );
   }, [balance, location]);
@@ -108,7 +108,7 @@ const WalletSelect = () => {
               </div>
               <input type="search" placeholder="Search token" />
               <ul>
-                {balance.map((t) => (
+                {balance.map((t: MinimaToken) => (
                   <li key={t.tokenid} onClick={() => handleSelection(t)}>
                     {t.tokenid === "0x00" && (
                       <img alt="token-icon" src="./assets/minimaToken.svg" />

@@ -1,18 +1,21 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import styles from "./Collector.module.css";
 import { CSSTransition } from "react-transition-group";
-import useVestingContracts from "../../hooks/useVestingContract";
 import Contracts from "../../components/contracts";
 import { Outlet, matchPath, useLocation } from "react-router-dom";
+import { appContext } from "../../AppContext";
 
 const Collector = () => {
-  const contracts = useVestingContracts();
+  const { contracts } = useContext(appContext);
   const location = useLocation();
   const contractDetailPath = matchPath(
     { path: "/dashboard/collector/contract/:id" },
     location.pathname
   );
 
+  useEffect(() => {
+    console.log("Contracts changed..");
+  }, [contracts]);
   const [filterText, setFilteredText] = useState("");
 
   return (

@@ -1,13 +1,13 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import styles from "./Creator.module.css";
 import { Outlet, useLocation, matchPath, useNavigate } from "react-router-dom";
 import { CSSTransition } from "react-transition-group";
-import useVestingContracts from "../../hooks/useVestingContract";
 import Contracts from "../../components/contracts";
+import { appContext } from "../../AppContext";
 const Creator = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const contracts = useVestingContracts();
+  const { contracts } = useContext(appContext);
   const reviewPath = matchPath(
     { path: "/dashboard/creator/create/review/:id" },
     location.pathname

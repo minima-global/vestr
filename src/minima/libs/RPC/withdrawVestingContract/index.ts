@@ -4,7 +4,8 @@ import Decimal from "decimal.js";
 export const withdrawVestingContract = (
   coin: any,
   cancollect: string,
-  change: string
+  change: string,
+  scriptAddress: string
 ) => {
   const coinid = coin.coinid;
   const tokenid = coin.tokenid;
@@ -20,7 +21,7 @@ export const withdrawVestingContract = (
             ${
               change && new Decimal(change).greaterThan(0)
                 ? `
-                txnoutput id:${id} address:${vestingContract.scriptaddress} amount:${change} tokenid:${tokenid} storestate:true;          
+                txnoutput id:${id} address:${scriptAddress} amount:${change} tokenid:${tokenid} storestate:true;          
                 `
                 : ""
             }
@@ -48,24 +49,26 @@ export const withdrawVestingContract = (
       coin,
       5
     )};         
-            txnstate id:${id} port:5 value:${MDS.util.getStateVariable(
+            txnstate id:${id} port:6 value:${MDS.util.getStateVariable(
       coin,
       6
     )};         
-            txnstate id:${id} port:5 value:${MDS.util.getStateVariable(
+            txnstate id:${id} port:7 value:${MDS.util.getStateVariable(
       coin,
       7
     )};         
             txnstate id:${id} port:199 value:${MDS.util.getStateVariable(
       coin,
       199
-    )};          
+    )};  
+            txnpost id:${id};
+    
             txndelete id:${id}
     
     `;
 
     MDS.cmd(command, (res) => {
-      // console.log(res);
+      console.log(res);
       const multiResponse = res.length > 1;
       if (!multiResponse && !res.status)
         reject(res.error ? res.error : "RPC Failed");

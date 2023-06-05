@@ -1,9 +1,9 @@
-export const setNewScript = (script: string): Promise<void> => {
+export const setNewScript = (script: string): Promise<string> => {
   return new Promise((resolve, reject) => {
-    MDS.cmd(`newscript script:"${script}" trackall:false clean:true`, (res) => {
+    MDS.cmd(`newscript script:"${script}" trackall:false`, (res) => {
       if (!res.status) reject(res.error);
 
-      resolve();
+      resolve(res.response.address);
     });
   });
 };

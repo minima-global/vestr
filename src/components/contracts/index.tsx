@@ -21,7 +21,7 @@ const Contracts = ({ coins, filterText }: IProps) => {
               containsText(MDS.util.getStateVariable(c, 199), filterText)
             )
             .map((c) => (
-              <li className={styles["list-item"]}>
+              <li key={c.coinid} className={styles["list-item"]}>
                 {c.tokenid === "0x00" && (
                   <img alt="token-image" src="./assets/minimaLogoSquare.png" />
                 )}
@@ -46,9 +46,7 @@ const Contracts = ({ coins, filterText }: IProps) => {
                 </div>
                 <button
                   onClick={() =>
-                    navigate("contract/" + MDS.util.getStateVariable(c, 199), {
-                      state: { contract: c },
-                    })
+                    navigate("contract/" + MDS.util.getStateVariable(c, 199))
                   }
                   type="button"
                 >

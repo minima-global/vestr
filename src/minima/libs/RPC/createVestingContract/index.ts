@@ -22,9 +22,11 @@ export const createVestingContract = async (
   contractLength: number,
   minBlockWait: number,
   id: string,
-  uid: string
+  uid: string,
+  scriptAddress: string
 ): Promise<0 | 1> => {
   try {
+    console.log("SCRIPTADDDR", scriptAddress);
     const calculateDate = addMonths(new Date(), contractLength);
     // console.log(calculateDate);
     // calculate block in time
@@ -65,11 +67,9 @@ export const createVestingContract = async (
 
     return new Promise((resolve, reject) => {
       MDS.cmd(
-        `send debug:false amount:${amount} address:${
-          vestingContract.scriptaddress
-        } tokenid:${
+        `send debug:false amount:${amount} address:${scriptAddress} tokenid:${
           token.tokenid
-        } state:{"0":"${address}","1":"${amount}","2":"${startingBlockHeightOfContract}", "3":"${endContractBlockHeight}","4":"${minimumTimeUserMustWaitToCollectAgain}","5":"${new Date().getTime()}","6":"${cliff}","7":"${minBlockWait}", "199":"${uid}"}`,
+        } state:{"0":"${address}","1":"${amount}","2":"${startingBlockHeightOfContract}", "3":"${finalEndContractBlockHeight}","4":"${minimumTimeUserMustWaitToCollectAgain}","5":"${new Date().getTime()}","6":"${cliff}","7":"${minBlockWait}", "199":"${uid}"}`,
         (res) => {
           // console.log(res);
           if (!res.status && !res.pending)
