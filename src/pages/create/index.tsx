@@ -16,6 +16,7 @@ import * as yup from "yup";
 import Tooltip from "../../components/tooltip";
 import { appContext } from "../../AppContext";
 import { MinimaToken } from "../../@types";
+import useMobileView from "../../hooks/useMobileView";
 
 const Create = () => {
   const { walletBalance: wallet, scriptAddress } = useContext(appContext);
@@ -24,6 +25,7 @@ const Create = () => {
   const navigate = useNavigate();
   const [exit, setExit] = useState(false);
   const [review, setReview] = useState(false);
+  const isMobile = useMobileView();
   // console.log(wallet);
   const [tooltips, setTooltips] = useState({
     walletAddress: false,
@@ -176,12 +178,20 @@ const Create = () => {
         <div className={styles["transaction-status"]}>
           <div>
             <h6>Confirm</h6>
-            {formik.status === 1 && (
+
+            {isMobile && formik.status === 1 && (
               <p>
                 To complete the transaction, go to the Minima app <br /> Home
                 screen, press <img alt="pending" src="./assets/pace.svg" /> ,
                 then <br /> long press the Vestr command and <br /> select
                 'Accept'.
+              </p>
+            )}
+            {!isMobile && formik.status === 1 && (
+              <p>
+                To complete this transaction, open your Minihub and <br /> find
+                the pending transaction in the 'Pending Actions' button in the
+                header.
               </p>
             )}
             {formik.status === 0 && (
