@@ -282,7 +282,7 @@ const Create = () => {
                 <AddressSelect />
               </label>
               {location.state && location.state.addressPreference && (
-                <label htmlFor="address" className={styles["form-group"]}>
+                <div className={styles["form-group"]}>
                   <span>
                     Wallet address
                     {!tooltips.walletAddress && (
@@ -348,7 +348,7 @@ const Create = () => {
                       {formik.errors.address}
                     </div>
                   </CSSTransition>
-                </label>
+                </div>
               )}
 
               {/* <label htmlFor="name" className={styles["form-group"]}>
@@ -414,7 +414,7 @@ const Create = () => {
                 </CSSTransition>
               </label> */}
 
-              <label htmlFor="amount" className={styles["form-group"]}>
+              <div className={styles["form-group"]}>
                 <span>
                   Token amount
                   {!tooltips.tokenAmount && (
@@ -477,9 +477,9 @@ const Create = () => {
                     {formik.errors.amount}
                   </div>
                 </CSSTransition>
-              </label>
+              </div>
 
-              <label htmlFor="length" className={styles["form-group"]}>
+              <div className={styles["form-group"]}>
                 <span>
                   Contract length
                   {!tooltips.contractLength && (
@@ -544,9 +544,9 @@ const Create = () => {
                     {formik.errors.length}
                   </div>
                 </CSSTransition>
-              </label>
+              </div>
 
-              <label htmlFor="Cliff period" className={styles["form-group"]}>
+              <div className={styles["form-group"]}>
                 <span>
                   Cliff period
                   {!tooltips.cliffPeriod && (
@@ -600,9 +600,9 @@ const Create = () => {
                     {formik.errors.cliff as string}
                   </div>
                 </CSSTransition>
-              </label>
+              </div>
 
-              <label className={styles["form-group"]}>
+              <div className={styles["form-group"]}>
                 <span>
                   Grace period
                   {!tooltips.gracePeriod && (
@@ -656,7 +656,7 @@ const Create = () => {
                     {formik.errors.grace}
                   </div>
                 </CSSTransition>
-              </label>
+              </div>
 
               <button
                 disabled={!(formik.isValid && formik.dirty)}

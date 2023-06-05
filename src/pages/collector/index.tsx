@@ -13,9 +13,6 @@ const Collector = () => {
     location.pathname
   );
 
-  useEffect(() => {
-    console.log("Contracts changed..");
-  }, [contracts]);
   const [filterText, setFilteredText] = useState("");
 
   return (

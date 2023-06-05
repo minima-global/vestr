@@ -291,7 +291,7 @@ const ContractDetails = () => {
                     className={styles["show-details"]}
                     onClick={() => setDetails((p) => !p)}
                   >
-                    Show details{" "}
+                    More details{" "}
                     <img
                       className={seeDetails ? styles.active : styles.passive}
                       alt="arrow-down"

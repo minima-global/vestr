@@ -26,7 +26,6 @@ export const createVestingContract = async (
   scriptAddress: string
 ): Promise<0 | 1> => {
   try {
-    console.log("SCRIPTADDDR", scriptAddress);
     const calculateDate = addMonths(new Date(), contractLength);
     // console.log(calculateDate);
     // calculate block in time
