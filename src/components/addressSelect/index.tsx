@@ -24,11 +24,11 @@ const AddressSelect = () => {
               location.state.addressPreference &&
               location.state.addressPreference === "0"
             }
-            disabled={
-              location.state &&
-              location.state.addressPreference &&
-              location.state.addressPreference === "1"
-            }
+            // disabled={
+            //   location.state &&
+            //   location.state.addressPreference &&
+            //   location.state.addressPreference === "1"
+            // }
             type="radio"
             id="my-address"
             name="radio"
@@ -44,11 +44,11 @@ const AddressSelect = () => {
               location.state.addressPreference &&
               location.state.addressPreference === "1"
             }
-            disabled={
-              location.state &&
-              location.state.addressPreference &&
-              location.state.addressPreference === "0"
-            }
+            // disabled={
+            //   location.state &&
+            //   location.state.addressPreference &&
+            //   location.state.addressPreference === "0"
+            // }
             type="radio"
             id="custom-address"
             name="radio"

@@ -16,7 +16,6 @@ const AppProvider = ({ children }: IProps) => {
   const [scriptAddress, setScriptAddress] = useState("");
   const [walletBalance, setWalletBalance] = useState<MinimaToken[]>([]);
 
-  console.log("INIT ScriptAddress", scriptAddress);
   const getBalance = async () => {
     await RPC.getMinimaBalance().then((b) => {
       setWalletBalance(b);
@@ -25,7 +24,6 @@ const AppProvider = ({ children }: IProps) => {
 
   const addScriptGetContracts = async () => {
     await RPC.setNewScript(vestingContract.cleanScript).then((a) => {
-      console.log("Setting new script..", a);
       setScriptAddress(a);
 
       RPC.getCoinsByAddress(a).then((d) => {
@@ -33,7 +31,6 @@ const AppProvider = ({ children }: IProps) => {
         d.relevantCoins.map((c) =>
           map.set(MDS.util.getStateVariable(c, 199), c)
         );
-        console.log("gotCoinsByAddress", map);
 
         setContracts(map);
       });
@@ -41,7 +38,6 @@ const AppProvider = ({ children }: IProps) => {
   };
 
   const getContracts = async (address: string) => {
-    console.log(`Getting contracts w/ scriptAddress: ${address}`);
     RPC.getCoinsByAddress(address).then((d) => {
       const map = new Map();
 
@@ -53,7 +49,6 @@ const AppProvider = ({ children }: IProps) => {
 
   useEffect(() => {
     events.onInit(() => {
-      console.log("ON INIT TRUE");
       addScriptGetContracts();
 
       getBalance();

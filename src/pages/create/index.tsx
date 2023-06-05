@@ -97,6 +97,10 @@ const Create = () => {
       if (own) {
         formik.setFieldValue("address", walletAddress, true);
       }
+
+      if (!own) {
+        formik.setFieldValue("address", "");
+      }
     }
   }, [
     location.state && location.state.addressPreference
@@ -347,9 +351,9 @@ const Create = () => {
                 </label>
               )}
 
-              <label htmlFor="name" className={styles["form-group"]}>
+              {/* <label htmlFor="name" className={styles["form-group"]}>
                 <span>
-                  Contract ID
+                  Contract name
                   {!tooltips.contractID && (
                     <img
                       onClick={() =>
@@ -408,7 +412,7 @@ const Create = () => {
                     {formik.errors.name}
                   </div>
                 </CSSTransition>
-              </label>
+              </label> */}
 
               <label htmlFor="amount" className={styles["form-group"]}>
                 <span>
@@ -715,10 +719,10 @@ const formValidation = yup.object().shape({
       const { path, createError } = this;
 
       if (val === undefined) {
-        return createError({ path, message: "Please select a month" });
+        return createError({ path, message: "Please select a length" });
       }
       if (val < 1) {
-        return createError({ path, message: "Please select a valid month" });
+        return createError({ path, message: "Please select a valid length" });
       }
       return true;
     }),

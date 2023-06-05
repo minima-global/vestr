@@ -30,9 +30,11 @@ p {
 }
 
 *::-webkit-scrollbar {
-  width: 16px;
+  width: 12px;
   border-radius: 4px;
+  background-clip: padding-box;
 }
+
 
 *::-webkit-scrollbar-track {
   background: #FFFFFF;
@@ -43,8 +45,8 @@ p {
 *::-webkit-scrollbar-thumb {
   background-color: #D3D3D8;
   border-radius: 16px;
-  padding: 4px;
 }
+
 
 button {
   font-family: "Manrope";

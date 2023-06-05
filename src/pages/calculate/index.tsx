@@ -71,10 +71,7 @@ const Calculate = () => {
             Back
           </button>
           <section>
-            <p>
-              Before creating a vesting contract, use the calculator below to
-              decide on a schedule.
-            </p>
+            <p>Use the calculator below to decide on a vesting schedule.</p>
           </section>
           <section>
             <label htmlFor="amount" className={styles["form-group"]}>

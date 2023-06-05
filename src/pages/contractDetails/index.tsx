@@ -26,7 +26,6 @@ export function getKeyByValue(object: any, value: any) {
 
 const ContractDetails = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const { scriptAddress } = useContext(appContext);
   const [seeDetails, setDetails] = useState(false);
   const [contract, setContract] = useState<Coin | null>(null);
@@ -40,6 +39,7 @@ const ContractDetails = () => {
   const [prompt, setPrompt] = useState(false);
   const [progress, setProgress] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [finish, setFinished] = useState(false);
   const [error, setError] = useState<false | string>(false);
   const tip = useChainHeight();
 
@@ -47,8 +47,8 @@ const ContractDetails = () => {
 
   const calculatedData: any = useContractCalculation(contract);
   useEffect(() => {
-    console.log(params);
-    console.log(contracts);
+    // console.log(params);
+    // console.log(contracts);
     setContract(contracts.get(params.id));
   }, [contracts]);
 
@@ -84,6 +84,13 @@ const ContractDetails = () => {
       });
       setProgress(false);
       setSuccess(true);
+
+      // has the contract been fully collected ?
+      const contractFinished = !contracts.get(params.id);
+
+      if (contractFinished) {
+        setFinished(true);
+      }
     } catch (error: any) {
       setProgress(false);
       setError(error.message);
@@ -141,6 +148,25 @@ const ContractDetails = () => {
               dismiss={false}
               primaryButtonAction={() => navigate("/dashboard/creator")}
               primaryButtonDisable={true}
+            />
+          </CSSTransition>
+          <CSSTransition
+            in={finish}
+            unmountOnExit
+            timeout={200}
+            classNames={{
+              enter: styles.backdropEnter,
+              enterDone: styles.backdropEnterActive,
+              exit: styles.backdropExit,
+              exitActive: styles.backdropExitActive,
+            }}
+          >
+            <Dialog
+              title="Contract completed"
+              subtitle={<img alt="success" src="./assets/check_circle.svg" />}
+              buttonTitle="Back to contracts"
+              dismiss={false}
+              primaryButtonAction={() => navigate(-1)}
             />
           </CSSTransition>
           <CSSTransition
