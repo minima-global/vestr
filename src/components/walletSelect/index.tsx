@@ -7,6 +7,7 @@ import AppGrid from "../app-grid";
 
 import { CSSTransition } from "react-transition-group";
 import { appContext } from "../../AppContext";
+import { containsText } from "../../utils/utils";
 
 interface IProps {}
 const WalletSelect = () => {
@@ -106,39 +107,86 @@ const WalletSelect = () => {
                   src="./assets/dismiss.svg"
                 />
               </div>
-              <input type="search" placeholder="Search token" />
-              <ul>
-                {balance.map((t: MinimaToken) => (
-                  <li key={t.tokenid} onClick={() => handleSelection(t)}>
-                    {t.tokenid === "0x00" && (
-                      <img alt="token-icon" src="./assets/minimaToken.svg" />
-                    )}
-                    {t.tokenid !== "0x00" && (
-                      <img
-                        alt="token-icon"
-                        src={
-                          "url" in t.token && t.token.url.length
-                            ? t.token.url
-                            : `https://robohash.org/${t.tokenid}`
-                        }
-                      />
-                    )}
+              <input
+                onChange={(e) => setSearchText(e.target.value)}
+                type="search"
+                placeholder="Search token"
+              />
+              {balance.filter(
+                (t: MinimaToken) =>
+                  containsText(
+                    t.tokenid === "0x00"
+                      ? t.token
+                      : "name" in t.token
+                      ? t.token.name
+                      : "",
+                    searchText
+                  ) || containsText(t.tokenid, searchText)
+              ).length > 0 && (
+                <ul>
+                  {balance
+                    .filter(
+                      (t: MinimaToken) =>
+                        containsText(
+                          t.tokenid === "0x00"
+                            ? t.token
+                            : "name" in t.token
+                            ? t.token.name
+                            : "",
+                          searchText
+                        ) || containsText(t.tokenid, searchText)
+                    )
+                    .map((t: MinimaToken) => (
+                      <li key={t.tokenid} onClick={() => handleSelection(t)}>
+                        {t.tokenid === "0x00" && (
+                          <img
+                            alt="token-icon"
+                            src="./assets/minimaToken.svg"
+                          />
+                        )}
+                        {t.tokenid !== "0x00" && (
+                          <img
+                            alt="token-icon"
+                            src={
+                              "url" in t.token && t.token.url.length
+                                ? t.token.url
+                                : `https://robohash.org/${t.tokenid}`
+                            }
+                          />
+                        )}
 
-                    <div>
-                      {t.tokenid === "0x00" && <h6>Minima</h6>}
-                      {t.tokenid !== "0x00" && (
-                        <h6>
-                          {t.token && "name" in t?.token
-                            ? t?.token.name
-                            : "Name not available"}
-                        </h6>
-                      )}
+                        <div>
+                          {t.tokenid === "0x00" && <h6>Minima</h6>}
+                          {t.tokenid !== "0x00" && (
+                            <h6>
+                              {t.token && "name" in t?.token
+                                ? t?.token.name
+                                : "Name not available"}
+                            </h6>
+                          )}
 
-                      <p>{t.sendable}</p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+                          <p>{t.sendable}</p>
+                        </div>
+                      </li>
+                    ))}
+                </ul>
+              )}
+
+              {balance.filter(
+                (t: MinimaToken) =>
+                  containsText(
+                    t.tokenid === "0x00"
+                      ? t.token
+                      : "name" in t.token
+                      ? t.token.name
+                      : "",
+                    searchText
+                  ) || containsText(t.tokenid, searchText)
+              ).length === 0 && (
+                <div>
+                  <p className={styles["no-contracts"]}>No results</p>
+                </div>
+              )}
             </div>
           }
         />

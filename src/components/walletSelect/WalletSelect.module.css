@@ -81,6 +81,7 @@
   grid-template-columns: 1fr;
   gap: 24px;
   height: max-content;
+  min-height: 50vh;
 }
 .dd ul {
   margin:0;
@@ -211,6 +212,20 @@
 
   display: flex;
   flex-direction: column;
+}
+
+
+.no-contracts {
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 28px;
+  letter-spacing: 0.02em;
+  text-align: center;
+  color: #A7A7B0;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  align-self: center;
 }
 
 
