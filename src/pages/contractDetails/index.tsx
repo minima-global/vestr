@@ -116,7 +116,9 @@ const ContractDetails = () => {
               title="Available to collect"
               subtitle={
                 <p className={styles["can-collect"]}>
-                  {calculatedData ? calculatedData.cancollect : "N/A"}
+                  {calculatedData && calculatedData.cancollect > 0
+                    ? calculatedData.cancollect
+                    : "N/A"}
                 </p>
               }
               buttonTitle="Collect"
@@ -504,6 +506,7 @@ const ContractDetails = () => {
               onClick={handleCollectionPrompt}
               className={styles["collect-btn"]}
               type="button"
+              disabled={calculatedData.cancollect <= 0}
             >
               Collect
             </button>
