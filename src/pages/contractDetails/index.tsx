@@ -506,7 +506,7 @@ const ContractDetails = () => {
               onClick={handleCollectionPrompt}
               className={styles["collect-btn"]}
               type="button"
-              disabled={calculatedData.cancollect <= 0}
+              disabled={calculatedData && calculatedData.cancollect <= 0}
             >
               Collect
             </button>
