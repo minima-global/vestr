@@ -15,10 +15,17 @@ const AppProvider = ({ children }: IProps) => {
   const [contracts, setContracts] = useState<Map<string, Coin>>(new Map());
   const [scriptAddress, setScriptAddress] = useState("");
   const [walletBalance, setWalletBalance] = useState<MinimaToken[]>([]);
+  const [vaultLocked, setVaultLocked] = useState(false);
 
   const getBalance = async () => {
     await RPC.getMinimaBalance().then((b) => {
       setWalletBalance(b);
+    });
+  };
+
+  const isVaultLocked = async () => {
+    await RPC.isVaultLocked().then((l) => {
+      setVaultLocked(l);
     });
   };
 
@@ -52,6 +59,8 @@ const AppProvider = ({ children }: IProps) => {
       addScriptGetContracts();
 
       getBalance();
+
+      isVaultLocked();
     });
     events.onNewBalance(() => {
       getBalance();
@@ -66,7 +75,13 @@ const AppProvider = ({ children }: IProps) => {
 
   return (
     <appContext.Provider
-      value={{ scriptAddress, contracts, walletBalance, getContracts }}
+      value={{
+        scriptAddress,
+        contracts,
+        walletBalance,
+        getContracts,
+        vaultLocked,
+      }}
     >
       {children}
     </appContext.Provider>

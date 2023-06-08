@@ -10,7 +10,8 @@ export const Review = ({}: IProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [schedule, setSchedule] = useState<any>();
-  const { submitForm, formStatus, isSubmitting }: any = useOutletContext();
+  const { submitForm, formStatus, isSubmitting, clearForm }: any =
+    useOutletContext();
 
   const scheduleCalculate = async () => {
     const s = await RPC.calculateVestingSchedule(
@@ -137,7 +138,10 @@ export const Review = ({}: IProps) => {
             <button
               disabled={isSubmitting}
               type="button"
-              onClick={() => navigate(-1)}
+              onClick={() => {
+                clearForm(); // status
+                navigate(-1);
+              }}
             >
               Cancel
             </button>

@@ -23,7 +23,8 @@ export const createVestingContract = async (
   minBlockWait: number,
   id: string,
   uid: string,
-  scriptAddress: string
+  scriptAddress: string,
+  password: string
 ): Promise<0 | 1> => {
   try {
     const calculateDate = addMonths(new Date(), contractLength);
@@ -66,7 +67,9 @@ export const createVestingContract = async (
 
     return new Promise((resolve, reject) => {
       MDS.cmd(
-        `send debug:false amount:${amount} address:${scriptAddress} tokenid:${
+        `send debug:false ${
+          password.length ? "password:" + password : ""
+        } amount:${amount} address:${scriptAddress} tokenid:${
           token.tokenid
         } state:{"0":"${address}","1":"${amount}","2":"${startingBlockHeightOfContract}", "3":"${finalEndContractBlockHeight}","4":"${minimumTimeUserMustWaitToCollectAgain}","5":"${new Date().getTime()}","6":"${cliff}","7":"${minBlockWait}", "199":"${uid}"}`,
         (res) => {

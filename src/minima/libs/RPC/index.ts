@@ -10,3 +10,4 @@ export * from "./runScript";
 export * from "./checkAddress";
 export * from "./calculateVestingSchedule";
 export * from "./hash";
+export * from "./isVaultLocked";

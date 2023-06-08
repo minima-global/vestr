@@ -19,13 +19,18 @@ import { MinimaToken } from "../../@types";
 import useMobileView from "../../hooks/useMobileView";
 
 const Create = () => {
-  const { walletBalance: wallet, scriptAddress } = useContext(appContext);
+  const {
+    walletBalance: wallet,
+    scriptAddress,
+    vaultLocked,
+  } = useContext(appContext);
   const { walletAddress } = useWalletAddress();
   const location = useLocation();
   const navigate = useNavigate();
   const [exit, setExit] = useState(false);
   const [review, setReview] = useState(false);
   const isMobile = useMobileView();
+
   // console.log(wallet);
   const [tooltips, setTooltips] = useState({
     walletAddress: false,
@@ -120,6 +125,7 @@ const Create = () => {
       name: "",
       address: "",
       uid: "",
+      password: "",
     },
     onSubmit: async (form) => {
       if (!form.token) throw new Error("You must select a token first");
@@ -133,15 +139,14 @@ const Create = () => {
           form.grace,
           form.name,
           form.uid,
-          scriptAddress
+          scriptAddress,
+          form.password
         ).catch((err) => {
           throw new Error(err);
         });
 
         formik.setStatus(transactionStatus);
       } catch (error: any) {
-        // console.log("Error transaction creation", error.message);
-
         const noCoinsAvailable = error.message.includes("No Coins of tokenid");
         const insufficientFunds = error.message.includes("Insufficient funds");
         formik.setStatus(
@@ -153,7 +158,7 @@ const Create = () => {
         );
       }
     },
-    validationSchema: formValidation,
+    validationSchema: formValidationSelector(vaultLocked),
   });
 
   // console.log("formik errors", formik.errors);
@@ -225,6 +230,7 @@ const Create = () => {
             submitForm: formik.handleSubmit,
             formStatus: formik.status,
             isSubmitting: formik.isSubmitting,
+            clearForm: () => formik.setStatus(undefined),
           }}
         />
       </CSSTransition>
@@ -668,6 +674,41 @@ const Create = () => {
                 </CSSTransition>
               </div>
 
+              {!!vaultLocked && (
+                <div className={styles["form-group"]}>
+                  <span>Vault password</span>
+
+                  <input
+                    placeholder="Vault password"
+                    type="password"
+                    id="password"
+                    name="password"
+                    value={formik.values.password}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                  />
+                  <CSSTransition
+                    in={
+                      formik.errors.password && formik.touched.password
+                        ? true
+                        : false
+                    }
+                    unmountOnExit
+                    timeout={200}
+                    classNames={{
+                      enter: styles.backdropEnter,
+                      enterDone: styles.backdropEnterActive,
+                      exit: styles.backdropExit,
+                      exitActive: styles.backdropExitActive,
+                    }}
+                  >
+                    <div className={styles["formError"]}>
+                      {formik.errors.password}
+                    </div>
+                  </CSSTransition>
+                </div>
+              )}
+
               <button
                 disabled={!(formik.isValid && formik.dirty)}
                 type="button"
@@ -685,80 +726,97 @@ const Create = () => {
 
 export default Create;
 
-const formValidation = yup.object().shape({
-  token: yup.object().required("Field is required"),
-  amount: yup.number().required("Field is required"),
-  cliff: yup.number().test("cliff", function (val) {
-    const { path, createError, parent } = this;
-    if (val === undefined) return true;
+const formValidationSelector = (vaultLocked: boolean) => {
+  return yup.object().shape({
+    token: yup.object().required("Field is required"),
+    amount: yup.number().required("Field is required"),
+    cliff: yup.number().test("cliff", function (val) {
+      const { path, createError, parent } = this;
+      if (val === undefined) return true;
 
-    const contractLength = parent.length;
+      const contractLength = parent.length;
 
-    // if (typeof contractLength !== "number" || contractLength === 0) return true;
+      // if (typeof contractLength !== "number" || contractLength === 0) return true;
 
-    const invalidCliffAmount = val >= contractLength;
-    if (invalidCliffAmount && Number(contractLength)) {
-      return createError({
-        path,
-        message: "Cliff period must be less than the contract length",
-      });
-    }
-
-    return true;
-  }),
-  grace: yup.number().test("grace", function (val) {
-    const { path, createError, parent } = this;
-    if (val === undefined) return true;
-
-    const contractLength = parent.length;
-
-    const invalidGracePeriod = val >= contractLength * 168 * 4;
-    if (invalidGracePeriod && Number(contractLength)) {
-      return createError({
-        path,
-        message: "Grace period must be less than the contract length",
-      });
-    }
-
-    return true;
-  }),
-  length: yup
-    .number()
-    .required("Field is required")
-    .test("contract-length", function (val) {
-      const { path, createError } = this;
-
-      if (val === undefined) {
-        return createError({ path, message: "Please select a length" });
+      const invalidCliffAmount = val >= contractLength;
+      if (invalidCliffAmount && Number(contractLength)) {
+        return createError({
+          path,
+          message: "Cliff period must be less than the contract length",
+        });
       }
-      if (val < 1) {
-        return createError({ path, message: "Please select a valid length" });
-      }
+
       return true;
     }),
-  name: yup
-    .string()
-    .max(255, "Contract name must be at most 255 characters")
-    .matches(/^[^\\;]+$/, "Invalid characters"),
-  address: yup
-    .string()
-    .required("Field is required")
-    .matches(/0|M[xX][0-9a-zA-Z]+/, "Invalid Address.")
-    .min(59, "Invalid Address, too short.")
-    .max(66, "Invalid Address, too long.")
-    .test("check-address", "Invalid address", function (val) {
-      const { path, createError } = this;
+    grace: yup.number().test("grace", function (val) {
+      const { path, createError, parent } = this;
+      if (val === undefined) return true;
 
-      if (val === undefined) {
-        return false;
+      const contractLength = parent.length;
+
+      const invalidGracePeriod = val >= contractLength * 168 * 4;
+      if (invalidGracePeriod && Number(contractLength)) {
+        return createError({
+          path,
+          message: "Grace period must be less than the contract length",
+        });
       }
 
-      return RPC.checkAddress(val)
-        .then(() => {
-          return true;
-        })
-        .catch((err) => {
-          return createError({ path, message: err });
-        });
+      return true;
     }),
-});
+    length: yup
+      .number()
+      .required("Field is required")
+      .test("contract-length", function (val) {
+        const { path, createError } = this;
+
+        if (val === undefined) {
+          return createError({ path, message: "Please select a length" });
+        }
+        if (val < 1) {
+          return createError({ path, message: "Please select a valid length" });
+        }
+        return true;
+      }),
+    name: yup
+      .string()
+      .max(255, "Contract name must be at most 255 characters")
+      .matches(/^[^\\;]+$/, "Invalid characters"),
+    address: yup
+      .string()
+      .required("Field is required")
+      .matches(/0|M[xX][0-9a-zA-Z]+/, "Invalid Address.")
+      .min(59, "Invalid Address, too short.")
+      .max(66, "Invalid Address, too long.")
+      .test("check-address", "Invalid address", function (val) {
+        const { path, createError } = this;
+
+        if (val === undefined) {
+          return false;
+        }
+
+        return RPC.checkAddress(val)
+          .then(() => {
+            return true;
+          })
+          .catch((err) => {
+            return createError({ path, message: err });
+          });
+      }),
+    password: yup.string().test("check-password", function (val) {
+      const { createError, path } = this;
+      if (!vaultLocked) {
+        return true;
+      }
+
+      if (vaultLocked && val === undefined) {
+        return createError({
+          path,
+          message: "Please enter your vault password.",
+        });
+      }
+
+      return true;
+    }),
+  });
+};
