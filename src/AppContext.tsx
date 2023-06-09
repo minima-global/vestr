@@ -4,6 +4,7 @@ import { vestingContract } from "./minima/libs/contracts";
 import { events } from "./minima/libs/events";
 
 import { Coin, MinimaToken } from "./@types";
+import useFirstVisit from "./hooks/useFirstVisit";
 
 export const appContext = createContext({} as any);
 
@@ -16,6 +17,7 @@ const AppProvider = ({ children }: IProps) => {
   const [scriptAddress, setScriptAddress] = useState("");
   const [walletBalance, setWalletBalance] = useState<MinimaToken[]>([]);
   const [vaultLocked, setVaultLocked] = useState(false);
+  const firstVisit = useFirstVisit();
 
   const getBalance = async () => {
     await RPC.getMinimaBalance().then((b) => {
@@ -81,6 +83,7 @@ const AppProvider = ({ children }: IProps) => {
         walletBalance,
         getContracts,
         vaultLocked,
+        firstVisit,
       }}
     >
       {children}

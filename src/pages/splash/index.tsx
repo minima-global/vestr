@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import styles from "./Splash.module.css";
 import { useNavigate } from "react-router-dom";
 import Vestr from "../../assets/vestr.json";
