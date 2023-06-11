@@ -1,9 +1,12 @@
 import { NavLink, Outlet } from "react-router-dom";
 import styles from "./Dashboard.module.css";
+import useGetInnerHeight from "../../hooks/useGetInnerHeight";
 const Dashboard = () => {
+  const innerHeight = useGetInnerHeight();
+
   return (
     <>
-      <div className={styles["grid"]}>
+      <div className={`${styles.grid}`} style={{ height: `${innerHeight}px` }}>
         <header>
           <div>
             <img alt="brand" src="./assets/brand.svg" />

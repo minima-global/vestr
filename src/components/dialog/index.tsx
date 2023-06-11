@@ -1,3 +1,4 @@
+import useGetInnerHeight from "../../hooks/useGetInnerHeight";
 import styles from "./Dialog.module.css";
 
 interface IProps {
@@ -18,10 +19,11 @@ const Dialog = ({
   primaryButtonAction,
   primaryButtonDisable = false,
 }: IProps) => {
+  const innerHeight = useGetInnerHeight();
   return (
     <div>
       <div className={styles["backdrop"]} />
-      <div className={styles["grid"]}>
+      <div className={styles["grid"]} style={{ height: `${innerHeight}px` }}>
         <header />
         <main>
           <section>

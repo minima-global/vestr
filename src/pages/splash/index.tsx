@@ -4,8 +4,10 @@ import { useNavigate } from "react-router-dom";
 import Vestr from "../../assets/vestr.json";
 import Lottie from "lottie-react";
 import { CSSTransition } from "react-transition-group";
+import useGetInnerHeight from "../../hooks/useGetInnerHeight";
 
 const SplashPage = () => {
+  const innerHeight = useGetInnerHeight();
   const navigate = useNavigate();
   const [displayBrand, setBrand] = useState(true);
   const [screen, setScreen] = useState(0);
@@ -30,8 +32,9 @@ const SplashPage = () => {
     <div
       onClick={!!displayBrand ? () => setBrand(false) : handleClick}
       className={`${styles.layout} ${!displayBrand ? styles.dark_bg : ""}`}
+      style={{ height: `${innerHeight}px` }}
     >
-      <div>
+      <div style={{ height: `${innerHeight}px` }}>
         <div />
         <div>
           {!!displayBrand && (
