@@ -1,12 +1,25 @@
 import { NavLink, Outlet } from "react-router-dom";
 import styles from "./Dashboard.module.css";
 import useGetInnerHeight from "../../hooks/useGetInnerHeight";
+// @ts-ignore
+import { useKeyboardOffset } from "virtual-keyboard-offset";
 const Dashboard = () => {
   const innerHeight = useGetInnerHeight();
+  // get the height when the virtual keyboard is open
+
+  const { keyBoardOffset, windowHeight } = useKeyboardOffset();
+  console.log(keyBoardOffset, windowHeight);
 
   return (
     <>
-      <div className={`${styles.grid}`} style={{ height: `${innerHeight}px` }}>
+      <div
+        className={`${styles.grid}`}
+        style={{
+          height: `${
+            keyBoardOffset.length ? windowHeight + "px" : innerHeight + "px"
+          }`,
+        }}
+      >
         <header>
           <div>
             <img alt="brand" src="./assets/brand.svg" />
