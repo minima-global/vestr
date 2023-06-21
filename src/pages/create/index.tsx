@@ -1,10 +1,9 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Outlet, useLocation, matchPath, useNavigate } from "react-router-dom";
 import styles from "./Create.module.css";
 import Dialog from "../../components/dialog";
 import WalletSelect from "../../components/walletSelect";
 import GraceSelect, { gracePeriods } from "../../components/gracePeriod";
-import CliffSelect from "../../components/cliffPeriod";
 import AddressSelect from "../../components/addressSelect";
 import { useFormik } from "formik";
 import useWalletAddress from "../../hooks/useWalletAddress";
@@ -17,21 +16,50 @@ import Tooltip from "../../components/tooltip";
 import { appContext } from "../../AppContext";
 import { MinimaToken } from "../../@types";
 import useMobileView from "../../hooks/useMobileView";
+import { DateTimePicker } from "@mui/x-date-pickers";
+import { isDate, addMinutes } from "date-fns";
+import TimeSelector from "../../components/timeSelector";
+
+import Decimal from "decimal.js";
+
+const cliffOptions = [
+  {
+    option: "minutes",
+    value: 0,
+  },
+  {
+    option: "hours",
+    value: 60,
+  },
+  {
+    option: "days",
+    value: 1440,
+  },
+  { option: "weeks", value: 10080 },
+  { option: "months", value: 40320 },
+];
 
 const Create = () => {
   const {
     walletBalance: wallet,
-    scriptAddress,
     vaultLocked,
+    scriptAddress,
   } = useContext(appContext);
-  const { walletAddress } = useWalletAddress();
   const location = useLocation();
   const navigate = useNavigate();
+  const isMobile = useMobileView();
+  const customInputRef = useRef(null);
+
+  const { walletAddress } = useWalletAddress();
+
   const [exit, setExit] = useState(false);
   const [review, setReview] = useState(false);
-  const isMobile = useMobileView();
 
-  // console.log(wallet);
+  const [openPicker, setOpenPicker] = useState(false);
+
+  const [dateTimePickerConstraintsOnCliff, setDateTimePickerConstraintOnCliff] =
+    useState<Date | undefined>(undefined);
+
   const [tooltips, setTooltips] = useState({
     walletAddress: false,
     contractID: false,
@@ -73,12 +101,6 @@ const Create = () => {
   };
 
   useEffect(() => {
-    if (location.state && location.state.cliff) {
-      formik.setFieldValue("cliff", location.state.cliff, true);
-    }
-  }, [location.state && location.state.cliff ? location.state.cliff : ""]);
-
-  useEffect(() => {
     formik.setFieldValue(
       "token",
       location.state && location.state.tokenid
@@ -115,27 +137,32 @@ const Create = () => {
       : "",
   ]);
 
+  // @ts-ignore
   const formik = useFormik({
     initialValues: {
       token: wallet[0],
-      cliff: 0,
+      cliff: {
+        quantity: 0,
+        period: 1440,
+      },
       grace: 0,
       amount: 0,
-      length: 0,
+      datetime: undefined,
       name: "",
       address: "",
       uid: "",
       password: "",
     },
     onSubmit: async (form) => {
-      if (!form.token) throw new Error("You must select a token first");
+      if (!form.datetime)
+        return formik.setFieldError("datetime", "Please select a valid date");
       try {
-        const transactionStatus: 0 | 1 = await RPC.createVestingContract(
+        const transactionStatus = await RPC.createVestingContract(
           form.amount.toString(),
-          form.cliff,
+          { quantity: form.cliff.quantity, period: form.cliff.period },
           form.address,
           form.token,
-          form.length,
+          form.datetime,
           form.grace,
           form.name,
           form.uid,
@@ -160,9 +187,6 @@ const Create = () => {
     },
     validationSchema: formValidationSelector(vaultLocked),
   });
-
-  // console.log("formik errors", formik.errors);
-  // console.log("token ", formik.values.token);
 
   return (
     <>
@@ -346,11 +370,7 @@ const Create = () => {
                     onChange={formik.handleChange}
                   />
                   <CSSTransition
-                    in={
-                      formik.errors.address && formik.touched.address
-                        ? true
-                        : false
-                    }
+                    in={formik.errors.address}
                     unmountOnExit
                     timeout={200}
                     classNames={{
@@ -366,69 +386,6 @@ const Create = () => {
                   </CSSTransition>
                 </div>
               )}
-
-              {/* <label htmlFor="name" className={styles["form-group"]}>
-                <span>
-                  Contract name
-                  {!tooltips.contractID && (
-                    <img
-                      onClick={() =>
-                        setTooltips({ ...tooltips, contractID: true })
-                      }
-                      alt="question"
-                      src="./assets/help_filled.svg"
-                    />
-                  )}
-                  {!!tooltips.contractID && (
-                    <img
-                      onClick={() =>
-                        setTooltips({ ...tooltips, contractID: false })
-                      }
-                      alt="question"
-                      src="./assets/cancel_filled.svg"
-                    />
-                  )}
-                </span>
-                <CSSTransition
-                  in={tooltips.contractID}
-                  unmountOnExit
-                  timeout={200}
-                  classNames={{
-                    enter: styles.backdropEnter,
-                    enterDone: styles.backdropEnterActive,
-                    exit: styles.backdropExit,
-                    exitActive: styles.backdropExitActive,
-                  }}
-                >
-                  <Tooltip
-                    content="A name for your contract so you can easily identify it."
-                    position={98}
-                  />
-                </CSSTransition>
-                <input
-                  placeholder="Contract name"
-                  type="text"
-                  id="name"
-                  name="name"
-                  value={formik.values.name}
-                  onChange={formik.handleChange}
-                />
-                <CSSTransition
-                  in={formik.errors.name && formik.touched.name ? true : false}
-                  unmountOnExit
-                  timeout={200}
-                  classNames={{
-                    enter: styles.backdropEnter,
-                    enterDone: styles.backdropEnterActive,
-                    exit: styles.backdropExit,
-                    exitActive: styles.backdropExitActive,
-                  }}
-                >
-                  <div className={styles["formError"]}>
-                    {formik.errors.name}
-                  </div>
-                </CSSTransition>
-              </label> */}
 
               <div className={styles["form-group"]}>
                 <span>
@@ -477,9 +434,7 @@ const Create = () => {
                   onChange={formik.handleChange}
                 />
                 <CSSTransition
-                  in={
-                    formik.errors.amount && formik.touched.amount ? true : false
-                  }
+                  in={formik.errors.amount}
                   unmountOnExit
                   timeout={200}
                   classNames={{
@@ -491,73 +446,6 @@ const Create = () => {
                 >
                   <div className={styles["formError"]}>
                     {formik.errors.amount}
-                  </div>
-                </CSSTransition>
-              </div>
-
-              <div className={styles["form-group"]}>
-                <span>
-                  Contract length
-                  {!tooltips.contractLength && (
-                    <img
-                      onClick={() =>
-                        setTooltips({ ...tooltips, contractLength: true })
-                      }
-                      alt="question"
-                      src="./assets/help_filled.svg"
-                    />
-                  )}
-                  {!!tooltips.contractLength && (
-                    <img
-                      onClick={() =>
-                        setTooltips({ ...tooltips, contractLength: false })
-                      }
-                      alt="question"
-                      src="./assets/cancel_filled.svg"
-                    />
-                  )}
-                </span>
-                <CSSTransition
-                  in={tooltips.contractLength}
-                  unmountOnExit
-                  timeout={200}
-                  classNames={{
-                    enter: styles.backdropEnter,
-                    enterDone: styles.backdropEnterActive,
-                    exit: styles.backdropExit,
-                    exitActive: styles.backdropExitActive,
-                  }}
-                >
-                  <Tooltip
-                    content="The number of months the contract lasts."
-                    position={136}
-                  />
-                </CSSTransition>
-
-                <input
-                  placeholder="Contract length"
-                  type="number"
-                  id="length"
-                  name="length"
-                  value={formik.values.length > 0 ? formik.values.length : ""}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                />
-                <CSSTransition
-                  in={
-                    formik.errors.length && formik.touched.length ? true : false
-                  }
-                  unmountOnExit
-                  timeout={200}
-                  classNames={{
-                    enter: styles.backdropEnter,
-                    enterDone: styles.backdropEnterActive,
-                    exit: styles.backdropExit,
-                    exitActive: styles.backdropExitActive,
-                  }}
-                >
-                  <div className={styles["formError"]}>
-                    {formik.errors.length}
                   </div>
                 </CSSTransition>
               </div>
@@ -600,9 +488,46 @@ const Create = () => {
                     position={96}
                   />
                 </CSSTransition>
-                <CliffSelect />
+                <div className={styles["cliff-group"]}>
+                  <input
+                    placeholder="Cliff period"
+                    id="cliff.quantity"
+                    name="cliff.quantity"
+                    type="number"
+                    value={
+                      formik.values.cliff.quantity
+                        ? formik.values.cliff.quantity
+                        : ""
+                    }
+                    onChange={(e) => {
+                      formik.handleChange(e);
+
+                      if (!e.target.value) {
+                        return setDateTimePickerConstraintOnCliff(undefined);
+                      }
+                      const inMinutes = formik.values.cliff.period === 0;
+                      const calculateCliff = new Decimal(e.target.value)
+                        .times(inMinutes ? 1 : formik.values.cliff.period)
+                        .toNumber();
+                      const today = new Date();
+                      const cliffPeriod = addMinutes(today, calculateCliff);
+
+                      setDateTimePickerConstraintOnCliff(cliffPeriod);
+                    }}
+                    onBlur={formik.handleBlur}
+                  />
+                  <TimeSelector
+                    options={cliffOptions}
+                    setForm={(option) => {
+                      formik.setFieldValue("cliff.period", option);
+                    }}
+                  />
+                </div>
                 <CSSTransition
-                  in={Boolean(formik.errors.cliff)}
+                  in={
+                    Boolean(formik.errors.cliff) &&
+                    Boolean(formik.touched.cliff)
+                  }
                   unmountOnExit
                   timeout={200}
                   classNames={{
@@ -614,6 +539,91 @@ const Create = () => {
                 >
                   <div className={styles["formError"]}>
                     {formik.errors.cliff as string}
+                  </div>
+                </CSSTransition>
+              </div>
+
+              <div className={styles["form-group"]}>
+                <span>
+                  Contract end date/time
+                  {!tooltips.contractLength && (
+                    <img
+                      onClick={() =>
+                        setTooltips({ ...tooltips, contractLength: true })
+                      }
+                      alt="question"
+                      src="./assets/help_filled.svg"
+                    />
+                  )}
+                  {!!tooltips.contractLength && (
+                    <img
+                      onClick={() =>
+                        setTooltips({ ...tooltips, contractLength: false })
+                      }
+                      alt="question"
+                      src="./assets/cancel_filled.svg"
+                    />
+                  )}
+                </span>
+                <CSSTransition
+                  in={tooltips.contractLength}
+                  unmountOnExit
+                  timeout={200}
+                  classNames={{
+                    enter: styles.backdropEnter,
+                    enterDone: styles.backdropEnterActive,
+                    exit: styles.backdropExit,
+                    exitActive: styles.backdropExitActive,
+                  }}
+                >
+                  <Tooltip
+                    content="The number of months the contract lasts."
+                    position={136}
+                  />
+                </CSSTransition>
+
+                <DateTimePicker
+                  open={openPicker}
+                  disablePast={true}
+                  minDateTime={dateTimePickerConstraintsOnCliff}
+                  value={formik.values.datetime}
+                  PopperProps={{ anchorEl: customInputRef.current }}
+                  onChange={(value) => {
+                    formik.setFieldValue("datetime", value, true);
+                  }}
+                  onClose={() => setOpenPicker(false)}
+                  renderInput={({ ref, inputProps, disabled, onChange }) => {
+                    return (
+                      <div ref={ref}>
+                        <input
+                          id="datetime"
+                          name="datetime"
+                          className={styles["datetime-input"]}
+                          onClick={() => setOpenPicker(true)}
+                          value={formik.values.datetime}
+                          onChange={onChange}
+                          disabled={disabled}
+                          placeholder="Select contract end"
+                          ref={customInputRef}
+                          {...inputProps}
+                        />
+                      </div>
+                    );
+                  }}
+                />
+                <CSSTransition
+                  in={formik.errors.datetime}
+                  unmountOnExit
+                  timeout={200}
+                  classNames={{
+                    enter: styles.backdropEnter,
+                    enterDone: styles.backdropEnterActive,
+                    exit: styles.bafckdropExit,
+                    exitActive: styles.backdropExitActive,
+                  }}
+                >
+                  <div className={styles["formError"]}>
+                    {formik.errors.datetime}
                   </div>
                 </CSSTransition>
               </div>
@@ -688,11 +698,7 @@ const Create = () => {
                     onBlur={formik.handleBlur}
                   />
                   <CSSTransition
-                    in={
-                      formik.errors.password && formik.touched.password
-                        ? true
-                        : false
-                    }
+                    in={formik.errors.password}
                     unmountOnExit
                     timeout={200}
                     classNames={{
@@ -730,52 +736,71 @@ const formValidationSelector = (vaultLocked: boolean) => {
   return yup.object().shape({
     token: yup.object().required("Field is required"),
     amount: yup.number().required("Field is required"),
-    cliff: yup.number().test("cliff", function (val) {
-      const { path, createError, parent } = this;
-      if (val === undefined) return true;
+    cliff: yup
+      .object()
+      .shape({
+        quantity: yup.number(),
+        period: yup.number(),
+      })
+      .test(
+        "test if end contract is more than the selected cliff",
+        function (val) {
+          const { path, parent, createError } = this;
 
-      const contractLength = parent.length;
+          if (!val) {
+            return true;
+          }
 
-      // if (typeof contractLength !== "number" || contractLength === 0) return true;
+          if (val.quantity === undefined || val.period === undefined) {
+            return true;
+          }
 
-      const invalidCliffAmount = val >= contractLength;
-      if (invalidCliffAmount && Number(contractLength)) {
-        return createError({
-          path,
-          message: "Cliff period must be less than the contract length",
-        });
-      }
+          const inMinutes = val.period === 0;
 
-      return true;
-    }),
+          const calculateCliff = new Decimal(val.quantity)
+            .times(inMinutes ? 1 : val.period)
+            .toNumber();
+          const today = new Date();
+          const cliffPeriod = addMinutes(today, calculateCliff);
+          const endContractLessThanCliff = parent.datetime >= cliffPeriod;
+
+          if (!endContractLessThanCliff) {
+            return createError({
+              path,
+              message:
+                "Please enter a cliff period less than the contract's length",
+            });
+          }
+          return true;
+        }
+      ),
     grace: yup.number().test("grace", function (val) {
-      const { path, createError, parent } = this;
       if (val === undefined) return true;
-
-      const contractLength = parent.length;
-
-      const invalidGracePeriod = val >= contractLength * 168 * 4;
-      if (invalidGracePeriod && Number(contractLength)) {
-        return createError({
-          path,
-          message: "Grace period must be less than the contract length",
-        });
-      }
 
       return true;
     }),
-    length: yup
-      .number()
+    datetime: yup
+      .date()
       .required("Field is required")
-      .test("contract-length", function (val) {
+      .typeError("Select a valid date and time")
+      .test("datetime-check", "Invalid date", function (val) {
         const { path, createError } = this;
 
         if (val === undefined) {
-          return createError({ path, message: "Please select a length" });
+          return false;
         }
-        if (val < 1) {
-          return createError({ path, message: "Please select a valid length" });
+
+        if (!isDate(val)) {
+          return createError({ path, message: "Please select a valid date" });
         }
+
+        if (val <= new Date()) {
+          return createError({
+            path,
+            message: "Please select a date in the future",
+          });
+        }
+
         return true;
       }),
     name: yup

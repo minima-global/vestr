@@ -148,6 +148,10 @@
   color: #91919D;
   border-color: #91919D;
 }
+.button-wrapper button:last-of-type:disabled {
+  opacity: 0.8;
+  cursor: not-allowed;
+}
 
 .formError {
   background-color: #FFE2E9;

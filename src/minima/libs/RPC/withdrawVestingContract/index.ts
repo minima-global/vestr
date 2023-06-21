@@ -57,6 +57,10 @@ export const withdrawVestingContract = (
       coin,
       7
     )};         
+            txnstate id:${id} port:8 value:${MDS.util.getStateVariable(
+      coin,
+      8
+    )};         
             txnstate id:${id} port:199 value:${MDS.util.getStateVariable(
       coin,
       199

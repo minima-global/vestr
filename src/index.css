@@ -30,21 +30,12 @@ p {
 }
 
 *::-webkit-scrollbar {
-  width: 12px;
-  border-radius: 4px;
-  background-clip: padding-box;
+  display: none;
 }
 
-
-*::-webkit-scrollbar-track {
-  background: #FFFFFF;
-  border-radius: 16px;
-  border: 2px solid #D3D3D8;
-}
-
-*::-webkit-scrollbar-thumb {
-  background-color: #D3D3D8;
-  border-radius: 16px;
+* {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;
 }
 
 

@@ -1,7 +1,7 @@
 import { format } from "date-fns";
 import { useContext, useEffect, useState } from "react";
 import styles from "./ContractDetails.module.css";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { CSSTransition } from "react-transition-group";
 import { Coin } from "../../@types";
 
@@ -19,6 +19,8 @@ import Dialog from "../../components/dialog";
 import Loading from "../../assets/loading.json";
 import Lottie from "lottie-react";
 import { appContext } from "../../AppContext";
+
+import { addMinutes } from "date-fns";
 
 export function getKeyByValue(object: any, value: any) {
   return Object.keys(object).find((key) => object[key] === value);
@@ -47,8 +49,6 @@ const ContractDetails = () => {
 
   const calculatedData: any = useContractCalculation(contract);
   useEffect(() => {
-    // console.log(params);
-    // console.log(contracts);
     setContract(contracts.get(params.id));
   }, [contracts]);
 
@@ -330,14 +330,42 @@ const ContractDetails = () => {
                           at
                           {format(
                             parseInt(MDS.util.getStateVariable(contract, 5)),
-                            ` hh:m a`
+                            ` hh:mm:ss a`
                           )}
                         </p>
                       </li>
                       <li>
-                        <h6>Cliff period</h6>
+                        <h6>Cliff period until</h6>
                         <p>
-                          {MDS.util.getStateVariable(contract, 6) + " month(s)"}
+                          {format(
+                            addMinutes(
+                              parseInt(MDS.util.getStateVariable(contract, 5)),
+                              parseInt(MDS.util.getStateVariable(contract, 6))
+                            ),
+                            "dd MMMM yyyy "
+                          )}
+                          at
+                          {format(
+                            addMinutes(
+                              parseInt(MDS.util.getStateVariable(contract, 5)),
+                              parseInt(MDS.util.getStateVariable(contract, 6))
+                            ),
+                            " hh:mm:ss a"
+                          )}
+                        </p>
+                      </li>
+                      <li>
+                        <h6>Contracts ends</h6>
+                        <p>
+                          {format(
+                            parseInt(MDS.util.getStateVariable(contract, 8)),
+                            "d MMMM yyyy "
+                          )}
+                          at
+                          {format(
+                            parseInt(MDS.util.getStateVariable(contract, 8)),
+                            " hh:mm:ss a"
+                          )}
                         </p>
                       </li>
                       <li>

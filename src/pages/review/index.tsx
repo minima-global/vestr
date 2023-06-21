@@ -5,10 +5,14 @@ import { useLocation, useNavigate, useOutletContext } from "react-router-dom";
 import { useEffect } from "react";
 import * as RPC from "../../minima/libs/RPC";
 
+import { format, addMinutes } from "date-fns";
+import Decimal from "decimal.js";
+
 interface IProps {}
 export const Review = ({}: IProps) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [cliffPeriod, setCliffPeriod] = useState<Date | false>(false);
   const [schedule, setSchedule] = useState<any>();
   const { submitForm, formStatus, isSubmitting, clearForm }: any =
     useOutletContext();
@@ -22,10 +26,24 @@ export const Review = ({}: IProps) => {
     setSchedule(s);
   };
 
+  const calculateCliff = () => {
+    if (!location.state.contract.cliff.quantity) return;
+
+    const inMinutes = location.state.contract.cliff.period === 0;
+    const calculateCliff = new Decimal(location.state.contract.cliff.quantity)
+      .times(inMinutes ? 1 : location.state.contract.cliff.period)
+      .toNumber();
+    const today = new Date();
+    const cliffPeriod = addMinutes(today, calculateCliff);
+    setCliffPeriod(cliffPeriod);
+  };
+
   useEffect(() => {
     if (location.state && !location.state.contract) {
       navigate("/dashboard/creator/create");
     }
+
+    calculateCliff();
 
     scheduleCalculate();
   }, [location.state]);
@@ -83,8 +101,13 @@ export const Review = ({}: IProps) => {
                 <p>{location.state.contract.id}</p>
               </li>
               <li>
-                <h6>Contract length</h6>
-                <p>{location.state.contract.length + " month(s)"}</p>
+                <h6>Contract ends</h6>
+                <p>
+                  {format(
+                    location.state.contract.datetime,
+                    "dd MMMM yyyy, hh:mm:ss a"
+                  )}
+                </p>
               </li>
               <li>
                 <h6>Collection address</h6>
@@ -92,7 +115,11 @@ export const Review = ({}: IProps) => {
               </li>
               <li>
                 <h6>Cliff period</h6>
-                <p>{location.state.contract.cliff + " month(s)"}</p>
+                <p>
+                  {cliffPeriod
+                    ? format(cliffPeriod, "dd MMMM yyyy, hh:mm:ss a")
+                    : "N/A"}
+                </p>
               </li>
               <li>
                 <h6>Grace period</h6>
