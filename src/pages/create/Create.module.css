@@ -220,3 +220,20 @@
 
 
 
+.datetime-input {
+  width: 100%;
+}
+
+
+.cliff-group {
+  display: flex;
+  gap: 4px;
+}
+
+.cliff-group > input {
+  width: 100%;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  line-height: 16px;
+  max-height: 50px;
+}

@@ -1,7 +1,7 @@
 import { format } from "date-fns";
 import { useContext, useEffect, useState } from "react";
 import styles from "./ContractDetails.module.css";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { CSSTransition } from "react-transition-group";
 import { Coin } from "../../@types";
 
@@ -19,6 +19,8 @@ import Dialog from "../../components/dialog";
 import Loading from "../../assets/loading.json";
 import Lottie from "lottie-react";
 import { appContext } from "../../AppContext";
+
+import { addMinutes } from "date-fns";
 
 export function getKeyByValue(object: any, value: any) {
   return Object.keys(object).find((key) => object[key] === value);
@@ -47,8 +49,6 @@ const ContractDetails = () => {
 
   const calculatedData: any = useContractCalculation(contract);
   useEffect(() => {
-    // console.log(params);
-    // console.log(contracts);
     setContract(contracts.get(params.id));
   }, [contracts]);
 
@@ -245,6 +245,27 @@ const ContractDetails = () => {
               <section>
                 <h6>Contract details</h6>
                 <ul>
+                  {calculatedData && (
+                    <li
+                      className={`${
+                        calculatedData.cancollect <= 0 ? "" : styles["golden"]
+                      }`}
+                    >
+                      <h6>Tokens available to collect</h6>
+                      <p>
+                        {calculatedData.cancollect <= 0
+                          ? 0
+                          : calculatedData.cancollect}
+                      </p>
+                    </li>
+                  )}
+                  <li>
+                    <h6>Tokens remaining</h6>
+                    {contract.tokenid === "0x00" && <p>{contract.amount}</p>}
+                    {contract.tokenid !== "0x00" && contract.tokenamount && (
+                      <p>{contract.tokenamount}</p>
+                    )}
+                  </li>
                   <li>
                     <h6>Contract ID</h6>
                     <p>{MDS.util.getStateVariable(contract, 199)}</p>
@@ -258,31 +279,6 @@ const ContractDetails = () => {
                           ? contract.token.name.name
                           : "N/A"}
                       </p>
-                    )}
-                  </li>
-                  <li>
-                    <h6>Tokens collected</h6>
-                    {!contract && <p>N/A</p>}
-                    {contract.tokenid === "0x00" && (
-                      <p>
-                        {new Decimal(MDS.util.getStateVariable(contract, 1))
-                          .minus(contract.amount)
-                          .toString()}
-                      </p>
-                    )}
-                    {contract.tokenid !== "0x00" && contract.tokenamount && (
-                      <p>
-                        {new Decimal(MDS.util.getStateVariable(contract, 1))
-                          .minus(contract.tokenamount)
-                          .toString()}
-                      </p>
-                    )}
-                  </li>
-                  <li>
-                    <h6>Total tokens left to collect</h6>
-                    {contract.tokenid === "0x00" && <p>{contract.amount}</p>}
-                    {contract.tokenid !== "0x00" && contract.tokenamount && (
-                      <p>{contract.tokenamount}</p>
                     )}
                   </li>
                 </ul>
@@ -313,11 +309,32 @@ const ContractDetails = () => {
                   >
                     <ul className={styles["hidden-details"]}>
                       <li>
-                        <h6>Available to withdraw</h6>
+                        <h6>Tokens collected</h6>
+                        {!contract && <p>N/A</p>}
+                        {contract.tokenid === "0x00" && (
+                          <p>
+                            {new Decimal(MDS.util.getStateVariable(contract, 1))
+                              .minus(contract.amount)
+                              .toString()}
+                          </p>
+                        )}
+                        {contract.tokenid !== "0x00" &&
+                          contract.tokenamount && (
+                            <p>
+                              {new Decimal(
+                                MDS.util.getStateVariable(contract, 1)
+                              )
+                                .minus(contract.tokenamount)
+                                .toString()}
+                            </p>
+                          )}
+                      </li>
+                      <li>
+                        <h6>Contract amount</h6>
                         <p>
-                          {calculatedData.cancollect < 0
-                            ? 0
-                            : calculatedData.cancollect}
+                          {new Decimal(
+                            MDS.util.getStateVariable(contract, 1)
+                          ).toString()}
                         </p>
                       </li>
                       <li>
@@ -330,14 +347,42 @@ const ContractDetails = () => {
                           at
                           {format(
                             parseInt(MDS.util.getStateVariable(contract, 5)),
-                            ` hh:m a`
+                            ` hh:mm:ss a`
                           )}
                         </p>
                       </li>
                       <li>
-                        <h6>Cliff period</h6>
+                        <h6>Cliff period until</h6>
                         <p>
-                          {MDS.util.getStateVariable(contract, 6) + " month(s)"}
+                          {format(
+                            addMinutes(
+                              parseInt(MDS.util.getStateVariable(contract, 5)),
+                              parseInt(MDS.util.getStateVariable(contract, 6))
+                            ),
+                            "dd MMMM yyyy "
+                          )}
+                          at
+                          {format(
+                            addMinutes(
+                              parseInt(MDS.util.getStateVariable(contract, 5)),
+                              parseInt(MDS.util.getStateVariable(contract, 6))
+                            ),
+                            " hh:mm:ss a"
+                          )}
+                        </p>
+                      </li>
+                      <li>
+                        <h6>Contracts ends</h6>
+                        <p>
+                          {format(
+                            parseInt(MDS.util.getStateVariable(contract, 8)),
+                            "d MMMM yyyy "
+                          )}
+                          at
+                          {format(
+                            parseInt(MDS.util.getStateVariable(contract, 8)),
+                            " hh:mm:ss a"
+                          )}
                         </p>
                       </li>
                       <li>
@@ -516,7 +561,7 @@ const ContractDetails = () => {
       {!contract && (
         <div>
           <p className={styles["no-contracts"]}>
-            The contract was not found, please go back and try again.
+            This contract does not exist. Have you collected all of it?
           </p>
         </div>
       )}

@@ -1,6 +1,5 @@
-import { addMonths } from "date-fns";
+import { addMinutes } from "date-fns";
 import { MinimaToken } from "../../../../@types";
-import { vestingContract } from "../../contracts";
 import Decimal from "decimal.js";
 import * as RPC from "../../RPC";
 
@@ -16,10 +15,10 @@ import * as RPC from "../../RPC";
  */
 export const createVestingContract = async (
   amount: string,
-  cliff: number,
+  cliff: { quantity: number; period: number },
   address: string,
   token: MinimaToken,
-  contractLength: number,
+  datetime: Date,
   minBlockWait: number,
   id: string,
   uid: string,
@@ -27,37 +26,38 @@ export const createVestingContract = async (
   password: string
 ): Promise<0 | 1> => {
   try {
-    const calculateDate = addMonths(new Date(), contractLength);
-    // console.log(calculateDate);
-    // calculate block in time
     const endContractBlockHeight = await RPC.calculateBlockHeightFromDate(
-      calculateDate
+      datetime
     );
-    // console.log("EndContractBlockHeight", endContractBlockHeight);
-    // get currentBlockHeight
+    console.log("EndContractBlockHeight", endContractBlockHeight);
     const currentBlockHeight = await RPC.getCurrentBlockHeight();
+    console.log("CurrentBlockHeight", currentBlockHeight);
 
     /**
      * Calculate the Cliff period, when can the user start collecting this contract
+     * Can be in days, weeks or months
      */
-    const then = addMonths(new Date(), cliff);
+    const cliffAlreadyInMinutes = cliff.period === 0;
+    console.log("cliffAlreadyInMinutes", cliffAlreadyInMinutes);
+    const cliffInMinutes = new Decimal(cliff.quantity)
+      .times(cliffAlreadyInMinutes ? 1 : cliff.period)
+      .toNumber();
+    console.log("cliffInMinutes", cliffInMinutes);
+    const then = addMinutes(new Date(), cliffInMinutes);
+    console.log("When the cliff ends", then);
     const now = new Decimal(new Date().getTime()).dividedBy(1000); // time now in seconds
+    console.log("time now", now);
     const difference = new Decimal(then.getTime()).dividedBy(1000).minus(now);
-    const estimateCliffPeriod = difference.dividedBy(50);
-    // console.log(
-    //   "Eestiamted cliff period in blocks",
-    //   estimateCliffPeriod.toNumber()
-    // );
+    console.log("te difference", difference);
+    const estimateCliffPeriodInBlocks = difference.dividedBy(50);
+    console.log("estimatedCliffPeriodInBlocks", estimateCliffPeriodInBlocks);
     const startingBlockHeightOfContract = new Decimal(currentBlockHeight)
-      .plus(estimateCliffPeriod)
+      .plus(estimateCliffPeriodInBlocks)
       .round()
       .toNumber();
+    console.log("Start of contract bloks", startingBlockHeightOfContract);
 
-    const finalEndContractBlockHeight = new Decimal(endContractBlockHeight)
-      .plus(estimateCliffPeriod)
-      .toNumber();
-    // console.log("Final Block Height + cliff", finalEndContractBlockHeight);
-
+    console.log("Contracts end son block", endContractBlockHeight);
     /**
      * Calculate the minimum block wait the user must wait before he collects again
      */
@@ -71,9 +71,9 @@ export const createVestingContract = async (
           password.length ? "password:" + password : ""
         } amount:${amount} address:${scriptAddress} tokenid:${
           token.tokenid
-        } state:{"0":"${address}","1":"${amount}","2":"${startingBlockHeightOfContract}", "3":"${finalEndContractBlockHeight}","4":"${minimumTimeUserMustWaitToCollectAgain}","5":"${new Date().getTime()}","6":"${cliff}","7":"${minBlockWait}", "199":"${uid}"}`,
+        } state:{"0":"${address}","1":"${amount}","2":"${startingBlockHeightOfContract}", "3":"${endContractBlockHeight}","4":"${minimumTimeUserMustWaitToCollectAgain}","5":"${new Date().getTime()}","6":"${cliffInMinutes}","7":"${minBlockWait}","8":"${datetime.getTime()}", "199":"${uid}"}`,
         (res) => {
-          // console.log(res);
+          console.log(res);
           if (!res.status && !res.pending)
             reject(
               res.error ? res.error : res.message ? res.message : "RPC Failed"
