@@ -283,3 +283,7 @@
   opacity: 0;
   transition: opacity 200ms;
 }
+
+.golden {
+  border: 2px solid #FFCD1E;
+}

@@ -245,6 +245,27 @@ const ContractDetails = () => {
               <section>
                 <h6>Contract details</h6>
                 <ul>
+                  {calculatedData && (
+                    <li
+                      className={`${
+                        calculatedData.cancollect <= 0 ? "" : styles["golden"]
+                      }`}
+                    >
+                      <h6>Tokens available to collect</h6>
+                      <p>
+                        {calculatedData.cancollect <= 0
+                          ? 0
+                          : calculatedData.cancollect}
+                      </p>
+                    </li>
+                  )}
+                  <li>
+                    <h6>Tokens remaining</h6>
+                    {contract.tokenid === "0x00" && <p>{contract.amount}</p>}
+                    {contract.tokenid !== "0x00" && contract.tokenamount && (
+                      <p>{contract.tokenamount}</p>
+                    )}
+                  </li>
                   <li>
                     <h6>Contract ID</h6>
                     <p>{MDS.util.getStateVariable(contract, 199)}</p>
@@ -258,31 +279,6 @@ const ContractDetails = () => {
                           ? contract.token.name.name
                           : "N/A"}
                       </p>
-                    )}
-                  </li>
-                  <li>
-                    <h6>Tokens collected</h6>
-                    {!contract && <p>N/A</p>}
-                    {contract.tokenid === "0x00" && (
-                      <p>
-                        {new Decimal(MDS.util.getStateVariable(contract, 1))
-                          .minus(contract.amount)
-                          .toString()}
-                      </p>
-                    )}
-                    {contract.tokenid !== "0x00" && contract.tokenamount && (
-                      <p>
-                        {new Decimal(MDS.util.getStateVariable(contract, 1))
-                          .minus(contract.tokenamount)
-                          .toString()}
-                      </p>
-                    )}
-                  </li>
-                  <li>
-                    <h6>Total tokens left to collect</h6>
-                    {contract.tokenid === "0x00" && <p>{contract.amount}</p>}
-                    {contract.tokenid !== "0x00" && contract.tokenamount && (
-                      <p>{contract.tokenamount}</p>
                     )}
                   </li>
                 </ul>
@@ -313,11 +309,32 @@ const ContractDetails = () => {
                   >
                     <ul className={styles["hidden-details"]}>
                       <li>
-                        <h6>Available to withdraw</h6>
+                        <h6>Tokens collected</h6>
+                        {!contract && <p>N/A</p>}
+                        {contract.tokenid === "0x00" && (
+                          <p>
+                            {new Decimal(MDS.util.getStateVariable(contract, 1))
+                              .minus(contract.amount)
+                              .toString()}
+                          </p>
+                        )}
+                        {contract.tokenid !== "0x00" &&
+                          contract.tokenamount && (
+                            <p>
+                              {new Decimal(
+                                MDS.util.getStateVariable(contract, 1)
+                              )
+                                .minus(contract.tokenamount)
+                                .toString()}
+                            </p>
+                          )}
+                      </li>
+                      <li>
+                        <h6>Contract amount</h6>
                         <p>
-                          {calculatedData.cancollect < 0
-                            ? 0
-                            : calculatedData.cancollect}
+                          {new Decimal(
+                            MDS.util.getStateVariable(contract, 1)
+                          ).toString()}
                         </p>
                       </li>
                       <li>
@@ -544,7 +561,7 @@ const ContractDetails = () => {
       {!contract && (
         <div>
           <p className={styles["no-contracts"]}>
-            The contract was not found, please go back and try again.
+            This contract does not exist. Have you collected all of it?
           </p>
         </div>
       )}
