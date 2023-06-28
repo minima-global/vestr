@@ -90,7 +90,7 @@
   font-weight: 400;
   font-size: 1rem;
   text-align: center;
-  word-break: break-all;
+  word-break: break-word;
 }
 .dialog div:last-of-type button:first-of-type {
   background-color: #08090B;

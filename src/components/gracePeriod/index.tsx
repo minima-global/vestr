@@ -68,8 +68,8 @@ const GraceSelect = () => {
           title="Grace period"
           subtitle={
             <p>
-              Please note, if you do not set a grace <br /> period, the
-              recipient will be able to collect <br /> tokens after every block
+              Please note, if you do not set a grace period, the recipient will
+              be able to collect tokens after every block
             </p>
           }
           buttonTitle="Confirm"

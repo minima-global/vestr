@@ -3,8 +3,10 @@ import styles from "./Dashboard.module.css";
 import useGetInnerHeight from "../../hooks/useGetInnerHeight";
 // @ts-ignore
 import { useKeyboardOffset } from "virtual-keyboard-offset";
+import useIsMinimaBrowser from "../../hooks/useIsMinimaBrowser";
 const Dashboard = () => {
   const innerHeight = useGetInnerHeight();
+  const openTitleBar = useIsMinimaBrowser();
   // get the height when the virtual keyboard is open
 
   const { keyBoardOffset, windowHeight } = useKeyboardOffset();
@@ -20,7 +22,7 @@ const Dashboard = () => {
           }`,
         }}
       >
-        <header>
+        <header onClick={() => openTitleBar()}>
           <div>
             <img alt="brand" src="./assets/brand.svg" />
             <h6>Vestr</h6>

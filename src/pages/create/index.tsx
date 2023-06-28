@@ -206,23 +206,15 @@ const Create = () => {
       >
         <div className={styles["transaction-status"]}>
           <div>
-            <h6>Confirm</h6>
+            <h6>{formik.status === 1 ? "Pending" : "Confirmed"}</h6>
 
-            {isMobile && formik.status === 1 && (
+            {formik.status === 1 && (
               <p>
-                To complete the transaction, go to the Minima app <br /> Home
-                screen, press <img alt="pending" src="./assets/pace.svg" /> ,
-                then <br /> long press the Vestr command and <br /> select
-                'Accept'.
+                To complete this transaction, navigate to the Pending MiniDapp
+                in your minihub and accept this action.
               </p>
             )}
-            {!isMobile && formik.status === 1 && (
-              <p>
-                To complete this transaction, open your Minihub and <br /> find
-                the pending transaction in the 'Pending Actions' button in the
-                header.
-              </p>
-            )}
+
             {formik.status === 0 && (
               <p>Transaction was completed and should arrive shortly.</p>
             )}
@@ -585,6 +577,7 @@ const Create = () => {
                 <DateTimePicker
                   open={openPicker}
                   disablePast={true}
+                  onOpen={() => setOpenPicker(true)}
                   minDateTime={dateTimePickerConstraintsOnCliff}
                   value={formik.values.datetime}
                   PopperProps={{ anchorEl: customInputRef.current }}
