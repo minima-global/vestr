@@ -186,3 +186,7 @@
   flex-direction: column;
   gap: 8px;
 }
+
+.datetime-input {
+  width: 100%;
+}

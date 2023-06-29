@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { RefObject, useContext, useEffect, useRef, useState } from "react";
 import { Outlet, useLocation, matchPath, useNavigate } from "react-router-dom";
 import styles from "./Create.module.css";
 import Dialog from "../../components/dialog";
@@ -17,27 +17,7 @@ import { appContext } from "../../AppContext";
 import { MinimaToken } from "../../@types";
 import useMobileView from "../../hooks/useMobileView";
 import { DateTimePicker } from "@mui/x-date-pickers";
-import { isDate, addMinutes } from "date-fns";
-import TimeSelector from "../../components/timeSelector";
-
-import Decimal from "decimal.js";
-
-const cliffOptions = [
-  {
-    option: "minutes",
-    value: 0,
-  },
-  {
-    option: "hours",
-    value: 60,
-  },
-  {
-    option: "days",
-    value: 1440,
-  },
-  { option: "weeks", value: 10080 },
-  { option: "months", value: 40320 },
-];
+import { isDate } from "date-fns";
 
 const Create = () => {
   const {
@@ -48,23 +28,26 @@ const Create = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const isMobile = useMobileView();
-  const customInputRef = useRef(null);
+  const customStartInputRef: RefObject<HTMLInputElement> = useRef(null);
+  const customEndInputRef: RefObject<HTMLInputElement> = useRef(null);
 
   const { walletAddress } = useWalletAddress();
 
   const [exit, setExit] = useState(false);
   const [review, setReview] = useState(false);
 
-  const [openPicker, setOpenPicker] = useState(false);
+  const [openEndPicker, setOpenEndPicker] = useState(false);
+  const [openStartPicker, setOpenStartPicker] = useState(false);
 
   const [dateTimePickerConstraintsOnCliff, setDateTimePickerConstraintOnCliff] =
-    useState<Date | undefined>(undefined);
+    useState<Date | null>(null);
 
   const [tooltips, setTooltips] = useState({
     walletAddress: false,
     contractID: false,
     tokenAmount: false,
-    contractLength: false,
+    start: false,
+    end: false,
     cliffPeriod: false,
     gracePeriod: false,
   });
@@ -141,49 +124,46 @@ const Create = () => {
   const formik = useFormik({
     initialValues: {
       token: wallet[0],
-      cliff: {
-        quantity: 0,
-        period: 1440,
-      },
       grace: 0,
       amount: 0,
-      datetime: undefined,
+      start: undefined, // start date
+      end: undefined, // end date
       name: "",
       address: "",
       uid: "",
       password: "",
     },
     onSubmit: async (form) => {
-      if (!form.datetime)
-        return formik.setFieldError("datetime", "Please select a valid date");
-      try {
-        const transactionStatus = await RPC.createVestingContract(
-          form.amount.toString(),
-          { quantity: form.cliff.quantity, period: form.cliff.period },
-          form.address,
-          form.token,
-          form.datetime,
-          form.grace,
-          form.name,
-          form.uid,
-          scriptAddress,
-          form.password
-        ).catch((err) => {
-          throw new Error(err);
-        });
+      const transactionStatus = await RPC.createVestingContract(
+        form.amount.toString(),
+        form.address,
+        form.token,
+        form.grace,
+        form.uid,
+        scriptAddress,
 
-        formik.setStatus(transactionStatus);
-      } catch (error: any) {
+        form.password,
+
+        form.start!,
+        form.end!
+      ).catch((error) => {
         const noCoinsAvailable = error.message.includes("No Coins of tokenid");
         const insufficientFunds = error.message.includes("Insufficient funds");
-        formik.setStatus(
-          noCoinsAvailable
-            ? "Not enough coins available."
-            : insufficientFunds
-            ? "Insufficient funds, you require more tokens."
-            : error.message
-        );
-      }
+
+        if (noCoinsAvailable) {
+          return formik.setStatus("Not enough coins available.  Top up?");
+        }
+
+        if (insufficientFunds) {
+          return formik.setStatus(
+            "Sorry, insufficient funds.  You require more tokens."
+          );
+        }
+
+        return formik.setStatus("Sorry, try again later.");
+      });
+
+      return formik.setStatus(transactionStatus);
     },
     validationSchema: formValidationSelector(vaultLocked),
   });
@@ -444,28 +424,24 @@ const Create = () => {
 
               <div className={styles["form-group"]}>
                 <span>
-                  Cliff period
-                  {!tooltips.cliffPeriod && (
+                  Contract start date/time
+                  {!tooltips.start && (
                     <img
-                      onClick={() =>
-                        setTooltips({ ...tooltips, cliffPeriod: true })
-                      }
+                      onClick={() => setTooltips({ ...tooltips, start: true })}
                       alt="question"
                       src="./assets/help_filled.svg"
                     />
                   )}
-                  {!!tooltips.cliffPeriod && (
+                  {!!tooltips.start && (
                     <img
-                      onClick={() =>
-                        setTooltips({ ...tooltips, cliffPeriod: false })
-                      }
+                      onClick={() => setTooltips({ ...tooltips, start: false })}
                       alt="question"
                       src="./assets/cancel_filled.svg"
                     />
                   )}
                 </span>
                 <CSSTransition
-                  in={tooltips.cliffPeriod}
+                  in={tooltips.start}
                   unmountOnExit
                   timeout={200}
                   classNames={{
@@ -477,48 +453,44 @@ const Create = () => {
                 >
                   <Tooltip
                     content="The amount of time before a contract starts."
-                    position={96}
+                    position={208}
                   />
                 </CSSTransition>
-                <div className={styles["cliff-group"]}>
-                  <input
-                    placeholder="Cliff period"
-                    id="cliff.quantity"
-                    name="cliff.quantity"
-                    type="number"
-                    value={
-                      formik.values.cliff.quantity
-                        ? formik.values.cliff.quantity
-                        : ""
-                    }
-                    onChange={(e) => {
-                      formik.handleChange(e);
-
-                      if (!e.target.value) {
-                        return setDateTimePickerConstraintOnCliff(undefined);
-                      }
-                      const inMinutes = formik.values.cliff.period === 0;
-                      const calculateCliff = new Decimal(e.target.value)
-                        .times(inMinutes ? 1 : formik.values.cliff.period)
-                        .toNumber();
-                      const today = new Date();
-                      const cliffPeriod = addMinutes(today, calculateCliff);
-
-                      setDateTimePickerConstraintOnCliff(cliffPeriod);
-                    }}
-                    onBlur={formik.handleBlur}
-                  />
-                  <TimeSelector
-                    options={cliffOptions}
-                    setForm={(option) => {
-                      formik.setFieldValue("cliff.period", option);
-                    }}
-                  />
-                </div>
+                <DateTimePicker
+                  open={openStartPicker}
+                  disablePast={true}
+                  onOpen={() => setOpenStartPicker(true)}
+                  minDateTime={new Date()}
+                  value={formik.values.start}
+                  PopperProps={{ anchorEl: customStartInputRef.current }}
+                  onChange={(value) => {
+                    formik.setFieldValue("start", value, true);
+                    setDateTimePickerConstraintOnCliff(value);
+                  }}
+                  onClose={() => setOpenStartPicker(false)}
+                  renderInput={({ ref, inputProps, disabled, onChange }) => {
+                    return (
+                      <div ref={ref}>
+                        <input
+                          id="start"
+                          name="start"
+                          className={styles["datetime-input"]}
+                          onClick={() => setOpenStartPicker(true)}
+                          value={formik.values.start}
+                          onChange={onChange}
+                          disabled={disabled}
+                          placeholder="Select contract start"
+                          ref={customStartInputRef}
+                          {...inputProps}
+                        />
+                      </div>
+                    );
+                  }}
+                />
                 <CSSTransition
                   in={
-                    Boolean(formik.errors.cliff) &&
-                    Boolean(formik.touched.cliff)
+                    Boolean(formik.errors.start) &&
+                    Boolean(formik.touched.start)
                   }
                   unmountOnExit
                   timeout={200}
@@ -530,7 +502,7 @@ const Create = () => {
                   }}
                 >
                   <div className={styles["formError"]}>
-                    {formik.errors.cliff as string}
+                    {formik.errors.start as string}
                   </div>
                 </CSSTransition>
               </div>
@@ -538,27 +510,23 @@ const Create = () => {
               <div className={styles["form-group"]}>
                 <span>
                   Contract end date/time
-                  {!tooltips.contractLength && (
+                  {!tooltips.end && (
                     <img
-                      onClick={() =>
-                        setTooltips({ ...tooltips, contractLength: true })
-                      }
+                      onClick={() => setTooltips({ ...tooltips, end: true })}
                       alt="question"
                       src="./assets/help_filled.svg"
                     />
                   )}
-                  {!!tooltips.contractLength && (
+                  {!!tooltips.end && (
                     <img
-                      onClick={() =>
-                        setTooltips({ ...tooltips, contractLength: false })
-                      }
+                      onClick={() => setTooltips({ ...tooltips, end: false })}
                       alt="question"
                       src="./assets/cancel_filled.svg"
                     />
                   )}
                 </span>
                 <CSSTransition
-                  in={tooltips.contractLength}
+                  in={tooltips.end}
                   unmountOnExit
                   timeout={200}
                   classNames={{
@@ -570,34 +538,34 @@ const Create = () => {
                 >
                   <Tooltip
                     content="The number of months the contract lasts."
-                    position={136}
+                    position={199}
                   />
                 </CSSTransition>
 
                 <DateTimePicker
-                  open={openPicker}
+                  open={openEndPicker}
                   disablePast={true}
-                  onOpen={() => setOpenPicker(true)}
+                  onOpen={() => setOpenEndPicker(true)}
                   minDateTime={dateTimePickerConstraintsOnCliff}
-                  value={formik.values.datetime}
-                  PopperProps={{ anchorEl: customInputRef.current }}
+                  value={formik.values.end}
+                  PopperProps={{ anchorEl: customEndInputRef.current }}
                   onChange={(value) => {
-                    formik.setFieldValue("datetime", value, true);
+                    formik.setFieldValue("end", value, true);
                   }}
-                  onClose={() => setOpenPicker(false)}
+                  onClose={() => setOpenEndPicker(false)}
                   renderInput={({ ref, inputProps, disabled, onChange }) => {
                     return (
                       <div ref={ref}>
                         <input
-                          id="datetime"
-                          name="datetime"
+                          id="end"
+                          name="end"
                           className={styles["datetime-input"]}
-                          onClick={() => setOpenPicker(true)}
-                          value={formik.values.datetime}
+                          onClick={() => setOpenEndPicker(true)}
+                          value={formik.values.end}
                           onChange={onChange}
                           disabled={disabled}
                           placeholder="Select contract end"
-                          ref={customInputRef}
+                          ref={customEndInputRef}
                           {...inputProps}
                         />
                       </div>
@@ -605,7 +573,7 @@ const Create = () => {
                   }}
                 />
                 <CSSTransition
-                  in={formik.errors.datetime}
+                  in={formik.errors.end}
                   unmountOnExit
                   timeout={200}
                   classNames={{
@@ -615,9 +583,7 @@ const Create = () => {
                     exitActive: styles.backdropExitActive,
                   }}
                 >
-                  <div className={styles["formError"]}>
-                    {formik.errors.datetime}
-                  </div>
+                  <div className={styles["formError"]}>{formik.errors.end}</div>
                 </CSSTransition>
               </div>
 
@@ -729,50 +695,12 @@ const formValidationSelector = (vaultLocked: boolean) => {
   return yup.object().shape({
     token: yup.object().required("Field is required"),
     amount: yup.number().required("Field is required"),
-    cliff: yup
-      .object()
-      .shape({
-        quantity: yup.number(),
-        period: yup.number(),
-      })
-      .test(
-        "test if end contract is more than the selected cliff",
-        function (val) {
-          const { path, parent, createError } = this;
-
-          if (!val) {
-            return true;
-          }
-
-          if (val.quantity === undefined || val.period === undefined) {
-            return true;
-          }
-
-          const inMinutes = val.period === 0;
-
-          const calculateCliff = new Decimal(val.quantity)
-            .times(inMinutes ? 1 : val.period)
-            .toNumber();
-          const today = new Date();
-          const cliffPeriod = addMinutes(today, calculateCliff);
-          const endContractLessThanCliff = parent.datetime >= cliffPeriod;
-
-          if (!endContractLessThanCliff) {
-            return createError({
-              path,
-              message:
-                "Please enter a cliff period less than the contract's length",
-            });
-          }
-          return true;
-        }
-      ),
     grace: yup.number().test("grace", function (val) {
       if (val === undefined) return true;
 
       return true;
     }),
-    datetime: yup
+    start: yup
       .date()
       .required("Field is required")
       .typeError("Select a valid date and time")
@@ -796,10 +724,37 @@ const formValidationSelector = (vaultLocked: boolean) => {
 
         return true;
       }),
-    name: yup
-      .string()
-      .max(255, "Contract name must be at most 255 characters")
-      .matches(/^[^\\;]+$/, "Invalid characters"),
+    end: yup
+      .date()
+      .required("Field is required")
+      .typeError("Select a valid date and time")
+      .test("datetime-check", "Invalid date", function (val) {
+        const { parent, path, createError } = this;
+
+        if (val === undefined) {
+          return false;
+        }
+
+        if (!isDate(val)) {
+          return createError({ path, message: "Please select a valid date" });
+        }
+
+        if (parent.start >= val) {
+          return createError({
+            path,
+            message: "Your contract can't end before it starts.",
+          });
+        }
+
+        if (val <= new Date()) {
+          return createError({
+            path,
+            message: "Please select a date in the future",
+          });
+        }
+
+        return true;
+      }),
     address: yup
       .string()
       .required("Field is required")

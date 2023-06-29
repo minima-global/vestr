@@ -352,21 +352,15 @@ const ContractDetails = () => {
                         </p>
                       </li>
                       <li>
-                        <h6>Cliff period until</h6>
+                        <h6>Contract starts</h6>
                         <p>
                           {format(
-                            addMinutes(
-                              parseInt(MDS.util.getStateVariable(contract, 5)),
-                              parseInt(MDS.util.getStateVariable(contract, 6))
-                            ),
+                            parseInt(MDS.util.getStateVariable(contract, 6)),
                             "dd MMMM yyyy "
                           )}
                           at
                           {format(
-                            addMinutes(
-                              parseInt(MDS.util.getStateVariable(contract, 5)),
-                              parseInt(MDS.util.getStateVariable(contract, 6))
-                            ),
+                            parseInt(MDS.util.getStateVariable(contract, 6)),
                             " hh:mm:ss a"
                           )}
                         </p>
