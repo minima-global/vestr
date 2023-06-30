@@ -179,7 +179,10 @@
   font-weight: 500;
   line-height: 19px;
   letter-spacing: 0.02em;
-  color: #D4AB1A;
+   color: #08090B;
+}
+.result div:last-of-type ul li p {
+  font-weight: 700;
 }
 .result div:last-of-type ul li {
   display: flex;

@@ -1,0 +1,48 @@
+
+
+
+
+.dialog {
+  background-color: #E9E9EB;
+  border-radius: 4px;
+  padding: 24px;
+  color: #F9F9FA;
+  z-index: 44;
+  align-self: center;
+  margin: 0 16px;
+  
+}
+.backdrop {
+  position: absolute;
+  z-index: 43;
+  top: 56px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: grid;
+  grid-template-rows: 1fr;
+  grid-template-columns: 1fr minmax(0, 568px) 1fr;
+}
+
+@media screen and (min-width: 560px) {
+  .dd {
+    position: relative;
+    align-self: center;
+    justify-self: center;
+    overflow: hidden;
+    max-width: 568px;
+    max-height: 568px;
+  }
+
+  .dd ul {
+    height: 368px;
+    overflow-y: scroll;
+  }
+}
+
+
+.no-results {
+  align-self: center;
+  justify-self: center;
+}

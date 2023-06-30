@@ -23,7 +23,6 @@ const AppProvider = ({ children }: IProps) => {
 
   const getBalance = async () => {
     await RPC.getMinimaBalance().then((b) => {
-      console.log(b);
       b.map((t) => {
         if (t.token.url && t.token.url.startsWith("<artimage>", 0)) {
           t.token.url = makeTokenImage(t.token.url, t.tokenid);
@@ -89,7 +88,6 @@ const AppProvider = ({ children }: IProps) => {
       isVaultLocked();
     });
     events.onNewBalance(() => {
-      console.log("new balance..");
       getBalance();
 
       addScriptGetContracts();
