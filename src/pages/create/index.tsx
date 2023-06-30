@@ -34,6 +34,12 @@ const Create = () => {
   const [dateTimePickerConstraintsOnCliff, setDateTimePickerConstraintOnCliff] =
     useState<Date | null>(null);
 
+  useEffect(() => {
+    if (!location.state) {
+      navigate("/dashboard/creator");
+    }
+  }, []);
+
   const [tooltips, setTooltips] = useState({
     walletAddress: false,
     contractID: false,
@@ -127,7 +133,18 @@ const Create = () => {
     validationSchema: formValidationSelector(vaultLocked),
   });
 
-  console.log(formik.values.preference);
+  useEffect(() => {
+    formik.setFieldValue(
+      "token",
+      wallet.find((t: MinimaToken) => t.tokenid === location.state.tokenid)
+    );
+  }, [wallet]);
+
+  useEffect(() => {
+    navigate("/dashboard/creator/create", {
+      state: { ...location.state, tokenid: formik.values.token.tokenid },
+    });
+  }, [formik.values.token]);
 
   return (
     <>

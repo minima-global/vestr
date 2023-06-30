@@ -23,28 +23,27 @@ const AppProvider = ({ children }: IProps) => {
 
   const getBalance = async () => {
     await RPC.getMinimaBalance().then((b) => {
+      console.log(b);
       b.map((t) => {
         if (t.token.url && t.token.url.startsWith("<artimage>", 0)) {
           t.token.url = makeTokenImage(t.token.url, t.tokenid);
         }
       });
 
-      // const walletNeedsUpdating = !!b.find((t) => t.unconfirmed !== "0");
+      const walletNeedsUpdating = !!b.find((t) => t.unconfirmed !== "0");
 
-      // if (!walletNeedsUpdating) {
-      //   console.log("Clearing intervals..");
-      //   window.clearInterval(balanceInterval);
-      // }
+      if (!walletNeedsUpdating) {
+        window.clearInterval(balanceInterval);
+      }
 
-      // if (walletNeedsUpdating) {
-      //   setWalletBalance(b);
-      //   if (!balanceInterval) {
-      //     balanceInterval = setInterval(() => {
-      //       console.log("Getting balance..");
-      //       getBalance();
-      //     }, 10000);
-      //   }
-      // }
+      if (walletNeedsUpdating) {
+        setWalletBalance(b);
+        if (!balanceInterval) {
+          balanceInterval = setInterval(() => {
+            getBalance();
+          }, 10000);
+        }
+      }
 
       setWalletBalance(b);
     });
@@ -90,6 +89,7 @@ const AppProvider = ({ children }: IProps) => {
       isVaultLocked();
     });
     events.onNewBalance(() => {
+      console.log("new balance..");
       getBalance();
 
       addScriptGetContracts();

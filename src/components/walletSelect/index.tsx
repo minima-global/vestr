@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext } from "react";
 
 import styles from "./WalletSelect.module.css";
 import { MinimaToken } from "../../@types";

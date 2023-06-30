@@ -16,7 +16,11 @@ const Info = () => {
           <p>I want to create a vesting contract</p>
           <button
             type="button"
-            onClick={() => navigate("/dashboard/creator/create")}
+            onClick={() =>
+              navigate("/dashboard/creator/create", {
+                state: { tokenid: "0x00" },
+              })
+            }
           >
             Create a contract
           </button>
