@@ -27,6 +27,7 @@ import Review from "./pages/review";
 import ContractDetails from "./pages/contractDetails";
 import Collector from "./pages/collector";
 import Calculate from "./pages/calculate";
+import VaultDialog from "./components/VaultDialog";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement

@@ -1,17 +1,22 @@
+import { FocusEvent } from "react";
+import useWalletAddress from "../../hooks/useWalletAddress";
 import styles from "./Address.module.css";
-import { useLocation, useNavigate } from "react-router-dom";
 
-const AddressSelect = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
+interface IProps {
+  currentSelection: { preference: string; current: string };
+  setFormValue: (address: string, preference: string) => void;
+}
+const AddressSelect = ({ currentSelection, setFormValue }: IProps) => {
+  const walletAddress = useWalletAddress();
 
   const handleChange = (e: any) => {
-    navigate("/dashboard/creator/create", {
-      state: {
-        ...location.state,
-        addressPreference: e.target.value,
-      },
-    });
+    const personalAddress = e.target.value === "0";
+
+    if (personalAddress) {
+      return setFormValue(walletAddress.walletAddress, e.target.value);
+    }
+
+    return setFormValue("", e.target.value);
   };
 
   return (
@@ -19,19 +24,10 @@ const AddressSelect = () => {
       <div onChange={handleChange} className={styles["radio-wrapper"]}>
         <label htmlFor="my-address">
           <input
-            defaultChecked={
-              location.state &&
-              location.state.addressPreference &&
-              location.state.addressPreference === "0"
-            }
-            // disabled={
-            //   location.state &&
-            //   location.state.addressPreference &&
-            //   location.state.addressPreference === "1"
-            // }
+            defaultChecked={currentSelection.preference === "0"}
             type="radio"
             id="my-address"
-            name="radio"
+            name="address.preference"
             value={0}
           />
           Use my Minima wallet address
@@ -39,19 +35,10 @@ const AddressSelect = () => {
 
         <label htmlFor="custom-address">
           <input
-            defaultChecked={
-              location.state &&
-              location.state.addressPreference &&
-              location.state.addressPreference === "1"
-            }
-            // disabled={
-            //   location.state &&
-            //   location.state.addressPreference &&
-            //   location.state.addressPreference === "0"
-            // }
+            defaultChecked={currentSelection.preference === "1"}
             type="radio"
             id="custom-address"
-            name="radio"
+            name="address.preference"
             value={1}
           />
           Use a different wallet address

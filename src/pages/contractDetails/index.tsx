@@ -20,8 +20,6 @@ import Loading from "../../assets/loading.json";
 import Lottie from "lottie-react";
 import { appContext } from "../../AppContext";
 
-import { addMinutes } from "date-fns";
-
 export function getKeyByValue(object: any, value: any) {
   return Object.keys(object).find((key) => object[key] === value);
 }
@@ -248,12 +246,16 @@ const ContractDetails = () => {
                   {calculatedData && (
                     <li
                       className={`${
-                        calculatedData.cancollect <= 0 ? "" : styles["golden"]
+                        calculatedData.cancollect <= 0 ||
+                        calculatedData.mustwait === "TRUE"
+                          ? ""
+                          : styles["golden"]
                       }`}
                     >
                       <h6>Tokens available to collect</h6>
                       <p>
-                        {calculatedData.cancollect <= 0
+                        {calculatedData.cancollect <= 0 ||
+                        calculatedData.mustwait === "TRUE"
                           ? 0
                           : calculatedData.cancollect}
                       </p>
@@ -352,21 +354,15 @@ const ContractDetails = () => {
                         </p>
                       </li>
                       <li>
-                        <h6>Cliff period until</h6>
+                        <h6>Contract starts</h6>
                         <p>
                           {format(
-                            addMinutes(
-                              parseInt(MDS.util.getStateVariable(contract, 5)),
-                              parseInt(MDS.util.getStateVariable(contract, 6))
-                            ),
+                            parseInt(MDS.util.getStateVariable(contract, 6)),
                             "dd MMMM yyyy "
                           )}
                           at
                           {format(
-                            addMinutes(
-                              parseInt(MDS.util.getStateVariable(contract, 5)),
-                              parseInt(MDS.util.getStateVariable(contract, 6))
-                            ),
+                            parseInt(MDS.util.getStateVariable(contract, 6)),
                             " hh:mm:ss a"
                           )}
                         </p>
@@ -391,8 +387,12 @@ const ContractDetails = () => {
                           {getKeyByValue(
                             gracePeriods,
                             parseInt(MDS.util.getStateVariable(contract, 7))
-                          )}
+                          )?.replaceAll("_", " ")}
                         </p>
+                      </li>
+                      <li>
+                        <h6>Grace period block time left</h6>
+                        <p>{calculatedData.mustwaitblocks + " blocks"}</p>
                       </li>
                       <li>
                         <h6 className={styles["copy-label"]}>
@@ -551,7 +551,11 @@ const ContractDetails = () => {
               onClick={handleCollectionPrompt}
               className={styles["collect-btn"]}
               type="button"
-              disabled={calculatedData && calculatedData.cancollect <= 0}
+              disabled={
+                calculatedData &&
+                (calculatedData.cancollect <= 0 ||
+                  calculatedData.mustwait === "TRUE")
+              }
             >
               Collect
             </button>

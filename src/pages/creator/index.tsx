@@ -69,7 +69,10 @@ const Creator = () => {
               <img alt="calculate-icon" src="./assets/calculate.svg" />
               Calculate a contract
             </button>
-            <button type="button" onClick={() => navigate("create")}>
+            <button
+              type="button"
+              onClick={() => navigate("create", { state: { tokenid: "0x00" } })}
+            >
               <img alt="add-icon" src="./assets/add.svg" />
               Create a contract
             </button>

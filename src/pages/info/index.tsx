@@ -7,8 +7,8 @@ const Info = () => {
   return (
     <section className={styles["grid"]}>
       <h6>
-        Vestr enables you to create and collect vesting schedules for any token
-        issued on the Minima blockchain.
+        Vestr enables you to create and collect vesting contracts for any Minima
+        token.
       </h6>
       <Stack rowGap={2}>
         <div className={styles["helper__wrapper"]}>
@@ -16,7 +16,11 @@ const Info = () => {
           <p>I want to create a vesting contract</p>
           <button
             type="button"
-            onClick={() => navigate("/dashboard/creator/create")}
+            onClick={() =>
+              navigate("/dashboard/creator/create", {
+                state: { tokenid: "0x00" },
+              })
+            }
           >
             Create a contract
           </button>

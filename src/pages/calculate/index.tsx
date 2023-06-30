@@ -1,29 +1,39 @@
-import { useEffect, useState } from "react";
+import { RefObject, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./Calculate.module.css";
 import { CSSTransition } from "react-transition-group";
 import Tooltip from "../../components/tooltip";
 import * as RPC from "../../minima/libs/RPC";
+import { DateTimePicker } from "@mui/x-date-pickers";
 
 const Calculate = () => {
   const navigate = useNavigate();
   const [amount, setAmount] = useState<number>(0);
-  const [contractLength, setContractLength] = useState<number>(0);
+  const [start, setStart] = useState<Date | null>(null);
+  const [end, setEnd] = useState<Date | null>(null);
+
+  const customStartInputRef: RefObject<HTMLInputElement> = useRef(null);
+  const customEndInputRef: RefObject<HTMLInputElement> = useRef(null);
+  const [openEndPicker, setOpenEndPicker] = useState(false);
+  const [openStartPicker, setOpenStartPicker] = useState(false);
+  const [dateTimePickerConstraintsOnCliff, setDateTimePickerConstraintOnCliff] =
+    useState<Date | null>(null);
 
   const [schedule, setSchedule] = useState<any>();
-  const [tooltips, setTooltips] = useState({ amount: false, length: false });
+  const [tooltips, setTooltips] = useState({
+    amount: false,
+    start: false,
+    end: false,
+  });
 
   const calculateSchedule = async () => {
-    const schedule = await RPC.calculateVestingSchedule(
-      amount || 0,
-      contractLength || 0
-    );
+    const schedule = await RPC.calculateVestingSchedule(amount, start!, end!);
     setSchedule(schedule);
   };
 
   useEffect(() => {
     calculateSchedule();
-  }, [amount, contractLength]);
+  }, [amount, start, end]);
 
   return (
     <CSSTransition
@@ -118,26 +128,32 @@ const Calculate = () => {
                 onChange={(e: any) => setAmount(e.target.value)}
               />
             </label>
-            <label htmlFor="length" className={styles["form-group"]}>
+            <label htmlFor="start" className={styles["form-group"]}>
               <span>
-                Contract length
-                {!tooltips.length && (
+                Contract start
+                {!tooltips.start && (
                   <img
-                    onClick={() => setTooltips({ ...tooltips, length: true })}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setTooltips({ ...tooltips, start: true });
+                    }}
                     alt="question"
                     src="./assets/help_filled.svg"
                   />
                 )}
-                {!!tooltips.length && (
+                {!!tooltips.start && (
                   <img
-                    onClick={() => setTooltips({ ...tooltips, length: false })}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setTooltips({ ...tooltips, start: false });
+                    }}
                     alt="question"
                     src="./assets/cancel_filled.svg"
                   />
                 )}
               </span>
               <CSSTransition
-                in={tooltips.length}
+                in={tooltips.start}
                 unmountOnExit
                 timeout={200}
                 classNames={{
@@ -148,18 +164,111 @@ const Calculate = () => {
                 }}
               >
                 <Tooltip
-                  content="The number of months the contract lasts."
-                  position={120}
+                  content="The date & time the contract starts"
+                  position={124}
                 />
               </CSSTransition>
-              <input
-                placeholder="Contract length"
-                type="number"
-                min={0}
-                id="length"
-                name="length"
-                value={contractLength === 0 ? "" : contractLength}
-                onChange={(e: any) => setContractLength(e.target.value)}
+              <DateTimePicker
+                open={openStartPicker}
+                disablePast={true}
+                onOpen={() => setOpenStartPicker(true)}
+                minDateTime={new Date()}
+                value={start}
+                PopperProps={{ anchorEl: customStartInputRef.current }}
+                onChange={(value) => {
+                  setStart(value);
+                  setDateTimePickerConstraintOnCliff(value);
+                }}
+                onClose={() => setOpenStartPicker(false)}
+                renderInput={({ ref, inputProps, disabled, onChange }) => {
+                  return (
+                    <div ref={ref}>
+                      <input
+                        id="start"
+                        name="start"
+                        className={styles["datetime-input"]}
+                        onClick={() => setOpenStartPicker(true)}
+                        // value={}
+                        onChange={onChange}
+                        disabled={disabled}
+                        placeholder="Select contract start"
+                        ref={customStartInputRef}
+                        {...inputProps}
+                      />
+                    </div>
+                  );
+                }}
+              />
+            </label>
+            <label htmlFor="end" className={styles["form-group"]}>
+              <span>
+                Contract end
+                {!tooltips.end && (
+                  <img
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setTooltips({ ...tooltips, end: true });
+                    }}
+                    alt="question"
+                    src="./assets/help_filled.svg"
+                  />
+                )}
+                {!!tooltips.end && (
+                  <img
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setTooltips({ ...tooltips, end: false });
+                    }}
+                    alt="question"
+                    src="./assets/cancel_filled.svg"
+                  />
+                )}
+              </span>
+              <CSSTransition
+                in={tooltips.end}
+                unmountOnExit
+                timeout={200}
+                classNames={{
+                  enter: styles.backdropEnter,
+                  enterDone: styles.backdropEnterActive,
+                  exit: styles.backdropExit,
+                  exitActive: styles.backdropExitActive,
+                }}
+              >
+                <Tooltip
+                  content="The date & time the contract ends"
+                  position={114}
+                />
+              </CSSTransition>
+              <DateTimePicker
+                open={openEndPicker}
+                disablePast={true}
+                onOpen={() => setOpenEndPicker(true)}
+                minDateTime={dateTimePickerConstraintsOnCliff}
+                value={end}
+                PopperProps={{ anchorEl: customEndInputRef.current }}
+                onChange={(value) => {
+                  setEnd(value);
+                }}
+                onClose={() => setOpenEndPicker(false)}
+                renderInput={({ ref, inputProps, disabled, onChange }) => {
+                  return (
+                    <div ref={ref}>
+                      <input
+                        id="end"
+                        name="end"
+                        className={styles["datetime-input"]}
+                        onClick={() => setOpenEndPicker(true)}
+                        // value={}
+                        onChange={onChange}
+                        disabled={disabled}
+                        placeholder="Select contract end"
+                        ref={customEndInputRef}
+                        {...inputProps}
+                      />
+                    </div>
+                  );
+                }}
               />
             </label>
           </section>
@@ -174,14 +283,6 @@ const Calculate = () => {
                       {!schedule || !Number(schedule.paymentPerBlock)
                         ? "-"
                         : schedule.paymentPerBlock}
-                    </p>
-                  </li>
-                  <li>
-                    <h6>Payment per month</h6>
-                    <p>
-                      {!schedule || !Number(schedule.paymentPerMonth)
-                        ? "-"
-                        : schedule.paymentPerMonth}
                     </p>
                   </li>
                 </ul>
