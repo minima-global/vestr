@@ -5,7 +5,9 @@ import { events } from "./minima/libs/events";
 
 import { Coin, MinimaToken } from "./@types";
 import useFirstVisit from "./hooks/useFirstVisit";
+import { makeTokenImage } from "./utils/utils";
 
+var balanceInterval: ReturnType<typeof setInterval>;
 export const appContext = createContext({} as any);
 
 interface IProps {
@@ -21,6 +23,29 @@ const AppProvider = ({ children }: IProps) => {
 
   const getBalance = async () => {
     await RPC.getMinimaBalance().then((b) => {
+      b.map((t) => {
+        if (t.token.url && t.token.url.startsWith("<artimage>", 0)) {
+          t.token.url = makeTokenImage(t.token.url, t.tokenid);
+        }
+      });
+
+      // const walletNeedsUpdating = !!b.find((t) => t.unconfirmed !== "0");
+
+      // if (!walletNeedsUpdating) {
+      //   console.log("Clearing intervals..");
+      //   window.clearInterval(balanceInterval);
+      // }
+
+      // if (walletNeedsUpdating) {
+      //   setWalletBalance(b);
+      //   if (!balanceInterval) {
+      //     balanceInterval = setInterval(() => {
+      //       console.log("Getting balance..");
+      //       getBalance();
+      //     }, 10000);
+      //   }
+      // }
+
       setWalletBalance(b);
     });
   };

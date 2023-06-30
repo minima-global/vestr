@@ -3,10 +3,9 @@ import { Outlet, useLocation, matchPath, useNavigate } from "react-router-dom";
 import styles from "./Create.module.css";
 import Dialog from "../../components/dialog";
 import WalletSelect from "../../components/walletSelect";
-import GraceSelect, { gracePeriods } from "../../components/gracePeriod";
+import GraceSelect from "../../components/gracePeriod";
 import AddressSelect from "../../components/addressSelect";
-import { useFormik } from "formik";
-import useWalletAddress from "../../hooks/useWalletAddress";
+import { useFormik, getIn } from "formik";
 
 import { CSSTransition } from "react-transition-group";
 
@@ -15,7 +14,6 @@ import * as yup from "yup";
 import Tooltip from "../../components/tooltip";
 import { appContext } from "../../AppContext";
 import { MinimaToken } from "../../@types";
-import useMobileView from "../../hooks/useMobileView";
 import { DateTimePicker } from "@mui/x-date-pickers";
 import { isDate } from "date-fns";
 
@@ -27,18 +25,12 @@ const Create = () => {
   } = useContext(appContext);
   const location = useLocation();
   const navigate = useNavigate();
-  const isMobile = useMobileView();
   const customStartInputRef: RefObject<HTMLInputElement> = useRef(null);
   const customEndInputRef: RefObject<HTMLInputElement> = useRef(null);
-
-  const { walletAddress } = useWalletAddress();
-
   const [exit, setExit] = useState(false);
-  const [review, setReview] = useState(false);
 
   const [openEndPicker, setOpenEndPicker] = useState(false);
   const [openStartPicker, setOpenStartPicker] = useState(false);
-
   const [dateTimePickerConstraintsOnCliff, setDateTimePickerConstraintOnCliff] =
     useState<Date | null>(null);
 
@@ -65,78 +57,43 @@ const Create = () => {
     navigate("/dashboard/creator");
   };
   const handleReviewClick = async () => {
-    setReview(true);
     const uniqueIdentityForContract = await RPC.hash(
       encodeURIComponent(formik.values.name) + Math.random() * 1000000
     );
     formik.setFieldValue("uid", uniqueIdentityForContract);
 
-    setReview(false);
-
     navigate("review/" + uniqueIdentityForContract, {
       state: {
         contract: {
           ...formik.values,
-          id: uniqueIdentityForContract,
+          uid: uniqueIdentityForContract,
         },
       },
     });
   };
 
-  useEffect(() => {
-    formik.setFieldValue(
-      "token",
-      location.state && location.state.tokenid
-        ? wallet.find((t: MinimaToken) => t.tokenid === location.state.tokenid)
-        : wallet[0],
-      true
-    );
-  }, [wallet]);
-
-  useEffect(() => {
-    if (location.state && location.state.grace) {
-      formik.setFieldValue(
-        "grace",
-        gracePeriods[location.state.grace.replaceAll(" ", "_")],
-        true
-      );
-    }
-  }, [location.state && location.state.grace ? location.state.grace : ""]);
-
-  useEffect(() => {
-    if (location.state && location.state.addressPreference) {
-      const own = location.state.addressPreference === "0";
-      if (own) {
-        formik.setFieldValue("address", walletAddress, true);
-      }
-
-      if (!own) {
-        formik.setFieldValue("address", "");
-      }
-    }
-  }, [
-    location.state && location.state.addressPreference
-      ? location.state.addressPreference
-      : "",
-  ]);
-
-  // @ts-ignore
   const formik = useFormik({
-    initialValues: {
-      token: wallet[0],
-      grace: 0,
-      amount: 0,
-      start: undefined, // start date
-      end: undefined, // end date
-      name: "",
-      address: "",
-      uid: "",
-      password: "",
-    },
+    initialValues:
+      location.state && "contract" in location.state
+        ? { ...location.state.contract }
+        : {
+            token: wallet[0],
+            grace: 0,
+            amount: 0,
+            start: null, // start date
+            end: null, // end date
+            name: "",
+            address: {
+              preference: null,
+              hex: "",
+            },
+            uid: "",
+            password: "",
+          },
     onSubmit: async (form) => {
-      const transactionStatus = await RPC.createVestingContract(
+      await RPC.createVestingContract(
         form.amount.toString(),
-        form.address,
+        form.address.hex,
         form.token,
         form.grace,
         form.uid,
@@ -146,35 +103,36 @@ const Create = () => {
 
         form.start!,
         form.end!
-      ).catch((error) => {
-        const noCoinsAvailable = error.message.includes("No Coins of tokenid");
-        const insufficientFunds = error.message.includes("Insufficient funds");
+      )
+        .then((response) => {
+          formik.setStatus(response);
+        })
+        .catch((error) => {
+          const noCoinsAvailable = error.includes("No Coins of tokenid");
+          const insufficientFunds = error.includes("Insufficient funds");
 
-        if (noCoinsAvailable) {
-          return formik.setStatus("Not enough coins available.  Top up?");
-        }
+          if (noCoinsAvailable) {
+            return formik.setStatus("Not enough coins available.  Top up?");
+          }
 
-        if (insufficientFunds) {
-          return formik.setStatus(
-            "Sorry, insufficient funds.  You require more tokens."
-          );
-        }
+          if (insufficientFunds) {
+            return formik.setStatus(
+              "Sorry, insufficient funds.  You require more tokens."
+            );
+          }
 
-        return formik.setStatus("Sorry, try again later.");
-      });
-
-      return formik.setStatus(transactionStatus);
+          return formik.setStatus("Sorry, try again later.");
+        });
     },
     validationSchema: formValidationSelector(vaultLocked),
   });
 
+  console.log(formik.values.preference);
+
   return (
     <>
       <CSSTransition
-        in={
-          typeof formik.status !== "undefined" &&
-          (formik.status === 0 || formik.status === 1)
-        }
+        in={formik.status && (formik.status === 1 || formik.status === 0)}
         timeout={200}
         unmountOnExit
         classNames={{
@@ -185,29 +143,33 @@ const Create = () => {
         }}
       >
         <div className={styles["transaction-status"]}>
-          <div>
-            <h6>{formik.status === 1 ? "Pending" : "Confirmed"}</h6>
+          <div />
+          <div className={styles["content"]}>
+            <div>
+              <h6>{formik.status === 1 ? "Pending" : "Confirmed"}</h6>
 
-            {formik.status === 1 && (
-              <p>
-                To complete this transaction, navigate to the Pending MiniDapp
-                in your minihub and accept this action.
-              </p>
-            )}
+              {formik.status === 1 && (
+                <p>
+                  To complete this transaction, navigate to the Pending MiniDapp
+                  in your minihub and accept this action.
+                </p>
+              )}
 
-            {formik.status === 0 && (
-              <p>Transaction was completed and should arrive shortly.</p>
-            )}
+              {formik.status === 0 && (
+                <p>Transaction was completed and should arrive shortly.</p>
+              )}
+            </div>
+            <button
+              onClick={() => {
+                navigate("/dashboard/creator/create");
+                setTimeout(() => formik.resetForm(), 250);
+              }}
+              type="button"
+            >
+              Continue
+            </button>
           </div>
-          <button
-            onClick={() => {
-              navigate("/dashboard/creator/create");
-              formik.resetForm();
-            }}
-            type="button"
-          >
-            Continue
-          </button>
+          <div />
         </div>
       </CSSTransition>
       <CSSTransition
@@ -269,7 +231,12 @@ const Create = () => {
               Cancel
             </button>
 
-            <WalletSelect />
+            <WalletSelect
+              currentToken={formik.values.token}
+              setFormToken={(token: MinimaToken) =>
+                formik.setFieldValue("token", token)
+              }
+            />
             <CSSTransition
               in={Boolean(formik.errors.token) && Boolean(formik.touched.token)}
               unmountOnExit
@@ -291,73 +258,85 @@ const Create = () => {
             <form onSubmit={formik.handleSubmit} className={styles["form"]}>
               <label htmlFor="radio" className={styles["form-group-custom"]}>
                 Withdrawal address
-                <AddressSelect />
+                <AddressSelect
+                  currentSelection={formik.values.address}
+                  setFormValue={(address: string, preference: string) => {
+                    formik.setFieldValue("address.preference", preference);
+                    formik.setFieldValue("address.hex", address);
+                  }}
+                />
               </label>
-              {location.state && location.state.addressPreference && (
-                <div className={styles["form-group"]}>
-                  <span>
-                    Wallet address
-                    {!tooltips.walletAddress && (
-                      <img
-                        onClick={() =>
-                          setTooltips({ ...tooltips, walletAddress: true })
-                        }
-                        alt="question"
-                        src="./assets/help_filled.svg"
-                      />
-                    )}
-                    {!!tooltips.walletAddress && (
-                      <img
-                        onClick={() =>
-                          setTooltips({ ...tooltips, walletAddress: false })
-                        }
-                        alt="question"
-                        src="./assets/cancel_filled.svg"
-                      />
-                    )}
-                  </span>
-
-                  <CSSTransition
-                    in={tooltips.walletAddress}
-                    unmountOnExit
-                    timeout={200}
-                    classNames={{
-                      enter: styles.backdropEnter,
-                      enterDone: styles.backdropEnterActive,
-                      exit: styles.backdropExit,
-                      exitActive: styles.backdropExitActive,
-                    }}
-                  >
-                    <Tooltip
-                      content="The wallet address tokens will be sent to."
-                      position={126}
+              <div className={styles["form-group"]}>
+                <span>
+                  Wallet address
+                  {!tooltips.walletAddress && (
+                    <img
+                      onClick={() =>
+                        setTooltips({ ...tooltips, walletAddress: true })
+                      }
+                      alt="question"
+                      src="./assets/help_filled.svg"
                     />
-                  </CSSTransition>
+                  )}
+                  {!!tooltips.walletAddress && (
+                    <img
+                      onClick={() =>
+                        setTooltips({ ...tooltips, walletAddress: false })
+                      }
+                      alt="question"
+                      src="./assets/cancel_filled.svg"
+                    />
+                  )}
+                </span>
 
-                  <input
-                    id="address"
-                    name="address"
-                    placeholder="Wallet address"
-                    value={formik.values.address}
-                    onChange={formik.handleChange}
+                <CSSTransition
+                  in={tooltips.walletAddress}
+                  unmountOnExit
+                  timeout={200}
+                  classNames={{
+                    enter: styles.backdropEnter,
+                    enterDone: styles.backdropEnterActive,
+                    exit: styles.backdropExit,
+                    exitActive: styles.backdropExitActive,
+                  }}
+                >
+                  <Tooltip
+                    content="The wallet address tokens will be sent to."
+                    position={126}
                   />
-                  <CSSTransition
-                    in={formik.errors.address}
-                    unmountOnExit
-                    timeout={200}
-                    classNames={{
-                      enter: styles.backdropEnter,
-                      enterDone: styles.backdropEnterActive,
-                      exit: styles.backdropExit,
-                      exitActive: styles.backdropExitActive,
-                    }}
-                  >
-                    <div className={styles["formError"]}>
-                      {formik.errors.address}
-                    </div>
-                  </CSSTransition>
-                </div>
-              )}
+                </CSSTransition>
+
+                <input
+                  disabled={formik.values.address.preference === null}
+                  id="address.hex"
+                  name="address.hex"
+                  placeholder="Wallet address"
+                  value={formik.values.address.hex}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                />
+                <CSSTransition
+                  in={
+                    (Boolean(getIn(formik.errors, "address.hex")) &&
+                      Boolean(getIn(formik.touched, "address.hex"))) ||
+                    (Boolean(getIn(formik.errors, "address.preference")) &&
+                      Boolean(getIn(formik.touched, "address.preference")))
+                  }
+                  unmountOnExit
+                  timeout={200}
+                  classNames={{
+                    enter: styles.backdropEnter,
+                    enterDone: styles.backdropEnterActive,
+                    exit: styles.backdropExit,
+                    exitActive: styles.backdropExitActive,
+                  }}
+                >
+                  <div className={styles["formError"]}>
+                    {getIn(formik.errors, "address.hex")} <br />
+                    {getIn(formik.errors, "address.preference")}
+                  </div>
+                </CSSTransition>
+              </div>
 
               <div className={styles["form-group"]}>
                 <span>
@@ -406,7 +385,10 @@ const Create = () => {
                   onChange={formik.handleChange}
                 />
                 <CSSTransition
-                  in={formik.errors.amount}
+                  in={
+                    Boolean(formik.errors.amount) &&
+                    Boolean(formik.touched.amount)
+                  }
                   unmountOnExit
                   timeout={200}
                   classNames={{
@@ -417,7 +399,7 @@ const Create = () => {
                   }}
                 >
                   <div className={styles["formError"]}>
-                    {formik.errors.amount}
+                    {getIn(formik.errors, "amount")}
                   </div>
                 </CSSTransition>
               </div>
@@ -476,6 +458,7 @@ const Create = () => {
                           name="start"
                           className={styles["datetime-input"]}
                           onClick={() => setOpenStartPicker(true)}
+                          onBlur={formik.handleBlur}
                           value={formik.values.start}
                           onChange={onChange}
                           disabled={disabled}
@@ -563,6 +546,7 @@ const Create = () => {
                           onClick={() => setOpenEndPicker(true)}
                           value={formik.values.end}
                           onChange={onChange}
+                          onBlur={formik.handleBlur}
                           disabled={disabled}
                           placeholder="Select contract end"
                           ref={customEndInputRef}
@@ -573,7 +557,7 @@ const Create = () => {
                   }}
                 />
                 <CSSTransition
-                  in={formik.errors.end}
+                  in={Boolean(formik.errors.end) && Boolean(formik.touched.end)}
                   unmountOnExit
                   timeout={200}
                   classNames={{
@@ -583,7 +567,9 @@ const Create = () => {
                     exitActive: styles.backdropExitActive,
                   }}
                 >
-                  <div className={styles["formError"]}>{formik.errors.end}</div>
+                  <div className={styles["formError"]}>
+                    {getIn(formik.errors, "end")}
+                  </div>
                 </CSSTransition>
               </div>
 
@@ -625,9 +611,17 @@ const Create = () => {
                     position={110}
                   />
                 </CSSTransition>
-                <GraceSelect />
+                <GraceSelect
+                  currentValue={formik.values.grace}
+                  setFormValue={(value: number) =>
+                    formik.setFieldValue("grace", value)
+                  }
+                />
                 <CSSTransition
-                  in={Boolean(formik.errors.grace)}
+                  in={
+                    Boolean(formik.errors.grace) &&
+                    Boolean(formik.touched.grace)
+                  }
                   unmountOnExit
                   timeout={200}
                   classNames={{
@@ -638,7 +632,7 @@ const Create = () => {
                   }}
                 >
                   <div className={styles["formError"]}>
-                    {formik.errors.grace}
+                    {getIn(formik.errors, "grace")}
                   </div>
                 </CSSTransition>
               </div>
@@ -657,7 +651,10 @@ const Create = () => {
                     onBlur={formik.handleBlur}
                   />
                   <CSSTransition
-                    in={formik.errors.password}
+                    in={
+                      Boolean(formik.errors.password) &&
+                      Boolean(formik.touched.password)
+                    }
                     unmountOnExit
                     timeout={200}
                     classNames={{
@@ -668,7 +665,7 @@ const Create = () => {
                     }}
                   >
                     <div className={styles["formError"]}>
-                      {formik.errors.password}
+                      {getIn(formik.errors, "password")}
                     </div>
                   </CSSTransition>
                 </div>
@@ -755,27 +752,32 @@ const formValidationSelector = (vaultLocked: boolean) => {
 
         return true;
       }),
-    address: yup
-      .string()
-      .required("Field is required")
-      .matches(/0|M[xX][0-9a-zA-Z]+/, "Invalid Address.")
-      .min(59, "Invalid Address, too short.")
-      .max(66, "Invalid Address, too long.")
-      .test("check-address", "Invalid address", function (val) {
-        const { path, createError } = this;
+    address: yup.object().shape({
+      hex: yup
+        .string()
+        .required("Please enter an address.")
+        .matches(/0|M[xX][0-9a-zA-Z]+/, "Invalid Address.")
+        .min(59, "Invalid Address, too short.")
+        .max(66, "Invalid Address, too long.")
+        .test("check-address", "Invalid address", function (val) {
+          const { path, createError } = this;
 
-        if (val === undefined) {
-          return false;
-        }
+          if (val === undefined) {
+            return false;
+          }
 
-        return RPC.checkAddress(val)
-          .then(() => {
-            return true;
-          })
-          .catch((err) => {
-            return createError({ path, message: err });
-          });
-      }),
+          return RPC.checkAddress(val)
+            .then(() => {
+              return true;
+            })
+            .catch((err) => {
+              return createError({ path, message: err });
+            });
+        }),
+      preference: yup
+        .string()
+        .required("Please select your preference for an address."),
+    }),
     password: yup.string().test("check-password", function (val) {
       const { createError, path } = this;
       if (!vaultLocked) {

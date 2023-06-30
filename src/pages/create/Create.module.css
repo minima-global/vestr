@@ -98,6 +98,10 @@
   letter-spacing: 0.05em;
 }
 
+.form-group input:disabled {
+  opacity: 0.5;
+}
+
 .form {
   display: grid;
   grid-template-columns: 1fr;
@@ -169,7 +173,7 @@
   background-color: #FFCD1E;
 
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 1fr minmax(0, 560px) 1fr;
   grid-template-rows: auto;
   padding: 24px;
   padding-bottom: 48px;
@@ -182,17 +186,22 @@
   cursor: pointer;
   opacity: 0.8;
 }
-.transaction-status div {
+.transaction-status .content {
+  height: 100%;
+  text-align: center;
+  display: grid;
+}
+.transaction-status .content > div {
   align-self: center;
   justify-self: center;
-  text-align: center;
 }
 .transaction-status div h6 {
   font-size: 2rem;
   font-weight: 800;
   line-height: 1.5;
   letter-spacing: 0.02em;
-}
+  margin-bottom: 32px;
+} 
 .transaction-status div p {
   font-size: 1rem;
   font-weight: 500;
@@ -201,8 +210,6 @@
 }
 .transaction-status button {
   align-self: flex-end;
-  /* justify-self: center; */
-
   background-color: #08090B;
   border: none;
   color: #ffffff;

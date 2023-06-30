@@ -6,14 +6,10 @@ const useWalletAddress = () => {
   const [walletPublicKey, setPublicKey] = useState("");
 
   useEffect(() => {
-    RPC.getAddress()
-      .then((res: any) => {
-        setAddress(res.miniaddress);
-        setPublicKey(res.publickey);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+    RPC.getAddress().then((response: any) => {
+      setAddress(response.miniaddress);
+      setPublicKey(response.publickey);
+    });
   }, []);
 
   return {

@@ -1,11 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 import styles from "./Grace.module.css";
 import AppGrid from "../app-grid";
 
 import { CSSTransition } from "react-transition-group";
 import Dialog from "../dialog";
-import { useLocation, useNavigate } from "react-router-dom";
 
 export const gracePeriods: any = {
   None: 0,
@@ -20,29 +19,16 @@ export function getObjectKey(obj: any, value: any) {
   return Object.keys(obj).find((key) => obj[key] === value);
 }
 
-const GraceSelect = () => {
-  const [current, setCurrent] = useState<null | string>(null);
+interface IProps {
+  setFormValue: (value: number) => void;
+  currentValue: number;
+}
+const GraceSelect = ({ setFormValue, currentValue }: IProps) => {
   const [active, setActive] = useState(false);
   const [warning, setWarning] = useState(false);
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  useEffect(() => {
-    if (location.state && location.state.grace) {
-      setCurrent(location.state.grace);
-    }
-  }, [location]);
 
   const handleSelection = (grace: string) => {
-    // console.log("grace", grace.replaceAll(" ", "_"));
-    navigate("/dashboard/creator/create", {
-      state: {
-        ...location.state,
-        grace: grace,
-      },
-    });
-
-    setCurrent(grace);
+    setFormValue(gracePeriods[grace.replaceAll(" ", "_")]);
     setActive(false);
   };
 
@@ -82,7 +68,13 @@ const GraceSelect = () => {
         />
       </CSSTransition>
       <div onClick={() => setActive(true)} className={styles["select"]}>
-        <div>{current ? current : "Select grace period"}</div>
+        <div>
+          {currentValue
+            ? Object.keys(gracePeriods)
+                .find((k) => gracePeriods[k] === currentValue)
+                ?.replaceAll("_", " ")
+            : "Select grace period"}
+        </div>
 
         <img
           className={active ? styles.active : ""}

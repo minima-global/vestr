@@ -7,8 +7,16 @@ import * as RPC from "../../minima/libs/RPC";
 
 import { format } from "date-fns";
 
-interface IProps {}
-export const Review = ({}: IProps) => {
+export const gracePeriods: any = {
+  None: 0,
+  Daily: 24,
+  Weekly: 168,
+  Monthly: 720,
+  Every_6_Months: 4320,
+  Yearly: 8640,
+};
+
+export const Review = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -84,13 +92,13 @@ export const Review = ({}: IProps) => {
             <ul>
               <li>
                 <h6>Contract ID</h6>
-                <p>{location.state.contract.id}</p>
+                <p>{location.state.contract.uid}</p>
               </li>
               <li>
                 <h6>Contract starts</h6>
                 <p>
                   {format(
-                    parseInt(location.state.contract.start),
+                    location.state.contract.start,
                     "dd MMMM yyyy, hh:mm:ss a"
                   )}
                 </p>
@@ -99,19 +107,25 @@ export const Review = ({}: IProps) => {
                 <h6>Contract ends</h6>
                 <p>
                   {format(
-                    parseInt(location.state.contract.end),
+                    location.state.contract.end,
                     "dd MMMM yyyy, hh:mm:ss a"
                   )}
                 </p>
               </li>
               <li>
                 <h6>Collection address</h6>
-                <p>{location.state.contract.address}</p>
+                <p>{location.state.contract.address.hex}</p>
               </li>
 
               <li>
                 <h6>Grace period</h6>
-                <p>{location.state.contract.grace + " hour(s)"}</p>
+                <p>
+                  {Object.keys(gracePeriods)
+                    .find(
+                      (k) => gracePeriods[k] === location.state.contract.grace
+                    )
+                    ?.replaceAll("_", " ")}
+                </p>
               </li>
               <li>
                 <h6>Token amount</h6>

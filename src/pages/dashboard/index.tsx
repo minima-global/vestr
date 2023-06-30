@@ -10,7 +10,6 @@ const Dashboard = () => {
   // get the height when the virtual keyboard is open
 
   const { keyBoardOffset, windowHeight } = useKeyboardOffset();
-  console.log(keyBoardOffset, windowHeight);
 
   return (
     <>
