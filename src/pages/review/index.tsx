@@ -37,7 +37,7 @@ export const Review = () => {
 
   useEffect(() => {
     if (location.state && !location.state.contract) {
-      navigate("/dashboard/creator/create", { state: { tokenid: "0x00" } });
+      navigate("/dashboard/creator/create");
     }
 
     scheduleCalculate();
@@ -135,7 +135,7 @@ export const Review = () => {
                 </li>
                 <li>
                   <h6>Token ID</h6>
-                  <p>{location.state.contract.token.tokenid}</p>
+                  <p>{location.state.contract.token.selected.tokenid}</p>
                 </li>
                 <li>
                   <h6>Payment per block</h6>

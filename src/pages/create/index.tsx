@@ -34,12 +34,6 @@ const Create = () => {
   const [dateTimePickerConstraintsOnCliff, setDateTimePickerConstraintOnCliff] =
     useState<Date | null>(null);
 
-  useEffect(() => {
-    if (!location.state) {
-      navigate("/dashboard/creator");
-    }
-  }, []);
-
   const [tooltips, setTooltips] = useState({
     walletAddress: false,
     contractID: false,
@@ -83,7 +77,10 @@ const Create = () => {
       location.state && "contract" in location.state
         ? { ...location.state.contract }
         : {
-            token: wallet[0],
+            token: {
+              current: "0x00",
+              selected: wallet[0],
+            },
             grace: 0,
             amount: 0,
             start: null, // start date
@@ -100,7 +97,7 @@ const Create = () => {
       await RPC.createVestingContract(
         form.amount.toString(),
         form.address.hex,
-        form.token,
+        form.token.selected,
         form.grace,
         form.uid,
         scriptAddress,
@@ -135,21 +132,18 @@ const Create = () => {
 
   useEffect(() => {
     formik.setFieldValue(
-      "token",
-      wallet.find((t: MinimaToken) => t.tokenid === location.state.tokenid)
+      "token.selected",
+      wallet.find((t: MinimaToken) => t.tokenid === formik.values.token.current)
     );
   }, [wallet]);
-
-  useEffect(() => {
-    navigate("/dashboard/creator/create", {
-      state: { ...location.state, tokenid: formik.values.token.tokenid },
-    });
-  }, [formik.values.token]);
 
   return (
     <>
       <CSSTransition
-        in={formik.status && (formik.status === 1 || formik.status === 0)}
+        in={
+          formik.status !== undefined &&
+          (formik.status === 1 || formik.status === 0)
+        }
         timeout={200}
         unmountOnExit
         classNames={{
@@ -163,7 +157,8 @@ const Create = () => {
           <div />
           <div className={styles["content"]}>
             <div>
-              <h6>{formik.status === 1 ? "Pending" : "Confirmed"}</h6>
+              {formik.status === 1 && <h6>Pending</h6>}
+              {formik.status === 0 && <h6>Confirmed</h6>}
 
               {formik.status === 1 && (
                 <p>
@@ -179,7 +174,7 @@ const Create = () => {
             <button
               onClick={() => {
                 navigate("/dashboard/creator/create");
-                setTimeout(() => formik.resetForm(), 250);
+                formik.resetForm();
               }}
               type="button"
             >
@@ -249,13 +244,17 @@ const Create = () => {
             </button>
 
             <WalletSelect
-              currentToken={formik.values.token}
-              setFormToken={(token: MinimaToken) =>
-                formik.setFieldValue("token", token)
-              }
+              currentToken={formik.values.token.selected}
+              setFormToken={(token: MinimaToken) => {
+                formik.setFieldValue("token.current", token.tokenid);
+                formik.setFieldValue("token.selected", token);
+              }}
             />
             <CSSTransition
-              in={Boolean(formik.errors.token) && Boolean(formik.touched.token)}
+              in={
+                Boolean(getIn(formik.errors, "token.selected")) &&
+                Boolean(getIn(formik.touched, "token.selected"))
+              }
               unmountOnExit
               timeout={200}
               classNames={{
@@ -266,7 +265,7 @@ const Create = () => {
               }}
             >
               <div className={styles["formError"]}>
-                {formik.errors.token as string}
+                {getIn(formik.errors, "token.selected")}
               </div>
             </CSSTransition>
           </section>
@@ -324,8 +323,8 @@ const Create = () => {
                 </CSSTransition>
 
                 <input
-                  disabled={formik.values.address.preference === null}
                   id="address.hex"
+                  disabled={formik.values.address.preference === null}
                   name="address.hex"
                   placeholder="Wallet address"
                   value={formik.values.address.hex}
@@ -707,7 +706,10 @@ export default Create;
 
 const formValidationSelector = (vaultLocked: boolean) => {
   return yup.object().shape({
-    token: yup.object().required("Field is required"),
+    token: yup.object().shape({
+      current: yup.string().required(),
+      selected: yup.object().required("Please select a token"),
+    }),
     amount: yup.number().required("Field is required"),
     grace: yup.number().test("grace", function (val) {
       if (val === undefined) return true;
