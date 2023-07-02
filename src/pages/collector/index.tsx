@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import styles from "./Collector.module.css";
 import { CSSTransition } from "react-transition-group";
 import Contracts from "../../components/contracts";

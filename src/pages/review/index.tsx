@@ -158,16 +158,17 @@ export const Review = () => {
               >
                 Create
               </button>
-              <button
-                disabled={isSubmitting}
-                type="button"
-                onClick={() => {
-                  clearForm(); // status
-                  navigate(-1);
-                }}
-              >
-                Cancel
-              </button>
+              {!isSubmitting && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    clearForm(); // status
+                    navigate(-1);
+                  }}
+                >
+                  Cancel
+                </button>
+              )}
             </div>
           </section>
         </section>
