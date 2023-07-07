@@ -22,6 +22,7 @@ const AppProvider = ({ children }: IProps) => {
   const firstVisit = useFirstVisit();
 
   const getBalance = async () => {
+    const tokens = await RPC.getTokens();
     await RPC.getMinimaBalance().then((b) => {
       b.map((t) => {
         if (t.token.url && t.token.url.startsWith("<artimage>", 0)) {
@@ -44,7 +45,12 @@ const AppProvider = ({ children }: IProps) => {
         }
       }
 
-      setWalletBalance(b);
+      const filterNonFungible = tokens.filter((t) => t.decimals === 0);
+      const balanceWithoutNFT = b.filter(
+        (t) => !filterNonFungible.some((f) => f.tokenid === t.tokenid)
+      );
+
+      setWalletBalance(balanceWithoutNFT);
     });
   };
 

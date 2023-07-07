@@ -40,3 +40,7 @@ p {
 * {
   font-family: 'Manrope';
 }
+
+.hidden {
+  display: none;
+}
