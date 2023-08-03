@@ -182,7 +182,12 @@ const ContractDetails = () => {
           >
             <Dialog
               title="Transaction complete"
-              subtitle={<img alt="success" src="./assets/check_circle.svg" />}
+              subtitle={
+                <>
+                  <p>Once confirmed on chain, your wallet will be updated.</p>
+                  <img alt="success" src="./assets/check_circle.svg" />
+                </>
+              }
               buttonTitle="Back to contract"
               dismiss={false}
               primaryButtonAction={() => setSuccess(false)}
@@ -344,7 +349,7 @@ const ContractDetails = () => {
                         <p>
                           {format(
                             parseInt(MDS.util.getStateVariable(contract, 5)),
-                            `d MMMM yyyy `
+                            `dd MMMM yyyy `
                           )}
                           at
                           {format(
@@ -372,7 +377,7 @@ const ContractDetails = () => {
                         <p>
                           {format(
                             parseInt(MDS.util.getStateVariable(contract, 8)),
-                            "d MMMM yyyy "
+                            "dd MMMM yyyy "
                           )}
                           at
                           {format(
