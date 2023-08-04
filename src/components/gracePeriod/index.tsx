@@ -2,10 +2,8 @@ import { useState } from "react";
 
 import styles from "./Grace.module.css";
 import AppGrid from "../app-grid";
-
+import FadeIn from "../UI/Animations/FadeIn";
 import { CSSTransition } from "react-transition-group";
-import Dialog from "../dialog";
-
 export const gracePeriods: any = {
   Daily: 24,
   Weekly: 168,
@@ -48,19 +46,12 @@ const GraceSelect = ({ setFormValue, currentValue }: IProps) => {
         />
       </div>
 
-      <CSSTransition
-        in={active}
-        unmountOnExit
-        timeout={200}
-        classNames={{
-          enter: styles.backdropEnter,
-          enterDone: styles.backdropEnterActive,
-          exit: styles.backdropExit,
-          exitActive: styles.backdropExitActive,
-        }}
-      >
-        <div className={styles["backdrop"]} />
-      </CSSTransition>
+      {active && (
+        <FadeIn delay={0}>
+          <div className={styles["backdrop"]} />
+        </FadeIn>
+      )}
+
       <CSSTransition
         in={active}
         unmountOnExit

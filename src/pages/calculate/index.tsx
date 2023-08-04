@@ -5,12 +5,15 @@ import { CSSTransition } from "react-transition-group";
 import Tooltip from "../../components/tooltip";
 import * as RPC from "../../minima/libs/RPC";
 import { DateTimePicker } from "@mui/x-date-pickers";
+import GraceSelect from "../../components/gracePeriod";
+import FadeIn from "../../components/UI/Animations/FadeIn";
 
 const Calculate = () => {
   const navigate = useNavigate();
   const [amount, setAmount] = useState<number>(0);
   const [start, setStart] = useState<Date | null>(null);
   const [end, setEnd] = useState<Date | null>(null);
+  const [grace, setGrace] = useState<number>(24);
 
   const customStartInputRef: RefObject<HTMLInputElement> = useRef(null);
   const customEndInputRef: RefObject<HTMLInputElement> = useRef(null);
@@ -24,29 +27,25 @@ const Calculate = () => {
     amount: false,
     start: false,
     end: false,
+    gracePeriod: false,
   });
 
   const calculateSchedule = async () => {
-    const schedule = await RPC.calculateVestingSchedule(amount, start!, end!);
+    const schedule = await RPC.calculateVestingSchedule(
+      amount,
+      start!,
+      end!,
+      grace
+    );
     setSchedule(schedule);
   };
 
   useEffect(() => {
     calculateSchedule();
-  }, [amount, start, end]);
+  }, [amount, start, end, grace]);
 
   return (
-    <CSSTransition
-      in={true}
-      unmountOnExit
-      timeout={200}
-      classNames={{
-        enter: styles.backdropEnter,
-        enterDone: styles.backdropEnterActive,
-        exit: styles.backdropExit,
-        exitActive: styles.backdropExitActive,
-      }}
-    >
+    <FadeIn delay={0}>
       <section className={styles["grid"]}>
         <section>
           <button
@@ -271,19 +270,57 @@ const Calculate = () => {
                 }}
               />
             </label>
+
+            <div className={styles["form-group"]}>
+              <span>
+                Grace period
+                {!tooltips.gracePeriod && (
+                  <img
+                    onClick={() =>
+                      setTooltips({ ...tooltips, gracePeriod: true })
+                    }
+                    alt="question"
+                    src="./assets/help_filled.svg"
+                  />
+                )}
+                {!!tooltips.gracePeriod && (
+                  <img
+                    onClick={() =>
+                      setTooltips({ ...tooltips, gracePeriod: false })
+                    }
+                    alt="question"
+                    src="./assets/cancel_filled.svg"
+                  />
+                )}
+              </span>
+              {!!tooltips.gracePeriod && (
+                <FadeIn delay={0}>
+                  <Tooltip
+                    content="The amount of time between each collection. Please note, if you do not set a grace period, the recipient will be able to collect tokens after every block."
+                    position={110}
+                  />
+                </FadeIn>
+              )}
+
+              <GraceSelect
+                currentValue={grace}
+                setFormValue={(value: number) => setGrace(value)}
+              />
+            </div>
           </section>
+
           <section>
             <div className={styles["result"]}>
               <div>Result</div>
               <div>
                 <ul>
                   <li>
-                    <h6>Payment per block</h6>
-                    <p>
-                      {!schedule || !Number(schedule.paymentPerBlock)
-                        ? "-"
-                        : schedule.paymentPerBlock}
-                    </p>
+                    <h6>Payment per grace period</h6>
+                    {schedule && Number(schedule.paymentPerGrace) > 0 ? (
+                      <p>{schedule.paymentPerGrace}</p>
+                    ) : (
+                      <p>-</p>
+                    )}
                   </li>
                 </ul>
               </div>
@@ -291,7 +328,7 @@ const Calculate = () => {
           </section>
         </section>
       </section>
-    </CSSTransition>
+    </FadeIn>
   );
 };
 export default Calculate;

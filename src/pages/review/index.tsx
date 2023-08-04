@@ -29,7 +29,8 @@ export const Review = () => {
     const s = await RPC.calculateVestingSchedule(
       location.state.contract.amount,
       location.state.contract.start,
-      location.state.contract.end
+      location.state.contract.end,
+      location.state.contract.grace
     );
 
     setSchedule(s);
@@ -138,12 +139,12 @@ export const Review = () => {
                   <p>{location.state.contract.token.selected.tokenid}</p>
                 </li>
                 <li>
-                  <h6>Payment per block</h6>
-                  <p>
-                    {schedule && schedule.paymentPerBlock
-                      ? schedule.paymentPerBlock
-                      : "N/A"}
-                  </p>
+                  <h6>Payment per grace</h6>
+                  {schedule && Number(schedule.paymentPerGrace) > 0 ? (
+                    <p>{schedule.paymentPerGrace}</p>
+                  ) : (
+                    <p>-</p>
+                  )}
                 </li>
               </ul>
             </section>
