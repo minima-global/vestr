@@ -114,9 +114,14 @@
   fill: #FFCD1E;
 }
 
+.hideNavigation {
+ grid-template-areas: "header" "main";
+ grid-template-rows: 56px 1fr;
+}
+
 @media screen and (min-width: 560px) {
   
-  
+
   .grid {  
     grid-template-rows: 56px 48px 1fr;
     
@@ -143,5 +148,11 @@
   .grid > footer {
     grid-area: subheader;
   }
+
+  .hideNavigation {
+    grid-template-areas: "header" "main";
+    grid-template-rows: 56px 1fr;
+   }
   
 }
+
