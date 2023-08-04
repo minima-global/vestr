@@ -24,48 +24,14 @@ interface IProps {
 }
 const GraceSelect = ({ setFormValue, currentValue }: IProps) => {
   const [active, setActive] = useState(false);
-  const [warning, setWarning] = useState(false);
 
   const handleSelection = (grace: string) => {
     setFormValue(gracePeriods[grace.replaceAll(" ", "_")]);
     setActive(false);
   };
 
-  const handleWarning = () => {
-    setActive(false); // close main Modal
-    setWarning(true); // open warning
-  };
-
   return (
     <>
-      <CSSTransition
-        in={warning}
-        unmountOnExit
-        timeout={200}
-        classNames={{
-          enter: styles.backdropEnter,
-          enterDone: styles.backdropEnterActive,
-          exit: styles.backdropExit,
-          exitActive: styles.backdropExitActive,
-        }}
-      >
-        <Dialog
-          title="Grace period"
-          subtitle={
-            <p>
-              Please note, if you do not set a grace period, the recipient will
-              be able to collect tokens after every block
-            </p>
-          }
-          buttonTitle="Confirm"
-          dismiss={true}
-          primaryButtonAction={() => {
-            setWarning(false);
-            handleSelection("None");
-          }}
-          cancelAction={() => setWarning(false)}
-        />
-      </CSSTransition>
       <div onClick={() => setActive(true)} className={styles["select"]}>
         <div>
           {currentValue
