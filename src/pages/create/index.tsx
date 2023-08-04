@@ -81,7 +81,7 @@ const Create = () => {
               current: "0x00",
               selected: wallet[0],
             },
-            grace: 0,
+            grace: 24,
             amount: 0,
             start: null, // start date
             end: null, // end date

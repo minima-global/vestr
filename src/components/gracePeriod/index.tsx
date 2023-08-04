@@ -7,7 +7,6 @@ import { CSSTransition } from "react-transition-group";
 import Dialog from "../dialog";
 
 export const gracePeriods: any = {
-  None: 0,
   Daily: 24,
   Weekly: 168,
   Monthly: 720,
@@ -122,14 +121,16 @@ const GraceSelect = ({ setFormValue, currentValue }: IProps) => {
               <ul>
                 {Object.keys(gracePeriods).map((g, i) => (
                   <li
+                    className={`${
+                      currentValue === gracePeriods[g] ? styles.selected : ""
+                    }`}
                     key={g}
                     onClick={() => {
-                      if (i === 0) {
-                        handleWarning();
+                      if (currentValue === gracePeriods[g]) {
+                        return;
                       }
-                      if (i !== 0) {
-                        handleSelection(g.replaceAll("_", " "));
-                      }
+
+                      handleSelection(g.replaceAll("_", " "));
                     }}
                   >
                     {g.replaceAll("_", " ")}
