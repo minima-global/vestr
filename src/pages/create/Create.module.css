@@ -152,7 +152,7 @@
 }
 .backdropEnterActive {
   opacity: 1;
-  transition: opacity 200ms;
+  transition: opacity 50ms;
 }
 
 .backdropExit {
@@ -160,7 +160,7 @@
 }
 .backdropExitActive {
   opacity: 0;
-  transition: opacity 200ms;
+  transition: opacity 50ms;
 }
 
 .transaction-status {

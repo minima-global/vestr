@@ -16,6 +16,7 @@ import { appContext } from "../../AppContext";
 import { MinimaToken } from "../../@types";
 import { DateTimePicker } from "@mui/x-date-pickers";
 import { isDate } from "date-fns";
+import FadeIn from "../../components/UI/Animations/FadeIn";
 
 const Create = () => {
   const {
@@ -204,28 +205,23 @@ const Create = () => {
           }}
         />
       </CSSTransition>
-      <CSSTransition
-        in={exit}
-        unmountOnExit
-        timeout={200}
-        classNames={{
-          enter: styles.backdropEnter,
-          enterDone: styles.backdropEnterActive,
-          exit: styles.backdropExit,
-          exitActive: styles.backdropExitActive,
-        }}
-      >
-        <Dialog
-          title="Exit this contract?"
-          subtitle={
-            <p className={styles["changes"]}>Your changes will not be saved</p>
-          }
-          buttonTitle="Exit this contract"
-          dismiss={true}
-          primaryButtonAction={handleCancel}
-          cancelAction={() => setExit(false)}
-        />
-      </CSSTransition>
+      {!!exit && (
+        <FadeIn delay={0}>
+          <Dialog
+            title="Exit this contract?"
+            subtitle={
+              <p className={styles["changes"]}>
+                Your changes will not be saved
+              </p>
+            }
+            buttonTitle="Exit this contract"
+            dismiss={true}
+            primaryButtonAction={handleCancel}
+            cancelAction={() => setExit(false)}
+          />
+        </FadeIn>
+      )}
+
       <CSSTransition
         in={Boolean(createPath) && !Boolean(reviewPath)}
         unmountOnExit
