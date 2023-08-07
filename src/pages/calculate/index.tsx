@@ -83,40 +83,38 @@ const Calculate = () => {
             <p>Use the calculator below to decide on a vesting schedule.</p>
           </section>
           <section>
-            <label htmlFor="amount" className={styles["form-group"]}>
+            <div className={styles["form-group"]}>
               <span>
                 Token amount
                 {!tooltips.amount && (
                   <img
-                    onClick={() => setTooltips({ ...tooltips, amount: true })}
+                    onClick={() => {
+                      setTooltips({ ...tooltips, amount: true });
+                    }}
                     alt="question"
                     src="./assets/help_filled.svg"
                   />
                 )}
                 {!!tooltips.amount && (
                   <img
-                    onClick={() => setTooltips({ ...tooltips, amount: false })}
+                    onClick={() => {
+                      setTooltips({ ...tooltips, amount: false });
+                    }}
                     alt="question"
                     src="./assets/cancel_filled.svg"
                   />
                 )}
               </span>
-              <CSSTransition
-                in={tooltips.amount}
-                unmountOnExit
-                timeout={200}
-                classNames={{
-                  enter: styles.backdropEnter,
-                  enterDone: styles.backdropEnterActive,
-                  exit: styles.backdropExit,
-                  exitActive: styles.backdropExitActive,
-                }}
-              >
-                <Tooltip
-                  content="The amount of time before a contract starts."
-                  position={120}
-                />
-              </CSSTransition>
+
+              {tooltips.amount && (
+                <FadeIn delay={0}>
+                  <Tooltip
+                    content="The amount of time before a contract starts."
+                    position={120}
+                  />
+                </FadeIn>
+              )}
+
               <input
                 placeholder="Token amount"
                 type="number"
@@ -126,8 +124,9 @@ const Calculate = () => {
                 value={amount === 0 ? "" : amount}
                 onChange={(e: any) => setAmount(e.target.value)}
               />
-            </label>
-            <label htmlFor="start" className={styles["form-group"]}>
+            </div>
+
+            <div className={styles["form-group"]}>
               <span>
                 Contract start
                 {!tooltips.start && (
@@ -151,22 +150,15 @@ const Calculate = () => {
                   />
                 )}
               </span>
-              <CSSTransition
-                in={tooltips.start}
-                unmountOnExit
-                timeout={200}
-                classNames={{
-                  enter: styles.backdropEnter,
-                  enterDone: styles.backdropEnterActive,
-                  exit: styles.backdropExit,
-                  exitActive: styles.backdropExitActive,
-                }}
-              >
-                <Tooltip
-                  content="The date & time the contract starts"
-                  position={124}
-                />
-              </CSSTransition>
+              {tooltips.start && (
+                <FadeIn delay={0}>
+                  <Tooltip
+                    content="The date & time the contract starts"
+                    position={124}
+                  />
+                </FadeIn>
+              )}
+
               <DateTimePicker
                 open={openStartPicker}
                 disablePast={true}
@@ -198,8 +190,9 @@ const Calculate = () => {
                   );
                 }}
               />
-            </label>
-            <label htmlFor="end" className={styles["form-group"]}>
+            </div>
+
+            <div className={styles["form-group"]}>
               <span>
                 Contract end
                 {!tooltips.end && (
@@ -223,22 +216,16 @@ const Calculate = () => {
                   />
                 )}
               </span>
-              <CSSTransition
-                in={tooltips.end}
-                unmountOnExit
-                timeout={200}
-                classNames={{
-                  enter: styles.backdropEnter,
-                  enterDone: styles.backdropEnterActive,
-                  exit: styles.backdropExit,
-                  exitActive: styles.backdropExitActive,
-                }}
-              >
-                <Tooltip
-                  content="The date & time the contract ends"
-                  position={114}
-                />
-              </CSSTransition>
+
+              {tooltips.end && (
+                <FadeIn delay={0}>
+                  <Tooltip
+                    content="The date & time the contract ends"
+                    position={114}
+                  />
+                </FadeIn>
+              )}
+
               <DateTimePicker
                 open={openEndPicker}
                 disablePast={true}
@@ -269,7 +256,7 @@ const Calculate = () => {
                   );
                 }}
               />
-            </label>
+            </div>
 
             <div className={styles["form-group"]}>
               <span>

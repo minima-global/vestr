@@ -1,12 +1,11 @@
 import { useState } from "react";
-import { CSSTransition } from "react-transition-group";
 import styles from "./Review.module.css";
-import { useLocation, useNavigate, useOutletContext } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import * as RPC from "../../minima/libs/RPC";
 
 import { format } from "date-fns";
-import VaultDialog from "../../components/VaultDialog";
+import FadeIn from "../../components/UI/Animations/FadeIn";
 
 export const gracePeriods: any = {
   None: 0,
@@ -17,52 +16,42 @@ export const gracePeriods: any = {
   Yearly: 8640,
 };
 
-export const Review = () => {
+export const Review = ({
+  submitForm,
+  formStatus,
+  isSubmitting,
+  clearForm,
+  contract,
+  closeReview,
+}: any) => {
   const location = useLocation();
-  const navigate = useNavigate();
-
   const [schedule, setSchedule] = useState<any>();
-  const { submitForm, formStatus, isSubmitting, clearForm }: any =
-    useOutletContext();
 
   const scheduleCalculate = async () => {
     const s = await RPC.calculateVestingSchedule(
-      location.state.contract.amount,
-      location.state.contract.start,
-      location.state.contract.end,
-      location.state.contract.grace
+      contract.amount,
+      contract.start,
+      contract.end,
+      contract.grace
     );
 
     setSchedule(s);
   };
 
   useEffect(() => {
-    if (location.state && !location.state.contract) {
-      navigate("/dashboard/creator/create");
-    }
-
     scheduleCalculate();
   }, [location.state]);
 
   return (
     <>
-      <CSSTransition
-        in={true}
-        unmountOnExit
-        timeout={200}
-        classNames={{
-          enter: styles.backdropEnter,
-          enterDone: styles.backdropEnterActive,
-          exit: styles.backdropExit,
-          exitActive: styles.backdropExitActive,
-        }}
-      >
+      <FadeIn delay={0}>
         <section className={styles["grid"]}>
           <section>
             <button
               className={styles["back-btn"]}
               type="button"
-              onClick={() => navigate(-1)}
+              onClick={() => closeReview()}
+              disabled={isSubmitting}
             >
               <svg
                 width="16"
@@ -95,48 +84,36 @@ export const Review = () => {
               <ul>
                 <li>
                   <h6>Contract ID</h6>
-                  <p>{location.state.contract.uid}</p>
+                  <p>{contract.uid}</p>
                 </li>
                 <li>
                   <h6>Contract starts</h6>
-                  <p>
-                    {format(
-                      location.state.contract.start,
-                      "dd MMMM yyyy, hh:mm:ss a"
-                    )}
-                  </p>
+                  <p>{format(contract.start, "dd MMMM yyyy, hh:mm:ss a")}</p>
                 </li>
                 <li>
                   <h6>Contract ends</h6>
-                  <p>
-                    {format(
-                      location.state.contract.end,
-                      "dd MMMM yyyy, hh:mm:ss a"
-                    )}
-                  </p>
+                  <p>{format(contract.end, "dd MMMM yyyy, hh:mm:ss a")}</p>
                 </li>
                 <li>
                   <h6>Collection address</h6>
-                  <p>{location.state.contract.address.hex}</p>
+                  <p>{contract.address.hex}</p>
                 </li>
 
                 <li>
                   <h6>Grace period</h6>
                   <p>
                     {Object.keys(gracePeriods)
-                      .find(
-                        (k) => gracePeriods[k] === location.state.contract.grace
-                      )
+                      .find((k) => gracePeriods[k] === contract.grace)
                       ?.replaceAll("_", " ")}
                   </p>
                 </li>
                 <li>
                   <h6>Token amount</h6>
-                  <p>{location.state.contract.amount}</p>
+                  <p>{contract.amount}</p>
                 </li>
                 <li>
                   <h6>Token ID</h6>
-                  <p>{location.state.contract.token.selected.tokenid}</p>
+                  <p>{contract.token.selected.tokenid}</p>
                 </li>
                 <li>
                   <h6>Payment per grace</h6>
@@ -164,7 +141,7 @@ export const Review = () => {
                 type="button"
                 onClick={() => {
                   clearForm(); // status
-                  navigate(-1);
+                  closeReview();
                 }}
               >
                 Cancel
@@ -172,7 +149,7 @@ export const Review = () => {
             </div>
           </section>
         </section>
-      </CSSTransition>
+      </FadeIn>
     </>
   );
 };

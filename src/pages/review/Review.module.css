@@ -30,6 +30,10 @@
   align-items: center;
   display: flex;
 }
+
+.back-btn:disabled {
+  opacity: 0.5;
+}
 .grid > section button:hover {
   color: #91919D;
   cursor: pointer;

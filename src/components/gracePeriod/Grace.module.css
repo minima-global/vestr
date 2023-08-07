@@ -71,6 +71,8 @@
   row-gap: 24px;
 
   overflow-y: inital;
+
+  z-index: 1010;
 }
 .dd ul {
   display: grid;
