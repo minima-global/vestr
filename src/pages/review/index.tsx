@@ -104,7 +104,7 @@ export const Review = ({
                   <p>
                     {Object.keys(gracePeriods)
                       .find((k) => gracePeriods[k] === contract.grace)
-                      ?.replaceAll("_", " ")}
+                      ?.replace(/[_]/g, " ")}
                   </p>
                 </li>
                 <li>

@@ -348,7 +348,7 @@ const ContractDetails = () => {
                           {getKeyByValue(
                             gracePeriods,
                             parseInt(MDS.util.getStateVariable(contract, 7))
-                          )?.replaceAll("_", " ")}
+                          )?.replace(/[_]/g, " ")}
                         </p>
                       </li>
                       <li>

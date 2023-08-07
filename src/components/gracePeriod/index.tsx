@@ -24,7 +24,7 @@ const GraceSelect = ({ setFormValue, currentValue }: IProps) => {
   const [active, setActive] = useState(false);
 
   const handleSelection = (grace: string) => {
-    setFormValue(gracePeriods[grace.replaceAll(" ", "_")]);
+    setFormValue(gracePeriods[grace.replace(/ /g, "_")]);
     setActive(false);
   };
 
@@ -35,7 +35,7 @@ const GraceSelect = ({ setFormValue, currentValue }: IProps) => {
           {currentValue
             ? Object.keys(gracePeriods)
                 .find((k) => gracePeriods[k] === currentValue)
-                ?.replaceAll("_", " ")
+                ?.replace(/[_]/g, " ")
             : "Select grace period"}
         </div>
 
@@ -87,10 +87,10 @@ const GraceSelect = ({ setFormValue, currentValue }: IProps) => {
                         return;
                       }
 
-                      handleSelection(g.replaceAll("_", " "));
+                      handleSelection(g.replace(/[_]/g, " "));
                     }}
                   >
-                    {g.replaceAll("_", " ")}
+                    {g.replace(/[_]/g, " ")}
                   </li>
                 ))}
               </ul>
