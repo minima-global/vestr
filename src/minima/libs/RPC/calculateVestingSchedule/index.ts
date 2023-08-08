@@ -21,7 +21,7 @@ export const calculateVestingSchedule = async (
     totalLockedAmount: amount,
     contractLength: length,
     paymentPerGrace: paymentRatio.lessThan(totalLockedAmount)
-      ? paymentRatio.toNumber()
+      ? paymentRatio.toNumber().toFixed(2)
       : totalLockedAmount.toNumber(),
   };
 };
