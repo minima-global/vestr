@@ -4,6 +4,7 @@
   grid-template-rows: auto 1fr;
   height: 100%;
   gap: 24px;
+  width: 100%;
 }
 .grid > section:first-of-type {
   display: flex;

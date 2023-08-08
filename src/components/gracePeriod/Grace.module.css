@@ -71,6 +71,8 @@
   row-gap: 24px;
 
   overflow-y: inital;
+
+  z-index: 1010;
 }
 .dd ul {
   display: grid;
@@ -173,4 +175,9 @@
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
   }
+}
+
+.selected {
+  opacity: 0.5!important;
+  cursor: not-allowed;
 }

@@ -39,12 +39,15 @@ export const router = createHashRouter(
       <Route index element={<SplashPage />} />
       <Route path="/dashboard" element={<Dashboard />}>
         <Route path="about" element={<Info />} />
-        <Route path="collector" element={<Collector />}>
+        <Route path="collector">
+          <Route index element={<Collector />} />
           <Route path="contract/:id" element={<ContractDetails />} />
         </Route>
-        <Route path="creator" element={<Creator />}>
-          <Route path="create" element={<Create />}>
-            <Route path="review/:id" element={<Review />} />
+        <Route path="creator">
+          <Route index element={<Creator />} />
+          <Route path="create">
+            <Route index element={<Create />} />
+            {/* <Route path="review/:id" element={<Review />} /> */}
           </Route>
           <Route path="contract/:id" element={<ContractDetails />} />
           <Route path="calculate" element={<Calculate />} />

@@ -19,6 +19,7 @@ import Dialog from "../../components/dialog";
 import Loading from "../../assets/loading.json";
 import Lottie from "lottie-react";
 import { appContext } from "../../AppContext";
+import FadeIn from "../../components/UI/Animations/FadeIn";
 
 export function getKeyByValue(object: any, value: any) {
   return Object.keys(object).find((key) => object[key] === value);
@@ -98,115 +99,85 @@ const ContractDetails = () => {
   return (
     <>
       {contract && (
-        <>
-          <CSSTransition
-            in={prompt}
-            unmountOnExit
-            timeout={200}
-            classNames={{
-              enter: styles.backdropEnter,
-              enterDone: styles.backdropEnterActive,
-              exit: styles.backdropExit,
-              exitActive: styles.backdropExitActive,
-            }}
-          >
-            <Dialog
-              title="Available to collect"
-              subtitle={
-                <p className={styles["can-collect"]}>
-                  {calculatedData && calculatedData.cancollect > 0
-                    ? calculatedData.cancollect
-                    : "N/A"}
-                </p>
-              }
-              buttonTitle="Collect"
-              dismiss={true}
-              primaryButtonAction={() => handleCollect(contract)}
-              cancelAction={() => setPrompt(false)}
-            />
-          </CSSTransition>
-          <CSSTransition
-            in={progress}
-            unmountOnExit
-            timeout={200}
-            classNames={{
-              enter: styles.backdropEnter,
-              enterDone: styles.backdropEnterActive,
-              exit: styles.backdropExit,
-              exitActive: styles.backdropExitActive,
-            }}
-          >
-            <Dialog
-              title="Transaction in progress"
-              subtitle={
-                <Lottie
-                  style={{ width: 110, height: 110 }}
-                  animationData={Loading}
-                />
-              }
-              buttonTitle="Back to contracts"
-              dismiss={false}
-              primaryButtonAction={() => navigate("/dashboard/creator")}
-              primaryButtonDisable={true}
-            />
-          </CSSTransition>
-          <CSSTransition
-            in={finish}
-            unmountOnExit
-            timeout={200}
-            classNames={{
-              enter: styles.backdropEnter,
-              enterDone: styles.backdropEnterActive,
-              exit: styles.backdropExit,
-              exitActive: styles.backdropExitActive,
-            }}
-          >
-            <Dialog
-              title="Contract completed"
-              subtitle={<img alt="success" src="./assets/check_circle.svg" />}
-              buttonTitle="Back to contracts"
-              dismiss={false}
-              primaryButtonAction={() => navigate(-1)}
-            />
-          </CSSTransition>
-          <CSSTransition
-            in={success}
-            unmountOnExit
-            timeout={200}
-            classNames={{
-              enter: styles.backdropEnter,
-              enterDone: styles.backdropEnterActive,
-              exit: styles.backdropExit,
-              exitActive: styles.backdropExitActive,
-            }}
-          >
-            <Dialog
-              title="Transaction complete"
-              subtitle={<img alt="success" src="./assets/check_circle.svg" />}
-              buttonTitle="Back to contract"
-              dismiss={false}
-              primaryButtonAction={() => setSuccess(false)}
-            />
-          </CSSTransition>
-          <CSSTransition
-            in={Boolean(error)}
-            unmountOnExit
-            timeout={200}
-            classNames={{
-              enter: styles.backdropEnter,
-              enterDone: styles.backdropEnterActive,
-              exit: styles.backdropExit,
-              exitActive: styles.backdropExitActive,
-            }}
-          >
-            <Dialog
-              title="Transaction failed"
-              subtitle={<p>{error}</p>}
-              buttonTitle="Back to contract"
-              dismiss={false}
-              primaryButtonAction={() => setError(false)}
-            />
-          </CSSTransition>
+        <FadeIn delay={0}>
+          {!!prompt && (
+            <FadeIn delay={0}>
+              <Dialog
+                title="Available to collect"
+                subtitle={
+                  <p className={styles["can-collect"]}>
+                    {calculatedData && calculatedData.cancollect > 0
+                      ? calculatedData.cancollect
+                      : "N/A"}
+                  </p>
+                }
+                buttonTitle="Collect"
+                dismiss={true}
+                primaryButtonAction={() => handleCollect(contract)}
+                cancelAction={() => setPrompt(false)}
+              />
+            </FadeIn>
+          )}
+
+          {!!progress && (
+            <FadeIn delay={0}>
+              <Dialog
+                title="Transaction in progress"
+                subtitle={
+                  <Lottie
+                    style={{ width: 110, height: 110 }}
+                    animationData={Loading}
+                  />
+                }
+                buttonTitle="Back to contracts"
+                dismiss={false}
+                primaryButtonAction={() => navigate("/dashboard/creator")}
+                primaryButtonDisable={true}
+              />
+            </FadeIn>
+          )}
+
+          {!!finish && (
+            <FadeIn delay={0}>
+              <Dialog
+                title="Contract completed"
+                subtitle={<img alt="success" src="./assets/check_circle.svg" />}
+                buttonTitle="Back to contracts"
+                dismiss={false}
+                primaryButtonAction={() => navigate(-1)}
+              />
+            </FadeIn>
+          )}
+
+          {!!success && (
+            <FadeIn delay={0}>
+              <Dialog
+                title="Transaction complete"
+                subtitle={
+                  <>
+                    <p>Once confirmed on chain, your wallet will be updated.</p>
+                    <img alt="success" src="./assets/check_circle.svg" />
+                  </>
+                }
+                buttonTitle="Back to contract"
+                dismiss={false}
+                primaryButtonAction={() => setSuccess(false)}
+              />
+            </FadeIn>
+          )}
+
+          {Boolean(error) && (
+            <FadeIn delay={0}>
+              <Dialog
+                title="Transaction failed"
+                subtitle={<p>{error}</p>}
+                buttonTitle="Back to contract"
+                dismiss={false}
+                primaryButtonAction={() => setError(false)}
+              />
+            </FadeIn>
+          )}
+
           <section className={styles["grid"]}>
             <section>
               <button
@@ -291,24 +262,14 @@ const ContractDetails = () => {
                     className={styles["show-details"]}
                     onClick={() => setDetails((p) => !p)}
                   >
-                    More details{" "}
+                    {!seeDetails ? "More" : "Hide"} details{" "}
                     <img
                       className={seeDetails ? styles.active : styles.passive}
                       alt="arrow-down"
                       src="./assets/expand_more.svg"
                     />
                   </h6>
-                  <CSSTransition
-                    in={seeDetails}
-                    unmountOnExit
-                    timeout={200}
-                    classNames={{
-                      enter: styles.backdropEnter,
-                      enterDone: styles.backdropEnterActive,
-                      exit: styles.backdropExit,
-                      exitActive: styles.backdropExitActive,
-                    }}
-                  >
+                  {seeDetails && (
                     <ul className={styles["hidden-details"]}>
                       <li>
                         <h6>Tokens collected</h6>
@@ -344,7 +305,7 @@ const ContractDetails = () => {
                         <p>
                           {format(
                             parseInt(MDS.util.getStateVariable(contract, 5)),
-                            `d MMMM yyyy `
+                            `dd MMMM yyyy `
                           )}
                           at
                           {format(
@@ -372,7 +333,7 @@ const ContractDetails = () => {
                         <p>
                           {format(
                             parseInt(MDS.util.getStateVariable(contract, 8)),
-                            "d MMMM yyyy "
+                            "dd MMMM yyyy "
                           )}
                           at
                           {format(
@@ -387,7 +348,7 @@ const ContractDetails = () => {
                           {getKeyByValue(
                             gracePeriods,
                             parseInt(MDS.util.getStateVariable(contract, 7))
-                          )?.replaceAll("_", " ")}
+                          )?.replace(/[_]/g, " ")}
                         </p>
                       </li>
                       <li>
@@ -536,7 +497,7 @@ const ContractDetails = () => {
                         <p>{calculatedData.finalblock}</p>
                       </li>
                     </ul>
-                  </CSSTransition>
+                  )}
                 </section>
               )}
               {!calculatedData && (
@@ -546,26 +507,27 @@ const ContractDetails = () => {
                   </p>
                 </div>
               )}
+              <button
+                onClick={handleCollectionPrompt}
+                className={styles["collect-btn"]}
+                type="button"
+                disabled={
+                  calculatedData &&
+                  (calculatedData.cancollect <= 0 ||
+                    calculatedData.mustwait === "TRUE")
+                }
+              >
+                Collect
+              </button>
             </section>
-            <button
-              onClick={handleCollectionPrompt}
-              className={styles["collect-btn"]}
-              type="button"
-              disabled={
-                calculatedData &&
-                (calculatedData.cancollect <= 0 ||
-                  calculatedData.mustwait === "TRUE")
-              }
-            >
-              Collect
-            </button>
           </section>
-        </>
+        </FadeIn>
       )}
       {!contract && (
         <div>
           <p className={styles["no-contracts"]}>
-            This contract does not exist. Have you collected all of it?
+            This contract does not exist. Your contract will not show once it
+            has been completed/all collected.
           </p>
         </div>
       )}

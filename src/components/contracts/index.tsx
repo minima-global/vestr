@@ -9,7 +9,6 @@ interface IProps {
 }
 const Contracts = ({ coins, filterText }: IProps) => {
   const navigate = useNavigate();
-  // console.log("rendering contracts", coins);
   return (
     <>
       {coins.filter((c) =>
