@@ -8,6 +8,7 @@ export const gracePeriods: any = {
   Daily: 24,
   Weekly: 168,
   Monthly: 720,
+  Every_3_Months: 2190,
   Every_6_Months: 4320,
   Yearly: 8640,
 };
