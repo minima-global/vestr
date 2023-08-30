@@ -512,9 +512,10 @@ const ContractDetails = () => {
                 className={styles["collect-btn"]}
                 type="button"
                 disabled={
-                  calculatedData &&
-                  (calculatedData.cancollect <= 0 ||
-                    calculatedData.mustwait === "TRUE")
+                  calculatedData === null ||
+                  (calculatedData &&
+                    (calculatedData.cancollect <= 0 ||
+                      calculatedData.mustwait === "TRUE"))
                 }
               >
                 Collect
