@@ -5,7 +5,7 @@ export const runScript = async (
 ) => {
   return new Promise((resolve, reject) => {
     MDS.cmd(
-      `runscript script:"${script} prevstate:${JSON.stringify(
+      `runscript script:"${script}" prevstate:${JSON.stringify(
         prevstate
       )} globals:${JSON.stringify(globals)}"`,
       (res) => {

@@ -10,7 +10,6 @@ import Decimal from "decimal.js";
 import useContractCalculation from "../../hooks/useContractCalculation";
 
 import { gracePeriods } from "../../components/gracePeriod";
-import useChainHeight from "../../hooks/useChainHeight";
 import { copy } from "../../utils/utils";
 
 import * as RPC from "../../minima/libs/RPC";
@@ -30,7 +29,7 @@ const ContractDetails = () => {
   const { scriptAddress } = useContext(appContext);
   const [seeDetails, setDetails] = useState(false);
   const [contract, setContract] = useState<Coin | null>(null);
-  const { contracts } = useContext(appContext);
+  const { contracts, tip } = useContext(appContext);
   const [copyButton, setCopy] = useState({
     tokenid: false,
     coinid: false,
@@ -42,7 +41,6 @@ const ContractDetails = () => {
   const [success, setSuccess] = useState(false);
   const [finish, setFinished] = useState(false);
   const [error, setError] = useState<false | string>(false);
-  const tip = useChainHeight();
 
   const params = useParams();
 
@@ -482,11 +480,11 @@ const ContractDetails = () => {
                         <p>{MDS.util.getStateVariable(contract, 0)}</p>
                       </li>
                       <li>
-                        {parseInt(tip ? tip.block : "0") <
+                        {parseInt(tip) <
                           parseInt(calculatedData.startblock) && (
                           <h6>Begins on Block</h6>
                         )}
-                        {parseInt(tip ? tip.block : "0") >
+                        {parseInt(tip) >
                           parseInt(calculatedData.startblock) && (
                           <h6>Began on Block</h6>
                         )}
@@ -512,9 +510,10 @@ const ContractDetails = () => {
                 className={styles["collect-btn"]}
                 type="button"
                 disabled={
-                  calculatedData &&
-                  (calculatedData.cancollect <= 0 ||
-                    calculatedData.mustwait === "TRUE")
+                  calculatedData === null ||
+                  (calculatedData &&
+                    (calculatedData.cancollect <= 0 ||
+                      calculatedData.mustwait === "TRUE"))
                 }
               >
                 Collect

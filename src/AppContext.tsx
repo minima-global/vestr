@@ -19,6 +19,7 @@ const AppProvider = ({ children }: IProps) => {
   const [scriptAddress, setScriptAddress] = useState("");
   const [walletBalance, setWalletBalance] = useState<MinimaToken[]>([]);
   const [vaultLocked, setVaultLocked] = useState(false);
+  const [tip, setTip] = useState(null);
   const firstVisit = useFirstVisit();
 
   const getBalance = async () => {
@@ -85,13 +86,25 @@ const AppProvider = ({ children }: IProps) => {
     });
   };
 
+  const getTip = () => {
+    (window as any).MDS.cmd("block", (resp: any) => {
+      if (resp.status) {
+        setTip(resp.response.block);
+      }
+    });
+  };
+
   useEffect(() => {
+    events.onNewBlock(() => {});
+
     events.onInit(() => {
       addScriptGetContracts();
 
       getBalance();
 
       isVaultLocked();
+
+      getTip();
     });
     events.onNewBalance(() => {
       getBalance();
@@ -113,6 +126,8 @@ const AppProvider = ({ children }: IProps) => {
         getContracts,
         vaultLocked,
         firstVisit,
+
+        tip,
       }}
     >
       {children}
