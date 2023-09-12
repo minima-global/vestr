@@ -13,11 +13,16 @@ const Creator = () => {
     <FadeIn delay={0}>
       <section className={styles["grid"]}>
         <section>
-          <button onClick={() => navigate("calculate")} type="button">
+          <button
+            className="text-black"
+            onClick={() => navigate("calculate")}
+            type="button"
+          >
             <img alt="calculate-icon" src="./assets/calculate.svg" />
             Calculate a contract
           </button>
           <button
+            className="text-black"
             type="button"
             onClick={() => navigate("create", { state: { tokenid: "0x00" } })}
           >

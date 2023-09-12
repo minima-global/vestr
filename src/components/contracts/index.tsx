@@ -44,6 +44,7 @@ const Contracts = ({ coins, filterText }: IProps) => {
                   <p>{c.tokenid === "0x00" ? c.amount : c.tokenamount}</p>
                 </div>
                 <button
+                  className="text-black"
                   onClick={() =>
                     navigate("contract/" + MDS.util.getStateVariable(c, 199))
                   }

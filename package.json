@@ -1,6 +1,6 @@
 {
   "name": "vestr",
-  "version": "1.7.1",
+  "version": "1.7.2",
   "private": true,
   "homepage": ".",
   "dependencies": {
@@ -58,5 +58,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.3.3"
   }
 }
