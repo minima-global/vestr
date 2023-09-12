@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import * as RPC from "../minima/libs/RPC";
 import { vestingContract } from "../minima/libs/contracts";
 import { Coin } from "../@types";
-import useChainHeight from "./useChainHeight";
+import { appContext } from "../AppContext";
 
 const useContractCalculation = (coin: Coin | null) => {
   const [calculatedData, setCalculatedData] = useState(null);
-  const tip = useChainHeight();
+  const { tip } = useContext(appContext);
 
   useEffect(() => {
     if (coin) {
@@ -21,7 +21,7 @@ const useContractCalculation = (coin: Coin | null) => {
         },
         {
           "@AMOUNT": coin.tokenid === "0x00" ? coin.amount : coin.tokenamount,
-          "@BLOCK": tip ? tip.block : "0",
+          "@BLOCK": tip,
           "@COINAGE": coin.created,
         }
       ).then((vars: any) => {

@@ -12,8 +12,8 @@ export const vestingContract = {
   LET startblock=PREVSTATE(2) 
   LET finalblock=PREVSTATE(3) 
   LET minblockwait=PREVSTATE(4) 
-  LET mustwaitblocks="0"  
-  LET mustwait=(@BLOCK - @COINAGE) LT minblockwait
+  LET mustwaitblocks="0"
+  LET mustwait= (@BLOCK - @COINAGE) GT "0" AND minblockwait GT (@BLOCK - @COINAGE)
   LET contractexpired = @BLOCK GTE finalblock
   IF mustwait EQ TRUE THEN LET mustwaitblocks=minblockwait - (@BLOCK - @COINAGE) ENDIF
   
