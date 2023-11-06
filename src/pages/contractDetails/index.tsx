@@ -1,10 +1,9 @@
-import { format } from "date-fns";
 import { useContext, useEffect, useState } from "react";
-import styles from "./ContractDetails.module.css";
-import { useNavigate, useParams } from "react-router-dom";
-import { CSSTransition } from "react-transition-group";
-import { Coin } from "../../@types";
 
+import { format } from "date-fns";
+import { useNavigate, useParams } from "react-router-dom";
+import { Coin } from "../../@types";
+import styles from "./ContractDetails.module.css";
 import Decimal from "decimal.js";
 
 import useContractCalculation from "../../hooks/useContractCalculation";
@@ -176,7 +175,7 @@ const ContractDetails = () => {
             </FadeIn>
           )}
 
-          <section className={styles["grid"]}>
+          <section className={`${styles.grid}`}>
             <section>
               <button
                 className={styles["back-btn"]}

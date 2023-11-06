@@ -154,7 +154,7 @@ body {
   min-height: -webkit-fill-available;
   font-weight: 500;
   letter-spacing: 0.3px;
-  font-family: 'Manrope', sans-serif;
+  font-family: 'Manrope', sans-serif!important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--background-color);
@@ -375,4 +375,10 @@ code {
 .accordion-content[aria-expanded="true"] {
   max-height: 0px;
   transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
+}
+
+ul {
+  padding: 0;
+  margin: 0;
+  list-style: none;
 }
