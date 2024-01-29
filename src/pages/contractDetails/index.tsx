@@ -70,16 +70,39 @@ const ContractDetails = () => {
     setProgress(true);
 
     try {
-      await RPC.withdrawVestingContract(
-        coin,
-        calculatedData.cancollect,
-        calculatedData.change,
-        scriptAddress
-      ).catch((err) => {
-        throw new Error(err);
-      });
-      setProgress(false);
-      setSuccess(true);
+      const finalBlock = MDS.util.getStateVariable(coin, 3);
+      const contractHasExpired = new Decimal(tip).greaterThanOrEqualTo(
+        finalBlock
+      );
+
+      if (contractHasExpired) {
+        const collectable =
+          coin.tokenid === "0x00" ? coin.amount : coin.tokenamount;
+
+        await RPC.withdrawVestingContract(
+          coin,
+          collectable!,
+          false,
+          scriptAddress
+        ).catch((err) => {
+          throw new Error(err);
+        });
+        setProgress(false);
+        setSuccess(true);
+      }
+
+      if (!contractHasExpired) {
+        await RPC.withdrawVestingContract(
+          coin,
+          calculatedData.cancollect,
+          calculatedData.change,
+          scriptAddress
+        ).catch((err) => {
+          throw new Error(err);
+        });
+        setProgress(false);
+        setSuccess(true);
+      }
 
       // has the contract been fully collected ?
       const contractFinished = !contracts.get(params.id);

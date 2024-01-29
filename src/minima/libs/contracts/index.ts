@@ -30,7 +30,6 @@ export const vestingContract = {
   
   IF contractexpired EQ TRUE THEN LET mustwait=FALSE ENDIF
   IF contractexpired EQ TRUE THEN LET cancollect=@AMOUNT ENDIF
-  
   `,
   checkMathsRoot: `LET desiredamount=PREVSTATE(1) LET change=@AMOUNT-desiredamount`,
   script: `
