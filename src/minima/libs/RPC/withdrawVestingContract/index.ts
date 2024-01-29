@@ -1,10 +1,9 @@
-import { vestingContract } from "../../contracts";
 import Decimal from "decimal.js";
 
 export const withdrawVestingContract = (
   coin: any,
   cancollect: string,
-  change: string,
+  change: string | false,
   scriptAddress: string
 ) => {
   const coinid = coin.coinid;
@@ -70,6 +69,8 @@ export const withdrawVestingContract = (
             txndelete id:${id}
     
     `;
+
+    // console.log(command);
 
     MDS.cmd(command, (res) => {
       // console.log(res);
