@@ -23,11 +23,9 @@ import SplashPage from "./pages/splash";
 import Info from "./pages/info";
 import Creator from "./pages/creator";
 import Create from "./pages/create";
-import Review from "./pages/review";
 import ContractDetails from "./pages/contractDetails";
 import Collector from "./pages/collector";
 import Calculate from "./pages/calculate";
-import VaultDialog from "./components/VaultDialog";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -45,10 +43,7 @@ export const router = createHashRouter(
         </Route>
         <Route path="creator">
           <Route index element={<Creator />} />
-          <Route path="create">
-            <Route index element={<Create />} />
-            {/* <Route path="review/:id" element={<Review />} /> */}
-          </Route>
+          <Route path="create" element={<Create />} />
           <Route path="contract/:id" element={<ContractDetails />} />
           <Route path="calculate" element={<Calculate />} />
         </Route>

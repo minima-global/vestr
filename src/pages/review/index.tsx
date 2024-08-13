@@ -6,6 +6,7 @@ import * as RPC from "../../minima/libs/RPC";
 
 import { format } from "date-fns";
 import FadeIn from "../../components/UI/Animations/FadeIn";
+import BackIcon from "../../components/UI/Icons/BackIcon";
 
 export const gracePeriods: any = {
   None: 0,
@@ -27,6 +28,7 @@ export const Review = ({
   const location = useLocation();
   const [schedule, setSchedule] = useState<any>();
 
+
   const scheduleCalculate = async () => {
     const s = await RPC.calculateVestingSchedule(
       contract.amount,
@@ -47,38 +49,18 @@ export const Review = ({
       <FadeIn delay={0}>
         <section className={styles["grid"]}>
           <section>
-            <button
-              className={styles["back-btn"]}
-              type="button"
-              onClick={() => closeReview()}
-              disabled={isSubmitting}
-            >
-              <svg
-                width="16"
-                height="17"
-                viewBox="0 0 16 17"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
+          <div>
+              <button
+                className="p-0 m-0 font-bold tracking-wide flex items-center gap-1 hover:text-opacity-80"
+                type="button"
+                onClick={() => closeReview()}
               >
-                <mask
-                  id="mask0_33_7292"
-                  maskUnits="userSpaceOnUse"
-                  x="0"
-                  y="0"
-                  width="16"
-                  height="17"
-                >
-                  <rect y="0.5" width="16" height="16" fill="#D9D9D9" />
-                </mask>
-                <g mask="url(#mask0_33_7292)">
-                  <path
-                    d="M6.39969 14.6695L0.230469 8.50027L6.39969 2.33105L7.29582 3.22719L2.02275 8.50027L7.29582 13.7734L6.39969 14.6695Z"
-                    fill="#08090B"
-                  />
-                </g>
-              </svg>
-              Back
-            </button>
+                <span className="text-black">
+                  <BackIcon fill="currentColor" />
+                </span>
+                Back
+              </button>
+            </div>
             <section>
               <h6>Review contract details</h6>
               <ul>
@@ -123,6 +105,14 @@ export const Review = ({
                     <p>-</p>
                   )}
                 </li>
+                <li>
+                  <h6>Burn</h6>
+                  {schedule && Number(contract.burn) > 0 ? (
+                    <p>{contract.burn}</p>
+                  ) : (
+                    <p>-</p>
+                  )}
+                </li>
               </ul>
             </section>
             {!!formStatus && typeof formStatus === "string" && (
@@ -130,6 +120,7 @@ export const Review = ({
             )}
             <div className={styles["button-wrapper"]}>
               <button
+                className="p-2 tracking-wide disabled:opacity-30 hover:bg-yellow-300 focus:outline-none bg-[#FFCD1E] text-[#1B1B1B] w-full flex items-center justify-center gap-2 font-bold py-2 rounded hover:bg-opacity-90"
                 disabled={isSubmitting}
                 type="button"
                 onClick={() => submitForm()}
@@ -137,7 +128,7 @@ export const Review = ({
                 Create
               </button>
               <button
-                className={isSubmitting ? "hidden" : ""}
+                className="mx-auto p-0 underline underline-offset-8 font-bold tracking-widest focus:outline-none focus:animate-pulse disabled:opacity-30"
                 type="button"
                 onClick={() => {
                   clearForm(); // status

@@ -2,12 +2,10 @@ import { RefObject, useContext, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import styles from "./Create.module.css";
 import Dialog from "../../components/dialog";
-import WalletSelect from "../../components/walletSelect";
+import WalletSelect from "../../components/WalletSelect";
 import GraceSelect from "../../components/gracePeriod";
 import AddressSelect from "../../components/addressSelect";
 import { useFormik, getIn } from "formik";
-
-import { CSSTransition } from "react-transition-group";
 
 import * as RPC from "../../minima/libs/RPC";
 import * as yup from "yup";
@@ -17,8 +15,8 @@ import { MinimaToken } from "../../@types";
 import { DateTimePicker } from "@mui/x-date-pickers";
 import { isDate } from "date-fns";
 import FadeIn from "../../components/UI/Animations/FadeIn";
-import SlideIn from "../../components/UI/Animations/SlideIn";
 import Review from "../review";
+import Decimal from "decimal.js";
 
 const Create = () => {
   const {
@@ -47,6 +45,7 @@ const Create = () => {
     end: false,
     cliffPeriod: false,
     gracePeriod: false,
+    burn: false
   });
 
   const handleCancel = () => {
@@ -81,13 +80,14 @@ const Create = () => {
             },
             uid: "",
             password: "",
+            burn: "",
           },
     onSubmit: async (form) => {
       await RPC.createVestingContract(
         form.amount.toString(),
         form.address.hex,
         form.token.selected,
-        form.grace,
+        0,
         form.uid,
         scriptAddress,
 
@@ -117,7 +117,7 @@ const Create = () => {
           return formik.setStatus(error);
         });
     },
-    validationSchema: formValidationSelector(vaultLocked),
+    validationSchema: formValidationSelector(vaultLocked, wallet),
   });
 
   useEffect(() => {
@@ -198,8 +198,8 @@ const Create = () => {
         <FadeIn delay={0}>
           <section className={styles["grid"]}>
             <section>
-              <button type="button" onClick={() => setExit(true)}>
-                Cancel
+              <button className="bg-transparent border border-neutral-200 text-black rounded-none hover:bg-neutral-200" type="button" onClick={() => setExit(true)}>
+                Exit Contract Creation
               </button>
 
               <WalletSelect
@@ -541,8 +541,56 @@ const Create = () => {
                   </div>
                 )}
 
+                <div className={styles["form-group"]}>
+                  <span>Burn (optional){!tooltips.burn && (
+                      <img
+                        onClick={() =>
+                          setTooltips({ ...tooltips, burn: true })
+                        }
+                        alt="question"
+                        src="./assets/help_filled.svg"
+                      />
+                    )}
+                    {!!tooltips.burn && (
+                      <img
+                        onClick={() =>
+                          setTooltips({ ...tooltips, burn: false })
+                        }
+                        alt="question"
+                        src="./assets/cancel_filled.svg"
+                      />
+                    )}</span>
+                  {tooltips.burn && (
+                    <FadeIn delay={0}>
+                      <Tooltip
+                        content="A burn is denominated in MINIMA and will prioritize your transaction"
+                        position={110}
+                      />
+                    </FadeIn>
+                  )}
+
+                  <input
+                    placeholder="0.0"
+                    type="burn"
+                    id="burn"
+                    name="burn"
+                    value={formik.values.burn}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                  />
+                  {Boolean(formik.errors.burn) &&
+                    Boolean(formik.touched.burn) && (
+                      <FadeIn delay={0}>
+                        <div className={styles["formError"]}>
+                          {getIn(formik.errors, "burn")}
+                        </div>
+                      </FadeIn>
+                    )}
+                </div>
+
                 <button
                   disabled={!(formik.isValid && formik.dirty)}
+                  className="p-2 tracking-wide disabled:opacity-30 hover:bg-yellow-300 focus:outline-none bg-[#FFCD1E] text-[#1B1B1B] w-full flex items-center justify-center gap-2 font-bold py-3 rounded hover:bg-opacity-90"
                   type="button"
                   onClick={handleReviewClick}
                 >
@@ -559,7 +607,7 @@ const Create = () => {
 
 export default Create;
 
-const formValidationSelector = (vaultLocked: boolean) => {
+const formValidationSelector = (vaultLocked: boolean, wallet: MinimaToken[]) => {
   return yup.object().shape({
     token: yup.object().shape({
       current: yup.string().required(),
@@ -652,6 +700,36 @@ const formValidationSelector = (vaultLocked: boolean) => {
         .string()
         .required("Please select your preference for an address."),
     }),
+    burn: yup
+          .string()
+          .matches(/^[^a-zA-Z\\;'"]+$/, "Invalid character")
+          .test("Sufficient funds", "Has enough Minima", function (val) {
+            const { path, createError, parent } = this;
+
+            if (!val) {
+              return true;
+            }
+
+            try {              
+              if (parent.token.tokenid === '0x00' && new Decimal(val).plus(parent.amount).greaterThan(wallet[0].sendable)) {
+                throw new Error("Insufficient funds, you need more MINIMA to pay for the burn");
+              }
+
+              if (new Decimal(val).greaterThan(wallet[0].sendable)) {
+                throw new Error(
+                  "Insufficient funds, you need more MINIMA to pay for the burn"
+                );
+              }
+            } catch (error) {
+              if (error instanceof Error) {
+                return createError({ path, message: error.message });
+              }
+
+              createError({ path, message: "Invalid burn amount" });
+            }
+
+            return true;
+          }),
     password: yup.string().test("check-password", function (val) {
       const { createError, path } = this;
       if (!vaultLocked) {

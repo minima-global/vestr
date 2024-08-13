@@ -1,5 +1,12 @@
 # Changelog
 
+##### [1.8.0] - 13 August 24
+
+- Add burn feature on transactional features
+- Added alias name for contracts
+- Re-factorization
+- Design tweaks
+
 ##### [1.6.0] - 30 August 23
 
 - Disable button on initial load (contract details)

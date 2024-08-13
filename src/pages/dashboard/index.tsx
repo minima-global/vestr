@@ -28,7 +28,7 @@ const Dashboard = () => {
         <header onClick={() => openTitleBar()}>
           <div>
             <img alt="brand" src="./assets/brand.svg" />
-            <h6>Vestr</h6>
+            <h6 className="!font-bold !tracking-wide">Vestr</h6>
           </div>
           <div />
         </header>

@@ -13,35 +13,6 @@
   overflow: hidden;
 }
 
-.back-btn {
-  border: none;
-  background: none;
-  text-align: left;
-
-  font-size: 1rem;
-  font-weight: 500;
-  line-height: 1.5;
-  letter-spacing: 0.05em;
-  text-align: left;
-  padding: 0;
-  margin:0;
-  color: #08090B;
-
-  align-items: center;
-  display: flex;
-}
-
-.back-btn:disabled {
-  opacity: 0.5;
-}
-.grid > section button:hover {
-  color: #91919D;
-  cursor: pointer;
-}
-.grid > section button:hover svg path {
-  fill: #91919D;
-}
-
 .grid > section > section h6 {
   font-size: 1.25rem;
   font-weight: 600;
@@ -103,59 +74,7 @@
   flex-direction: column;
   gap: 24px;
 }
-.button-wrapper button:first-of-type {
-  border: none;
 
-  background-color: #FFCD1E;
-  text-align: center;
-  font-size: 1rem;
-  font-weight: 600;
-  line-height: 19px;
-  letter-spacing: 0.05em;
-  color: #08090B;
-  border-radius: 4px;
-  padding: 16px;
-  text-align: center;
-  margin-top: calc(32px - 24px);
-}
-.button-wrapper button:first-of-type:disabled {
-  cursor: not-allowed;
-  background-color: #D3D3D8;
-  color: #FFFFFF;
-}
-.button-wrapper button:first-of-type:hover {
-  cursor: pointer;
-  background-color: #FFE792;
-}
-.button-wrapper button:first-of-type:disabled:hover {
-  cursor: not-allowed;
-  background-color: #D3D3D8;
-}
-
-.button-wrapper button:last-of-type {
-  align-self: center;
-  background-color: transparent;
-  text-align: center;
-  border: none;
-  border-bottom: 1px solid #17191C;
-  padding-bottom: 4px;
-  color: #17191C;
-  letter-spacing: 0.05em;
-  line-height: 1.5;
-  font-weight: 600;
-  max-width: fit-content;
-  padding: 0;
-  font-size: 1rem;
-}
-.button-wrapper button:last-of-type:hover {
-  cursor: pointer;
-  color: #91919D;
-  border-color: #91919D;
-}
-.button-wrapper button:last-of-type:disabled {
-  opacity: 0.8;
-  cursor: not-allowed;
-}
 
 .formError {
   background-color: #FFE2E9;

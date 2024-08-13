@@ -63,3 +63,4 @@ const makeTokenImage = (
 export { containsText, copy, numberWithCommas, makeTokenImage };
 
 export * from "./getAppUID";
+export * from "./containsText";

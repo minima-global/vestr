@@ -1,20 +1,19 @@
 import { useContext, useState } from "react";
-import styles from "./Creator.module.css";
 import { useNavigate } from "react-router-dom";
 import Contracts from "../../components/contracts";
 import { appContext } from "../../AppContext";
-import FadeIn from "../../components/UI/Animations/FadeIn";
+import AnimateFadeIn from "../../components/UI/Animations/AnimateFadeIn";
 const Creator = () => {
   const navigate = useNavigate();
   const { contracts } = useContext(appContext);
   const [filterText, setFilteredText] = useState("");
 
   return (
-    <FadeIn delay={0}>
-      <section className={styles["grid"]}>
-        <section>
+    <AnimateFadeIn display={true}>
+      <section>
+        <div className="space-y-4 mb-4">
           <button
-            className="text-black"
+            className="bg-[#FFCD1E] text-[#1B1B1B] w-full flex items-center gap-2 font-bold py-2 rounded hover:bg-opacity-90"
             onClick={() => navigate("calculate")}
             type="button"
           >
@@ -22,29 +21,29 @@ const Creator = () => {
             Calculate a contract
           </button>
           <button
-            className="text-black"
+            className="bg-[#FFCD1E] text-[#1B1B1B] w-full flex items-center gap-2 font-bold py-2 rounded hover:bg-opacity-90"
             type="button"
             onClick={() => navigate("create", { state: { tokenid: "0x00" } })}
           >
             <img alt="add-icon" src="./assets/add.svg" />
             Create a contract
           </button>
-        </section>
-        <section>
-          <section>
-            <h6>My contracts</h6>
+        </div>
+        <div>
+          <div className="mb-4 w-full">
+            <h6 className="mb-2 font-bold tracking-wide">My contracts</h6>
             <input
               type="search"
-              placeholder="Search contract"
+              placeholder="Search contract id or alias"
               onChange={(e: any) => setFilteredText(e.target.value)}
+              className="w-full p-4 py-2 rounded bg-white focus:outline-none focus:outline focus:outline-offset-1 focus:outline-yellow-400 placeholder:tracking-wide"
             />
-          </section>
-          <section>
+          </div>
+
+          <div>
             {!contracts.size && !filterText.length && (
               <div>
-                <p className={styles["no-contracts"]}>
-                  You currently have no vesting contracts
-                </p>
+                <p>You currently have no vested contracts</p>
               </div>
             )}
 
@@ -54,10 +53,10 @@ const Creator = () => {
                 coins={Array.from(contracts.values())}
               />
             )}
-          </section>
-        </section>
+          </div>
+        </div>
       </section>
-    </FadeIn>
+    </AnimateFadeIn>
   );
 };
 

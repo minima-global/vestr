@@ -4,7 +4,8 @@ export const withdrawVestingContract = (
   coin: any,
   cancollect: string,
   change: string | false,
-  scriptAddress: string
+  scriptAddress: string,
+  burn?: string
 ) => {
   const coinid = coin.coinid;
   const tokenid = coin.tokenid;
@@ -64,16 +65,14 @@ export const withdrawVestingContract = (
       coin,
       199
     )};  
-            txnpost id:${id};
+            txnpost id:${id} ${burn ? "burn:"+burn+";" : ';'}
     
             txndelete id:${id}
     
     `;
 
-    // console.log(command);
 
     MDS.cmd(command, (res) => {
-      // console.log(res);
       const multiResponse = res.length > 1;
       if (!multiResponse && !res.status)
         reject(res.error ? res.error : "RPC Failed");

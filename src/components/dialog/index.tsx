@@ -32,24 +32,24 @@ const Dialog = ({
                 <h6>{title}</h6>
                 {subtitle}
               </div>
-              <div className={styles["button__wrapper"]}>
+              <div className="flex justify-center flex-col gap-4">
                 <button
                   disabled={primaryButtonDisable}
-                  className={styles["primary"]}
+                  className="!bg-black !tracking-widest font-bold"
                   type="button"
                   onClick={() => primaryButtonAction()}
                 >
                   {buttonTitle}
-                </button>
-                {dismiss && (
-                  <button
-                    className={styles["secondary"]}
-                    type="button"
-                    onClick={cancelAction}
-                  >
-                    Go back
-                  </button>
-                )}
+                </button>                
+                  {dismiss && (
+                    <button
+                      className="mx-auto p-0 underline underline-offset-8 font-bold tracking-widest focus:outline-none focus:animate-pulse"
+                      type="button"
+                      onClick={cancelAction}
+                    >
+                      Go back
+                    </button>
+                  )}
               </div>
             </div>
           </section>
