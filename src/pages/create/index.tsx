@@ -87,7 +87,7 @@ const Create = () => {
         form.amount.toString(),
         form.address.hex,
         form.token.selected,
-        0,
+        form.grace,
         form.uid,
         scriptAddress,
 
